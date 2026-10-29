@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from copy import deepcopy
 from pathlib import Path
 from typing import Literal, Optional, Tuple, Union
@@ -13,6 +14,9 @@ CHECKPOINT_FILES = {
     "uni": "best_model/pretrain_checkpoint_best_uni.pth",
     "multi": "best_model/pretrain_checkpoint_best_multi.pth",
 }
+# Checkpoints shipped inside the repository, i.e. ``<repo>/best_model``.
+DEFAULT_WEIGHTS_DIR = Path(__file__).resolve().parent.parent / "best_model"
+WEIGHTS_DIR_ENV = "TIMERCD_WEIGHTS_DIR"
 DEFAULT_WIN_SIZE = 5000
 DEFAULT_BATCH_SIZE = {"uni": 64, "multi": 1}
 
@@ -116,6 +120,54 @@ class TimeRCDDetector:
         if not path.is_file():
             raise FileNotFoundError(f"Checkpoint not found: {path}")
         return cls(checkpoint_path=str(path), variant=variant, **kwargs)
+
+    @classmethod
+    def from_project(
+        cls,
+        variant: Literal["uni", "multi"] = "uni",
+        weights_dir: Optional[Union[str, Path]] = None,
+        fallback_to_hub: bool = True,
+        **kwargs,
+    ) -> "TimeRCDDetector":
+        """Load a checkpoint kept inside the project instead of the HF cache.
+
+        The lookup order is: ``weights_dir`` argument, then the
+        ``TIMERCD_WEIGHTS_DIR`` environment variable, then ``<repo>/best_model``.
+
+        Parameters
+        ----------
+        variant:
+            ``"uni"`` or ``"multi"``.
+        weights_dir:
+            Directory holding ``pretrain_checkpoint_best_*.pth`` files.
+        fallback_to_hub:
+            When the local file is missing, download it through
+            :meth:`from_pretrained` instead of raising an error.
+        """
+        if variant not in CHECKPOINT_FILES:
+            raise ValueError(f"variant must be one of {list(CHECKPOINT_FILES)}, got {variant!r}")
+
+        if weights_dir is None:
+            env_dir = os.environ.get(WEIGHTS_DIR_ENV)
+            root = Path(env_dir).expanduser() if env_dir else DEFAULT_WEIGHTS_DIR
+        else:
+            root = Path(weights_dir).expanduser()
+
+        # Accept both ``<dir>/pretrain_checkpoint_best_*.pth`` and a directory
+        # that mirrors the Hub layout, i.e. ``<dir>/best_model/...``.
+        candidates = [root / Path(CHECKPOINT_FILES[variant]).name, root / CHECKPOINT_FILES[variant]]
+        for path in candidates:
+            if path.is_file():
+                return cls(checkpoint_path=str(path), variant=variant, **kwargs)
+
+        if fallback_to_hub:
+            return cls.from_pretrained(variant=variant, **kwargs)
+
+        raise FileNotFoundError(
+            f"No {variant!r} checkpoint found in {root}. "
+            f"Expected {Path(CHECKPOINT_FILES[variant]).name}. "
+            "Download it once or call from_pretrained() instead."
+        )
 
     def predict(
         self,

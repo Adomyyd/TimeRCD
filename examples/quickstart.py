@@ -21,7 +21,7 @@ def main() -> None:
     # Inject a simple anomaly spike.
     data[1000:1010] += 8.0
 
-    detector = TimeRCDDetector.from_pretrained(variant="uni")
+    detector = TimeRCDDetector.from_project(variant="uni")
     scores = detector.predict(data)
 
     print(f"Input shape: {data.shape}")

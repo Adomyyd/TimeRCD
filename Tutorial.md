@@ -89,19 +89,41 @@ scores = detector.predict(data)
 
 ## 5. Local checkpoints and offline inference
 
-If checkpoints are already on disk, you can avoid network access:
+Checkpoints live in `<repo>/best_model/` by default, so nothing is written to the
+Hugging Face cache. `from_project()` resolves that directory for you:
 
 ```python
 from time_rcd import TimeRCDDetector
 
-detector = TimeRCDDetector.from_local(
-    "best_model/pretrain_checkpoint_best_uni.pth",
-    variant="uni",
-)
+detector = TimeRCDDetector.from_project(variant="uni")
 scores = detector.predict(data)
 ```
 
-To use the local cache without contacting the Hub:
+Lookup order: `weights_dir=` argument, then `TIMERCD_WEIGHTS_DIR`, then
+`<repo>/best_model`. Both `<dir>/pretrain_checkpoint_best_*.pth` and
+`<dir>/best_model/pretrain_checkpoint_best_*.pth` layouts are accepted.
+
+```bash
+export TIMERCD_WEIGHTS_DIR=/data/weights   # keep weights outside the repo
+```
+
+If a file is missing, `from_project()` falls back to the Hub download. Pass
+`fallback_to_hub=False` to fail fast instead:
+
+```python
+detector = TimeRCDDetector.from_project(variant="multi", fallback_to_hub=False)
+```
+
+An explicit path still works and never touches the network:
+
+```python
+detector = TimeRCDDetector.from_local(
+    "best_model/pretrain_checkpoint_best_multi.pth",
+    variant="multi",
+)
+```
+
+To load from the Hugging Face cache only (no network):
 
 ```python
 detector = TimeRCDDetector.from_pretrained(
