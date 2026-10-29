@@ -36,7 +36,7 @@ pip install -e .
 评测和合成数据生成还需要额外依赖：
 
 ```bash
-pip install pandas scikit-learn statsmodels matplotlib seaborn tqdm "huggingface_hub[cli]"
+pip install pandas scikit-learn scipy statsmodels PyWavelets networkx matplotlib seaborn tqdm "huggingface_hub[cli]"
 ```
 
 ## 使用场景
@@ -74,32 +74,104 @@ python examples/quickstart.py
 
 ### 2. 训练模型
 
-先生成合成数据：
+训练入口是 `training.py`，数据放在 `data/pretrain/`，权重输出到 `checkpoints/`。
+
+#### 2.1 生成合成数据
+
+`dataset_gen` 没有命令行参数，需要在 `dataset_gen/` 目录下用 `PYTHONPATH=src` 调用（配置里的 `config/synthetic.json` 是相对路径）：
 
 ```bash
 pip install -r dataset_gen/requirements.txt
-python dataset_gen/src/generate_dataset.py --config dataset_gen/config/synthetic.json
+cd dataset_gen
+
+PYTHONPATH=src python - <<'PY'
+import pickle, os
+from generate_dataset import generate_dataset
+
+ds = generate_dataset(
+    num_samples=20000,
+    seq_len=None,          # None 表示 1000–10000 之间随机
+    anomaly_sample_ratio=0.5,
+    is_multivariate=True,
+    num_features=5,
+    use_attribute_set=True,   # 推荐的生成模式
+    num_workers=8,
+)
+os.makedirs("../data/pretrain", exist_ok=True)
+with open("../data/pretrain/dataset_5.pkl", "wb") as f:
+    pickle.dump(ds, f)
+PY
 ```
 
-将生成的 `.pkl` 数据集放入 `data/pretrain/`，并按需修改 `training.py` 中的数据集文件名，然后启动训练：
+每个样本是 `{'time_series', 'normal_time_series', 'labels', 'attribute'}` 四个字段，正好对应训练时的 `ChatTSAnomalyPretrainDataset`。
+
+#### 2.2 文件名规则
+
+`training.py` 里文件名是硬编码的，必须对得上：
+
+| 模式 | 位置 | 规则 |
+|---|---|---|
+| `single` | `training.py` 的 `single_dataset_filename` | 现为 `dataset_1000000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl`，改成自己的文件名 |
+| `multi` | `training.py` 的 `dataset_filenames` 列表 | 文件名最后一个 `_` 后的数字会被当作变量数，例如 `dataset_5.pkl` → 5 个变量 |
+
+`single` 模式固定 `num_features=1`（`training.py` 中写死）；训练多变量请用 `--mode multi`，或自己改 `config.ts_config.num_features`。
+
+#### 2.3 启动训练
 
 ```bash
+# 单数据集
 python training.py --mode single --gpus 0
-# 多数据集顺序训练
-python training.py --mode multi --gpus 0
+
+# 多数据集顺序训练（权重在数据集之间延续）
+python training.py --mode multi --gpus 0,1
+
 # 从最新 checkpoint 续训
 python training.py --mode single --gpus 0 --resume auto
 ```
 
-### 3. TSB-AD 评测
+主要超参在 `training.py` 的 `main()` 开头（50 epoch、lr 5e-4、batch 64、`checkpoint_dir="checkpoints/"`）。训练产物：
 
-下载并解压 TSB-AD 数据集到 `datasets/TSB-AD-U/` 或 `datasets/TSB-AD-M/`，并将模型权重放到项目根目录的 `best_model/`。运行：
-
-```bash
-# 单变量
-python main.py --AD_Name Time_RCD
-# 多变量
-python main.py --AD_Name Time_RCD --mode multi
+```text
+checkpoints/
+├── pretrain_checkpoint_latest.pth
+├── pretrain_checkpoint_best.pth
+├── pretrain_checkpoint_epoch_{N}.pth
+└── pretrained_ts_encoder.pth        # multi 模式按数据集再分一层子目录
 ```
 
-评测结果会保存为当前目录下的 CSV 文件；逐数据集的异常分数会保存为 pickle 文件。
+训练好的权重可以直接用 `TimeRCDDetector.from_local("checkpoints/pretrain_checkpoint_best.pth", variant="multi")` 推理。
+
+### 3. TSB-AD 评测
+
+评测入口是 `main.py`，数据目录固定为 `datasets/TSB-AD-U/`（单变量）或 `datasets/TSB-AD-M/`（多变量），权重从项目根目录的 `best_model/` 读取。
+
+CSV 文件名需符合 TSB-AD 命名，`main.py` 用 `split('_')[-3]` 取训练段长度：
+
+```text
+datasets/TSB-AD-U/001_Synthetic_tr_2000_1st_2020-01-01-00-00-00.csv
+                               ^^^^ train 长度 = 2000
+```
+
+前 N 行作训练段，其余作测试段；最后一列必须是 `Label`。
+
+```bash
+# 单变量（HP_list 中 win_size=7000）
+python main.py --AD_Name Time_RCD
+
+# 多变量（win_size=5000, batch_size=1）
+python main.py --AD_Name Time_RCD --mode multi
+
+# 指定窗口做对比试验
+python main.py --AD_Name Time_RCD --test_window_sizes 1000,3000,5000
+```
+
+输出：
+
+```text
+Uni_Time_RCD_v4.csv            # 指标汇总（AUC-PR/ROC、VUS、F1、PA-F1、Affiliation、F1_T）
+Uni_Time_RCD_v4_logits.csv     # logits 指标
+Uni_Time_RCD_v4/<数据集>_results.pkl   # value / label / anomaly_score / logits
+Multi_..._v4*                  # 多变量同理
+```
+
+`main.py` 顶部把 `CUDA_VISIBLE_DEVICES` 写死为 `"0"`，换卡需要改这一行。`filter_list` 用来跳过特定数据集，目录下没有匹配文件时会打印提示并退出。
