@@ -84,10 +84,10 @@ def _compute_f1_t(labels, score, max_workers=8, chunk_size=25, n_splits=800):
         return grader.metric_F1_T(
             labels,
             score,
-            use_parallel=True,
-            parallel_method='chunked',
-            chunk_size=chunk_size,
-            max_workers=max_workers,
+            # The caller may already be running metrics in a thread pool. Avoid
+            # creating a nested threshold thread pool here: on some series this
+            # can stall the outer metric executor indefinitely.
+            use_parallel=False,
             n_splits=n_splits,
         )
     except Exception:

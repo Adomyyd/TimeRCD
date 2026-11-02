@@ -511,7 +511,9 @@ class basic_metricor():
                     labels, score, beta=1, n_splits=n_splits
                 )
         else:
-            f1, details = self.__best_ts_fbeta_score(labels, score, beta=1)
+            f1, details = self.__best_ts_fbeta_score(
+                labels, score, beta=1, n_splits=n_splits
+            )
 
         result['thre_T'] = details['threshold']
         result['ACC_T'] = sklearn.metrics.accuracy_score(labels, score > details['threshold'])
