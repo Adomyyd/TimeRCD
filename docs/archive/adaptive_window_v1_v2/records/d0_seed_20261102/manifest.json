@@ -1,0 +1,80 @@
+{
+  "dataset_kind": "controlled_synthetic_univariate",
+  "files_sha256": {
+    "synthetic_index.csv": "90ed904d5ac3b2f56b12002eb3c18b459e1069bb96cb81ddc427e091a17f847f",
+    "synthetic_raw/dev/shard-00000.pkl": "2ee00b642a89c5fabd38005374929bd894494c10de84094f099064b847f2217d",
+    "synthetic_raw/mechanism-test/shard-00000.pkl": "a9caa69c639679fb44e879e32e603455b1972dad2e7de4396e117d19ed54120a",
+    "synthetic_raw/train/shard-00000.pkl": "28f499bc5d89b22c59cfeacf1774edcc67b6e00f4ac4acd43d0e70539c04b3b8"
+  },
+  "generator_sha256": "15ad7938b44fe4a87d454a340bec2cf4d8e1981eadd4777bc6226bcdab2ce123",
+  "generator_version": "adaptive-window-synthetic-v1",
+  "git_commit": "a36ed1e5b855d16602fc8fca6a915ab90e62fd7d",
+  "labels_usage": "generation-truth only; not adaptive-window teacher labels",
+  "length_extrapolation": {
+    "sequence_lengths_above_threshold": [
+      12000,
+      16000,
+      20000
+    ],
+    "threshold": 10000
+  },
+  "num_samples": 100,
+  "numpy_version": "2.1.3",
+  "parameter_grid": {
+    "anomaly_repeat_count_r": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "period_P": [
+      50,
+      200,
+      800,
+      2000,
+      5000
+    ],
+    "sequence_lengths": [
+      512,
+      999,
+      1000,
+      1001,
+      1999,
+      2000,
+      2001,
+      3999,
+      4000,
+      4001,
+      7999,
+      8000,
+      8001,
+      10000,
+      12000,
+      16000,
+      20000
+    ],
+    "state_segment_length_L": [
+      1000,
+      2000,
+      4000,
+      8000,
+      16000
+    ]
+  },
+  "python_version": "3.13.5",
+  "root_seed": 20261102,
+  "source": "synthetic; no benchmark dataset or labels used",
+  "split_counts": {
+    "dev": 15,
+    "mechanism-test": 15,
+    "train": 70
+  },
+  "split_method": "stable hash ordering of unique (P, L, r) combinations; parameter groups are disjoint",
+  "split_ratios": {
+    "dev": 0.15,
+    "mechanism-test": 0.15,
+    "train": 0.7
+  },
+  "split_seed": 20261102,
+  "stage": "D0"
+}
