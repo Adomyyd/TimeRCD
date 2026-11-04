@@ -162,8 +162,3 @@ logs/
 *.log
 *.csv
 wandb/
-
-# Adaptive-window experiment artifacts
-/adaptive_window_runs/
-
-# 文档
