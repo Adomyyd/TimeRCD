@@ -4,7 +4,7 @@
 
 ## 结果
 
-E05预定13条含P真实开发序列中，12条满足至少3个完整P块。原始标准化16点P片段的平均两两Pearson相关，与完整序列AP(P_C)−AP(A)的Spearman秩相关为 **+0.580420（n=12）**。未计算p值。此方向与簇假设的关联预测一致，尚不能解释屏蔽效应的机制。
+E05预定13条含P真实开发序列中，12条满足至少3个完整P块。原始标准化16点P片段的平均两两Pearson相关，与完整序列AP(P_C)−AP(A)的Spearman秩相关为 **+0.580420（n=12）**。未计算p值。该关联尚不能解释屏蔽效应的机制。
 
 | 序列索引 | P块数 | 平均片段相关 | ΔAP |
 |---|---:|---:|---:|
@@ -31,4 +31,4 @@ E05预定13条含P真实开发序列中，12条满足至少3个完整P块。原�
 - 逐序列数字：运行目录`per_series.csv`；散点：`similarity_vs_benefit.png`和`.svg`；片段及其窗口/patch/绝对起点：`arrays/*_p_segments.npz`。
 - 复现：`/home/omnisky/anaconda3/envs/RCD_yyd/bin/python -m experiments.stage2_cluster_probe.run --config experiments/stage2_cluster_probe/configs/real_similarity_v1.json`。每次生成新目录，不覆盖父产物。
 
-这些序列已用于既有诊断，不是独立验证集。不同来源、P块数量、波形趋势和基线AP仍可能共同影响关联；不把小样本正相关写成“真实异常形成自洽簇”或“同伴提供检测证据”。下一步按指导运行S，先判断单个异常Patch删除是否就会产生异常特异损失。H尚未解锁。
+这些序列已用于既有诊断，不是独立验证集。不同来源、P块数量、波形趋势和基线AP仍可能共同影响关联；不把小样本正相关写成“真实异常形成自洽簇”或“同伴提供检测证据”。S的实际执行结果见[孤立异常报告](../../stage2_isolated/reports/isolated_v1.md)，本轮H未实现、未执行。

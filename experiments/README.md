@@ -1,6 +1,8 @@
 # TimeRCD 诊断实验
 
-当前实现对应根目录 `TimeRCD_诊断优先实验路线.md` 的阶段一：单变量、离线、冻结已有权重的实现诊断。合成 smoke 数据只用于检查实验管线，不能据此判断参照污染或最终检测性能。
+本页保留已有实验的实现说明和复现入口。研究入口为[问题定义](../TimeRCD_问题定义与研究边界.md)和[实验记录](../EXPERIMENT_LOG.md)，当前不指定下一项实验。
+
+`protocols/`和各实验包中的协议保留执行前原文，供追溯当时设计、验收和停止条件；其中的候选方向与未来时态不作为当前指令。报告保留已执行设计、数值、失败和解释限制，已清除后续路线建议。`runs/`中的历史快照和原始产物不改动。
 
 ## 目录与职责
 
@@ -25,7 +27,7 @@ experiments/
 └── runs/                   # 每次执行独立目录，Git 忽略
 ```
 
-后续 Oracle、窗口敏感性归因按阶段新增同级目录，复用数据、指标和产物工具。配置和代码进入 Git；运行结果保存在 `runs/`。
+配置和代码进入Git；运行结果保存在`runs/`。下列命令是既有实验的复现说明，不表示已授权重新执行。
 
 ## 执行
 
@@ -135,7 +137,7 @@ conda run -n RCD_yyd python -m experiments.stage1.audit_precision \
 
 首次执行的结果和数值复核见 [阶段一真实数据诊断记录](reports/stage1_real_v1.md)。精度复核的 `completed` 只表示复核执行完成，各精度的判定见 `precision.json`；它不改变原实验的 `checks_failed` 标记。
 
-## 阶段二：全层干净参照 Oracle
+## 阶段二：全层标签辅助硬屏蔽（历史名Oracle）
 
 代码集中在 `stage2/`：`masking.py` 管理标签到 Patch 的映射及注意力干预，`synthetic.py` 生成受控数据，`inference.py` 执行窗口对照，`run.py` 记录运行，`analyze.py` 做成对分析。配置为 `configs/stage2_oracle_v1.json`。
 
@@ -158,7 +160,7 @@ conda run -n RCD_yyd python -m experiments.stage2.analyze <run_directory>
 
 解释时以 Oracle 相对原模型及随机组的**成对改善**为准。真实组按序列 bootstrap；合成组先平均同一生成种子的三个布局，再按生成种子 bootstrap，只有三个生成种子，区间是探索性描述。Oracle 需要标签、随机组也用标签决定屏蔽数量，均不是部署算法；随机组未匹配空间布局，因此只能诊断当前干预机制。
 
-首轮结果见 [阶段二 Oracle 实验报告](reports/stage2_oracle_v1.md)：合成中高密度组恢复，但基准序列的 5000 点主窗口明显退化。该结果只约束当前硬屏蔽干预，可靠性方向仍待更精细诊断。
+首轮结果见 [阶段二 Oracle 实验报告](reports/stage2_oracle_v1.md)：合成中高密度组恢复，但基准序列的 5000 点主窗口明显退化。该结果只约束当前硬屏蔽干预，不是干净参照的性能上界。
 
 ## 阶段二后续：分数路径与归一化交叉对照
 
@@ -228,7 +230,7 @@ conda run -n RCD_yyd python -m experiments.stage2_pc_localization.analyze \
   --config experiments/configs/stage2_pc_localization_v1.json
 ```
 
-[结果报告](reports/stage2_pc_localization_v1.md)：含P集合AP差−0.230379，P异常—N正常对贡献最大的平均AUC损失，但该类点对权重约77%，且贡献区间跨零。多来源存在AP损失，不能据AUC分解直接解释AP退化。48项测试、5493项运行检查通过，零新增推理；下一步制定含P长事件的干净反事实参照替换协议。
+[结果报告](reports/stage2_pc_localization_v1.md)：含P集合AP差−0.230379，P异常—N正常对贡献最大的平均AUC损失，但该类点对权重约77%，且贡献区间跨零。多来源存在AP损失，不能据AUC分解直接解释AP退化。48项测试、5493项运行检查通过，零新增推理。
 
 ## 最后一层干净反事实参照替换
 
@@ -239,7 +241,7 @@ CUDA_VISIBLE_DEVICES=2 conda run -n RCD_yyd python -m experiments.stage2_clean_r
   --config experiments/configs/stage2_clean_reference_v1.json
 ```
 
-8种子×3形态×3事件长度×2对齐共144条，A/C/V/KV/C_all共720条正式预测；12例gate、27条旧合成回归另记。55项测试及4812项运行检查通过。长事件V−A的P—N条件AUC +0.020107但AP −0.052355，KV−V的AP +0.041559；干净替换并非普遍改善。层范围、形态和对齐条件有异质性，后续先控制背景相位与M/P覆盖的共同变化。当前状态与执行顺序以根目录[实验记录](../EXPERIMENT_LOG.md)为准。
+8种子×3形态×3事件长度×2对齐共144条，A/C/V/KV/C_all共720条正式预测；12例gate、27条旧合成回归另记。55项测试及4812项运行检查通过。长事件V−A的P—N条件AUC +0.020107但AP −0.052355，KV−V的AP +0.041559；干净替换并非普遍改善。层范围、形态和对齐条件有异质性。
 
 ## 背景配对与共同P位置控制
 
@@ -250,7 +252,7 @@ CUDA_VISIBLE_DEVICES=2 conda run -n RCD_yyd python -m experiments.stage2_alignme
   --config experiments/configs/stage2_alignment_controls_v1.json
 ```
 
-原执行推理后在统计阶段外部超时，保留`interrupted`；独立离线恢复`completed`，没有重复推理。61项测试、28728项原数值检查、8448项恢复检查通过。AP交互I_full=−0.360421，I_common=+0.026556；集合控制显著改变结果但不是纯数量因果识别。下一步拟在同输入/同每事件数量下换P选择位置。使用足够运行超时或后台执行，最终统计路径详见报告。
+原执行推理后在统计阶段外部超时，保留`interrupted`；独立离线恢复`completed`，没有重复推理。61项测试、28728项原数值检查、8448项恢复检查通过。AP交互I_full=−0.360421，I_common=+0.026556；集合控制显著改变结果但不是纯数量因果识别。最终统计路径详见报告。
 
 ## 同输入、同数量的P位置选择
 
@@ -261,7 +263,7 @@ CUDA_VISIBLE_DEVICES=2 conda run -n RCD_yyd python -m experiments.stage2_p_posit
   --config experiments/configs/stage2_p_positions_v1.json
 ```
 
-67项测试、58416项运行检查、24240项零推理输出验收通过。全层保留末块相对首块AP差−0.024854；层范围交互−0.001082（区间跨零），但32/128点与正/负偏移分层方向相反。全层随机指标均值AP0.501962，首/末0.570465/0.545612；同数量具体选择仍影响检测。下一步先冻结已有输出的高分区排序与保留/屏蔽P定位协议。当前执行顺序见根目录[实验记录](../EXPERIMENT_LOG.md)。
+67项测试、58416项运行检查、24240项零推理输出验收通过。全层保留末块相对首块AP差−0.024854；层范围交互−0.001082（区间跨零），但32/128点与正/负偏移分层方向相反。全层随机指标均值AP0.501962，首/末0.570465/0.545612；同数量具体选择仍影响检测。
 
 `stage2_p_positions/`分离父输入/选择验收、推理、种子配对统计和运行；`validate.py`将保存分数重算、有限性及指标身份核对另存到`output_validation/`。主运行在统计前保存`inference_summary.json`，给运行足够超时；本轮约223秒，无中断。
 
@@ -274,7 +276,7 @@ conda run -n RCD_yyd python -m experiments.stage2_rank_localization.analyze \
   --config experiments/configs/stage2_rank_localization_v1.json
 ```
 
-192条×17条件×两分数，共6528行、6个预定召回目标；74项测试、132089项检查通过，零新增推理。50%召回下全层末块相对首块precision差−0.029138；固定末块排名后移，首块在短/长事件方向相反。10%召回precision差为正、75%以后更负，均值与单一阈值不足以解释完整排序。下一步拟固定首末掩码，做从末层向前累积的屏蔽深度对照，详见根目录[实验记录](../EXPERIMENT_LOG.md)。
+192条×17条件×两分数，共6528行、6个预定召回目标；74项测试、132089项检查通过，零新增推理。50%召回下全层末块相对首块precision差−0.029138；固定末块排名后移，首块在短/长事件方向相反。10%召回precision差为正、75%以后更负，均值与单一阈值不足以解释完整排序。
 
 ## 固定首末掩码的累积屏蔽深度
 
@@ -285,7 +287,7 @@ CUDA_VISIBLE_DEVICES=2 conda run -n RCD_yyd python -m experiments.stage2_depth_c
   --config experiments/configs/stage2_depth_controls_v1.json
 ```
 
-79项测试、127824项运行检查通过。位置AP差的相邻深度变化总体区间均跨零，但d1→d2在短/长事件为+0.020740/−0.018746；首/末总体AP在d4为0.619991/0.591161，d8下降，深度效果非单调。下一步拟补齐最后两层2×2开关，区分倒数第二层单独干预与条件交互。
+79项测试、127824项运行检查通过。位置AP差的相邻深度变化总体区间均跨零，但d1→d2在短/长事件为+0.020740/−0.018746；首/末总体AP在d4为0.619991/0.591161，d8下降，深度效果非单调。
 
 `stage2_depth_controls/`分离独立深度适配器、父数据、推理/读出、统计及运行。d1/d8逐点对齐E09、全部端点诊断对齐E10，干预起点及此前QKV固定，模型和父产物不变。运行约406秒，统计前保存`inference_summary.json`，应给足超时。
 
@@ -298,7 +300,7 @@ CUDA_VISIBLE_DEVICES=2 conda run -n RCD_yyd python -m experiments.stage2_layer_f
   --config experiments/configs/stage2_layer_factorial_v1.json
 ```
 
-85项测试、116160项运行检查通过。第7层单独屏蔽位置AP差Δ10=+0.004924，与两层交互首末差K=−0.003927相互抵消，合计复现E11的+0.000997；K在短/长事件为+0.003129/−0.010983。下一步拟做logit加性替代的零推理读出，区分输出非加性与AP指标非线性。
+85项测试、116160项运行检查通过。第7层单独屏蔽位置AP差Δ10=+0.004924，与两层交互首末差K=−0.003927相互抵消，合计复现E11的+0.000997；K在短/长事件为+0.003129/−0.010983。
 
 `stage2_layer_factorial/`分离显式层适配器、父数据核验、推理、统计和运行；00/01/11逐点及全部读出对齐E11，10/11第7与第8层input/QKV完全相同，模型及父产物不变。运行约327秒，推理验收先落盘再统计。
 
@@ -311,7 +313,7 @@ conda run -n RCD_yyd python -m experiments.stage2_logit_additivity.analyze \
   --config experiments/configs/stage2_logit_additivity_v1.json
 ```
 
-3456行读出、384行残差统计，91项测试、78799项检查通过，零新增推理。总体K_add=−0.007350、K_R=+0.003423相互抵消；负AP交互首末差已可在加性logits下出现，不能直接归于网络输出负交互。下一步拟做固定F/L/I/N残差回放，检验排序变化。
+3456行读出、384行残差统计，91项测试、78799项检查通过，零新增推理。总体K_add=−0.007350、K_R=+0.003423相互抵消；负AP交互首末差已可在加性logits下出现，不能直接归于网络输出负交互。
 
 `stage2_logit_additivity/`分离加性构造、父核验、读出、统计与运行。父原条件全部读出及J/K回归、派生数组落盘复核、父产物和权重哈希通过；运行约226秒，读出验收先落盘再统计。
 
@@ -324,7 +326,7 @@ conda run -n RCD_yyd python -m experiments.stage2_residual_replay.analyze \
   --config experiments/configs/stage2_residual_replay_v1.json
 ```
 
-98项测试、143380项检查通过，零新增推理。总体末−首平均AP边际D_N=+0.006622、D_L=−0.005465；D_L在短/长事件方向反转。该归因不证明正常参照普遍可靠。下一步拟检查加入N残差前后的误报点集合转移。
+98项测试、143380项检查通过，零新增推理。总体末−首平均AP边际D_N=+0.006622、D_L=−0.005465；D_L在短/长事件方向反转。该归因不证明正常参照普遍可靠。
 
 E14于07:49误重复执行一次，保留第二次运行但不计独立证据；两次均零推理、143380检查通过且父产物不变。E15引用第二次运行并独立核验E13全链。
 
@@ -339,11 +341,11 @@ conda run -n RCD_yyd python -m experiments.stage2_normal_replay_transitions.anal
 
 106项测试、514369项检查通过；保存membership后另逐行重计39168组。零模型加载、零新增推理，父链及权重不变。N-only净误报变化随召回变号：首块10%/90%为+15.188/−26.349，末块10%/100%为−18.135/+7.479。N-only异常点和阈值严格不变，full阈值则全部改变，不能把full差归于N单组。
 
-`stage2_normal_replay_transitions/`分开阈值/转移核、父链和数组核验、读出、种子配对统计与运行。报告包含完整24格；下一候选为正常分数来源×正例阈值来源的2×2离线控制，尚未冻结或执行。
+`stage2_normal_replay_transitions/`分开阈值/转移核、父链和数组核验、读出、种子配对统计与运行。报告包含完整24格。
 
 ## 正常分数与正例阈值来源交叉
 
-E16已完成上述候选，[协议](protocols/stage2_score_threshold_cross_v1.md)、[报告](reports/stage2_score_threshold_cross_v1.md)与`configs/stage2_score_threshold_cross_v1.json`固定四格00/10/01/11为正常/正例来源add或full，对齐E14 mask0/8/7/15。
+E16的[协议](protocols/stage2_score_threshold_cross_v1.md)、[报告](reports/stage2_score_threshold_cross_v1.md)与`configs/stage2_score_threshold_cross_v1.json`固定四格00/10/01/11为正常/正例来源add或full，对齐E14 mask0/8/7/15。
 
 ```bash
 conda run -n RCD_yyd python -m experiments.stage2_score_threshold_cross.analyze \
@@ -354,4 +356,8 @@ conda run -n RCD_yyd python -m experiments.stage2_score_threshold_cross.analyze 
 
 首块10%召回FP分解S0+T0+I=+15.188−46.021−2.474=−33.307；末块100%为+7.479−282.984−5.495=−281.000。阈值来源差能解释部分方向反转，但不同召回和因素格并不一致；交互是指定输出与阈值读出的性质，不是网络层内因果结论。
 
-`stage2_score_threshold_cross/`分开交叉核、父产物验证、读出、种子统计与运行。报告包含全部六召回及完整24格交互，全部八比较的FP/FPR、绝对读出及点转移均有完整分层表。下一候选为正例阈值锚点与正常跨阈值区间定位，尚未冻结或执行。
+`stage2_score_threshold_cross/`分开交叉核、父产物验证、读出、种子统计与运行。报告包含全部六召回及完整24格交互，全部八比较的FP/FPR、绝对读出及点转移均有完整分层表。
+
+## R与S及实现排查
+
+E17/R的[执行前协议](stage2_cluster_probe/protocols/real_similarity_v1.md)和[报告](stage2_cluster_probe/reports/real_similarity_v1.md)记录真实开发序列的零推理相似度分析。E18/S的[执行前协议](stage2_isolated/protocols/isolated_v1.md)和[报告](stage2_isolated/reports/isolated_v1.md)记录孤立异常、随机删除数量、微型掩码、Patch边界及独立产物验收。具体数值和运行目录见报告及根目录实验记录；本轮H未实现、未执行，损失机制仍未解释。

@@ -23,7 +23,7 @@ Time-RCD/
 └── Tutorial.md                 # 推理使用说明
 ```
 
-科研诊断脚本与配置见 [`experiments/README.md`](experiments/README.md)。阶段一包含推理路径一致性、尾窗补齐诊断，以及独立运行目录和版本／数据指纹记录。
+研究文档仅保留[问题定义](TimeRCD_问题定义与研究边界.md)和[实验记录](EXPERIMENT_LOG.md)。科研诊断脚本、配置和历史记录索引见 [`experiments/README.md`](experiments/README.md)；历史协议和运行快照用于追溯，不作为当前执行路线。
 
 ## 环境
 

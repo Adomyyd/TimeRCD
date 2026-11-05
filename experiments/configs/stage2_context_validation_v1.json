@@ -1,0 +1,22 @@
+{
+  "name": "stage2_context_validation_v1",
+  "protocol_path": "experiments/protocols/stage2_context_validation_v1.md",
+  "output_root": "experiments/runs",
+  "checkpoint": "best_model/pretrain_checkpoint_best_uni.pth",
+  "device": "cuda",
+  "seed": 2024,
+  "bootstrap_repetitions": 10000,
+  "generation_seeds": [3101,3102,3103,3104,3105,3106,3107,3108,3109,3110,3111,3112,3113,3114,3115,3116,3117,3118],
+  "length": 5000,
+  "period": 64,
+  "noise_std": 0.1,
+  "amplitude": 4.0,
+  "window": 5000,
+  "patch_size": 16,
+  "target": [2480,2512],
+  "radii": [0,1,2,5,10,20,40,"full"],
+  "batch_size": 1,
+  "threads": 4,
+  "atol": 0.00001,
+  "rtol": 0.00001
+}

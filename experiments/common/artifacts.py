@@ -68,7 +68,7 @@ def capture_provenance(directory, manifest):
     tracked = [ROOT / p for p in git("ls-files", "-z").split("\0") if p]
     experiment_root = ROOT / "experiments"
     experimental = list(experiment_root.glob("*"))
-    for folder in ("common", "stage1", "stage2", "stage2_followup", "stage2_paths", "stage2_patch_types", "protocols", "configs", "tests"):
+    for folder in ("common", "stage1", "stage2", "stage2_context_validation", "stage2_followup", "stage2_paths", "stage2_patch_types", "protocols", "configs", "tests"):
         experimental.extend((experiment_root / folder).rglob("*"))
     sources = sorted({p for p in tracked + experimental
                       if p.is_file() and p.suffix in {".py", ".json", ".toml", ".md"}
