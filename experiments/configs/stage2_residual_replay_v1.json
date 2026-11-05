@@ -1,0 +1,13 @@
+{
+  "name": "stage2_residual_replay_v1",
+  "parent_run": "experiments/runs/20261105T044853_695157Z_stage2_logit_additivity_v1_b12be63d",
+  "protocol_path": "experiments/protocols/stage2_residual_replay_v1.md",
+  "output_root": "experiments/runs",
+  "checkpoint": "best_model/pretrain_checkpoint_best_uni.pth",
+  "window": 5000, "patch_size": 16, "tolerance": 1e-12,
+  "groups": ["F", "L", "I", "N"], "primary_score_kind": "logits", "derived_dtype": "float64",
+  "recalls": [0.1,0.25,0.5,0.75,0.9,1.0],
+  "random_seeds": [2024,2025,2026,2027,2028],
+  "synthetic": {"seeds": [4101,4102,4103,4104,4105,4106,4107,4108]},
+  "bootstrap_seed": 2024, "bootstrap_repetitions": 10000, "data": {}
+}

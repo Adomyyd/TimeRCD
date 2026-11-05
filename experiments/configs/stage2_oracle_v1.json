@@ -1,0 +1,30 @@
+{
+  "base_config": "experiments/selections/stage1_real_v1/config.json",
+  "name": "stage2_oracle_v1",
+  "random_seeds": [2024, 2025, 2026, 2027, 2028],
+  "real_windows": [128, 256, 512, 5000],
+  "synthetic_windows": [5000],
+  "synthetic": {
+    "length": 5000,
+    "event_length": 5,
+    "anomaly_counts": [5, 500, 2000],
+    "seeds": [71, 72, 73],
+    "placements": ["early", "late", "spread"],
+    "period": 64,
+    "noise_std": 0.1,
+    "shift": 4.0
+  },
+  "protocol": {
+    "primary_metric": "probability_average_precision",
+    "primary_real_window": 5000,
+    "material_ap_difference": 0.01,
+    "oracle": "Block any Patch containing a labeled anomalous valid point as key/value at every layer; retain all queries",
+    "random": "Uniform subset of valid Patches with exactly the same retained count in each window; 5 fixed seeds",
+    "empty_reference": "Baseline fallback in every arm; separately report metrics on matched eligible points",
+    "real_normalization": "Official full-series mean and std, unchanged between arms",
+    "synthetic_normalization": "Clean generator mean/std fixed across all anomaly counts; not official per-corrupted-series normalization",
+    "scope": "Development mechanism diagnostic, labels used by oracle only; no deployment claim",
+    "bootstrap_repetitions": 2000,
+    "bootstrap_seed": 2024
+  }
+}

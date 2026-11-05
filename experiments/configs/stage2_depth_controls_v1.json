@@ -1,0 +1,15 @@
+{
+  "name": "stage2_depth_controls_v1",
+  "parent_run": "experiments/runs/20261105T022618_834830Z_stage2_p_positions_v1_175b2bdd",
+  "analysis_parent": "experiments/runs/20261105T024956_218936Z_stage2_rank_localization_v1_785c71d0",
+  "protocol_path": "experiments/protocols/stage2_depth_controls_v1.md",
+  "output_root": "experiments/runs",
+  "checkpoint": "best_model/pretrain_checkpoint_best_uni.pth",
+  "device": "cuda", "seed": 2024, "threads": 4, "batch_size": 1,
+  "window": 5000, "patch_size": 16, "expected_layers": 8, "depths": [1,2,4,8],
+  "atol": 1e-5, "rtol": 1e-5, "tolerance": 1e-12,
+  "recalls": [0.1,0.25,0.5,0.75,0.9,1.0],
+  "random_seeds": [2024,2025,2026,2027,2028],
+  "synthetic": {"seeds": [4101,4102,4103,4104,4105,4106,4107,4108]},
+  "bootstrap_seed": 2024, "bootstrap_repetitions": 10000, "data": {}
+}

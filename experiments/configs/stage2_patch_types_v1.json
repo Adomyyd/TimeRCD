@@ -1,0 +1,10 @@
+{
+  "name": "stage2_patch_types_v1",
+  "parent_run": "experiments/runs/20261104T155501_031615Z_stage2_paths_v1_b2223909",
+  "protocol_path": "experiments/protocols/stage2_patch_types_v1.md",
+  "window": 5000,
+  "random_seeds": [2024, 2025, 2026, 2027, 2028],
+  "bootstrap_seed": 2024,
+  "bootstrap_repetitions": 2000,
+  "partition_rule": "Reuse saved random union; SHA256(partition_v1:seed:series:window_index) seeds permutation, first mixed_count elements assigned to M, remaining to P"
+}

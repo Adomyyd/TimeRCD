@@ -1,0 +1,29 @@
+{
+  "name": "stage2_clean_reference_v1",
+  "parent_run": "experiments/runs/20261104T160533_245898Z_stage2_patch_types_v1_f1764898",
+  "protocol_path": "experiments/protocols/stage2_clean_reference_v1.md",
+  "output_root": "experiments/runs",
+  "checkpoint": "best_model/pretrain_checkpoint_best_uni.pth",
+  "device": "cuda",
+  "seed": 2024,
+  "threads": 4,
+  "batch_size": 1,
+  "window": 5000,
+  "patch_size": 16,
+  "atol": 1e-5,
+  "rtol": 1e-5,
+  "bootstrap_seed": 2024,
+  "bootstrap_repetitions": 10000,
+  "data": {},
+  "synthetic": {
+    "length": 5000,
+    "anomaly_count": 640,
+    "seeds": [3101,3102,3103,3104,3105,3106,3107,3108],
+    "event_lengths": [5,32,128],
+    "offsets": [0,8],
+    "shapes": ["positive","negative","alternating"],
+    "period": 64,
+    "noise_std": 0.1,
+    "amplitude": 4.0
+  }
+}

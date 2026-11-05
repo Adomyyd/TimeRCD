@@ -1,0 +1,15 @@
+{
+  "name": "stage2_followup_v1",
+  "parent_run": "experiments/runs/20261104T151946_593450Z_stage2_oracle_v1_353b48d2",
+  "protocol": {
+    "primary_window": 5000,
+    "primary_metric": "probability_average_precision",
+    "score_diagnostic": "Paired score/logit shifts by class; exact within/across-window ROC pair decomposition; no additive AP decomposition",
+    "crossover": "Same 27 stored synthetic inputs, labels, weights, windows and masks; replace fixed clean statistics with official full-series statistics",
+    "random_seeds": [2024, 2025, 2026, 2027, 2028],
+    "bootstrap_unit": "generator_seed after averaging placements within anomaly count",
+    "bootstrap_repetitions": 2000,
+    "bootstrap_seed": 2024,
+    "interpretation": "Follow-up to hard Patch masking, not an upper bound or a test of all reliability methods"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "stage1_real_v1",
+  "seed": 2024,
+  "device": "cuda",
+  "threads": 4,
+  "checkpoint": "best_model/pretrain_checkpoint_best_uni.pth",
+  "output_root": "experiments/runs",
+  "window_sizes": [
+    128,
+    256,
+    512,
+    5000
+  ],
+  "batch_size": 1,
+  "atol": 1e-05,
+  "rtol": 1e-05,
+  "data": {
+    "kind": "tsb",
+    "root": "/media/omnisky/Disk8.0T/YYD/Time-RCD/datasets/TSB-AD-U",
+    "split": "test",
+    "files": [
+      "628_YAHOO_id_78_WebService_tr_500_1st_147.csv",
+      "015_NAB_id_15_Synthetic_tr_1007_1st_2787.csv",
+      "267_IOPS_id_8_WebService_tr_1534_1st_1882.csv",
+      "294_TODS_id_8_Synthetic_tr_500_1st_200.csv",
+      "283_NEK_id_7_WebService_tr_500_1st_777.csv",
+      "753_YAHOO_id_203_WebService_tr_500_1st_6.csv",
+      "019_NAB_id_19_Facility_tr_1007_1st_1171.csv",
+      "287_TODS_id_1_Synthetic_tr_500_1st_11.csv",
+      "260_IOPS_id_1_WebService_tr_5000_1st_11804.csv",
+      "479_UCR_id_177_Medical_tr_2000_1st_7000.csv",
+      "072_WSD_id_44_WebService_tr_1691_1st_1791.csv",
+      "321_UCR_id_19_Medical_tr_1875_1st_4485.csv",
+      "104_WSD_id_76_WebService_tr_3047_1st_3147.csv",
+      "016_NAB_id_16_Environment_tr_1816_1st_3540.csv",
+      "383_UCR_id_81_Medical_tr_1875_1st_3198.csv",
+      "054_WSD_id_26_WebService_tr_2409_1st_2509.csv",
+      "163_Stock_id_15_Finance_tr_500_1st_3.csv",
+      "234_SED_id_1_Medical_tr_3740_1st_3840.csv",
+      "165_Stock_id_17_Finance_tr_500_1st_7.csv",
+      "235_SED_id_2_Medical_tr_2499_1st_3840.csv",
+      "159_Stock_id_11_Finance_tr_500_1st_5.csv",
+      "261_IOPS_id_2_WebService_tr_2178_1st_2278.csv",
+      "105_WSD_id_77_WebService_tr_2348_1st_2448.csv",
+      "025_NAB_id_25_WebService_tr_3958_1st_4614.csv"
+    ],
+    "selection_manifest": "/media/omnisky/Disk8.0T/YYD/Time-RCD/experiments/selections/stage1_real_v1/selection.json"
+  },
+  "force_short_padding": true
+}

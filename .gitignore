@@ -157,7 +157,7 @@ best_model/
 # 评测与训练产物
 results/
 outputs/
-experiments/
+/experiments/runs/
 logs/
 *.log
 *.csv

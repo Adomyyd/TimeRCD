@@ -23,6 +23,8 @@ Time-RCD/
 └── Tutorial.md                 # 推理使用说明
 ```
 
+科研诊断脚本与配置见 [`experiments/README.md`](experiments/README.md)。阶段一包含推理路径一致性、尾窗补齐诊断，以及独立运行目录和版本／数据指纹记录。
+
 ## 环境
 
 需要 Python 3.10 或更高版本。
