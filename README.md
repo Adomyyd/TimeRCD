@@ -1,5 +1,7 @@
 # Time-RCD
 
+> 本仓库是上游原始代码；本项目的研究方向与记录纪律见仓库外的 `../研究方向.md`。
+
 Time-RCD 是一个用于时间序列异常检测的项目，包含零样本推理、模型训练和 TSB-AD 评测。
 
 ## 项目结构
@@ -105,7 +107,7 @@ with open("../data/pretrain/dataset_5.pkl", "wb") as f:
 PY
 ```
 
-每个样本是 `{'time_series', 'normal_time_series', 'labels', 'attribute'}` 四个字段，正好对应训练时的 `ChatTSAnomalyPretrainDataset`。
+每个样本是 `{'time_series', 'normal_time_series', 'labels', 'attribute'}` 四个字段，正好对应训练时的 `ChatTSTimeRCDPretrainDataset`。
 
 #### 2.2 文件名规则
 
@@ -157,7 +159,7 @@ datasets/TSB-AD-U/001_Synthetic_tr_2000_1st_2020-01-01-00-00-00.csv
 前 N 行作训练段，其余作测试段；最后一列必须是 `Label`。
 
 ```bash
-# 单变量（HP_list 中 win_size=7000）
+# 单变量（Optimal_Uni_algo_HP_dict 中 win_size=5000）
 python main.py --AD_Name Time_RCD
 
 # 多变量（win_size=5000, batch_size=1）
