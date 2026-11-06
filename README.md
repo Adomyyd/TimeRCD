@@ -23,7 +23,7 @@ Time-RCD/
 └── Tutorial.md                 # 推理使用说明
 ```
 
-研究文档仅保留[问题定义](TimeRCD_问题定义与研究边界.md)和[实验记录](EXPERIMENT_LOG.md)。科研诊断脚本、配置和历史记录索引见 [`experiments/README.md`](experiments/README.md)；历史协议和运行快照用于追溯，不作为当前执行路线。
+当前仓库不包含 `experiments/` 实验脚本目录或 `EXPERIMENT_LOG.md` 实验记录文件。克隆仓库后可按下文安装依赖并使用推理 API；模型权重、训练数据和 TSB-AD 数据集需按使用场景另行准备（推理权重也可从 Hugging Face 自动下载）。
 
 ## 环境
 
