@@ -1,9 +1,0 @@
-{
-  "name": "stage2_cluster_probe_v1",
-  "parent_run": "experiments/runs/20261104T160533_245898Z_stage2_patch_types_v1_f1764898",
-  "output_root": "experiments/runs",
-  "protocol_path": "experiments/stage2_cluster_probe/protocols/real_similarity_v1.md",
-  "window": 5000,
-  "patch_size": 16,
-  "minimum_patches": 3
-}
