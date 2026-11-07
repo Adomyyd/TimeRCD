@@ -162,3 +162,6 @@ logs/
 *.log
 *.csv
 wandb/
+# Local research experiment directories; do not publish to GitHub
+/experiments/
+/experiments_archive_20261107/
