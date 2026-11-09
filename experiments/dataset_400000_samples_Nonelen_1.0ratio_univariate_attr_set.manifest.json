@@ -1,0 +1,30 @@
+{
+  "created_utc": "2026-11-07T22:29:38.454877+00:00",
+  "config": {
+    "num_samples": 400000,
+    "seq_len": null,
+    "anomaly_sample_ratio": 1.0,
+    "is_multivariate": false,
+    "num_features": 1,
+    "use_attribute_set": true,
+    "num_workers": 8,
+    "generator": "dataset_gen/src/generate_dataset.py",
+    "seed": null
+  },
+  "actual_samples": 400000,
+  "total_time_points": 1576189006,
+  "min_sequence_length": 1000,
+  "max_sequence_length": 10000,
+  "mean_sequence_length": 3940.472515,
+  "samples_with_anomaly": 400000,
+  "anomaly_labeled_points": 85573137,
+  "sample_keys": [
+    "attribute",
+    "labels",
+    "normal_time_series",
+    "time_series"
+  ],
+  "pickle_bytes": 38865368343,
+  "pickle_sha256": "00a22b916b60a91f5561292142e7c02a3ebe9df5df528173df7c68217432b2a8",
+  "data_path": "/diskA/YYD/TimeRCD/experiments/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl"
+}

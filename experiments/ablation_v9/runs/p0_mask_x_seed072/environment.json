@@ -1,0 +1,11 @@
+{
+  "created_utc": "2026-11-09T16:12:46.428711+00:00",
+  "python": "3.10.22 (main, Oct 29 2026, 20:33:25) [GCC 14.3.0]",
+  "platform": "Linux-6.2.0-39-generic-x86_64-with-glibc2.35",
+  "torch": "2.5.1+cu121",
+  "cuda_available": true,
+  "cuda_version": "12.1",
+  "gpu": "NVIDIA GeForce RTX 2080 Ti",
+  "requested_device": "cuda",
+  "git_revision": "f5f214bc9a1e9d9203456877b20b0ff7fcff8d5c"
+}

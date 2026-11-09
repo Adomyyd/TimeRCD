@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "data": {
+    "path": "/diskA/YYD/TimeRCD/experiments/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
+    "manifest_path": "/diskA/YYD/TimeRCD/experiments/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
+  },
+  "split": {
+    "train_ratio": 0.95,
+    "seed": 42
+  },
+  "model": {
+    "d_model": 512,
+    "d_proj": 256,
+    "patch_size": 16,
+    "num_layers": 8,
+    "num_heads": 8,
+    "d_ff_dropout": 0.1,
+    "use_rope": true,
+    "num_features": 1,
+    "activation": "gelu",
+    "dropout": 0.1
+  },
+  "loss": {
+    "reconstruction_weight": 1,
+    "classification_weight": 1
+  },
+  "optimization": {
+    "batch_size": 16,
+    "learning_rate": 0.0005,
+    "weight_decay": 0.00001,
+    "epochs": 50,
+    "early_stopping_patience": 7,
+    "num_workers": 0
+  },
+  "runtime": {
+    "seed": 72,
+    "device": "cuda",
+    "mixed_precision": false
+  },
+  "evaluation": {
+    "validation_mask_seed": 20261109,
+    "threshold_source": "validation_only"
+  },
+  "experiment_id": "p1_full_x",
+  "input": {
+    "input_mode": "full_x",
+    "target": "x",
+    "mask_ratio": 0.15,
+    "mask_unit": "patch"
+  }
+}

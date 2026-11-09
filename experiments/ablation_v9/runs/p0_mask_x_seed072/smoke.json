@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "losses": {
+    "total": 1.7902531623840332,
+    "reconstruction": 1.0763472318649292,
+    "classification": 0.7139059901237488,
+    "reconstruction_count": 96,
+    "classification_count": 640
+  },
+  "mask_count": 96
+}
