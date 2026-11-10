@@ -1,20 +1,24 @@
-# 活动实验入口
+# 实验
 
-`experiments/` 是当前实验工作区。实验脚本、数据快照、配置、日志和运行产物都放在本目录下；根目录的 `实验记录.md` 负责汇总研究状态、已核实事实和推进边界。
+本目录提供两条独立实验路线，共用同一份400k单变量数据。
 
-以下根目录文件主要是给 Codex 和项目协作者提供上下文与约束：
+| 路线 | 做什么 | 完整命令 |
+|---|---|---|
+| original_400k | 原TimeRCD流程的400k复现：生成数据、恢复训练、对比检测结果 | [使用说明](original_400k/README.md) |
+| ablation_v9 | P0/P1/P2消融、padding处理对照、可选多GPU训练 | [使用说明](ablation_v9/README.md) |
 
-- `../AGENTS.md`
-- `../研究问题和思路.md`
-- `../方法设计.md`
-- `../实验记录.md`
+## 快速检查
 
-当前目录中的主要内容：
+在仓库根目录激活项目环境。以下命令查看入口并运行合成回归，不启动正式训练，也不需要400k数据：
 
-- `train_400k.py`、`generate_400k.py`、`compare_400k.py`：数据生成、训练和比较脚本。
-- `dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl` 及对应 manifest：400k 原流程数据快照。
-- `runs/`：按实验划分保存配置、日志、检查点和其他运行产物；当前 400k 运行见 `runs/time_rcd_400k_20261108/`。
-- `EXPERIMENT_SPEC.md`：v9 新消融实验的目录、文件职责、统一入口、运行登记和验证规范。
-- `ablation_v9/`：按该规范放置的新消融代码和产物；目录已按规范创建，尚未启动训练。
+```bash
+python experiments/original_400k/run_experiment.py --help
+python experiments/ablation_v9/run_experiment.py --help
+python experiments/ablation_v9/tests/run_checks.py
+```
 
-v9 新路线的 P0/P1/P2 代码已写入 `ablation_v9/`，但尚未启动新训练。不要根据历史记录自动恢复任务，也不要覆盖现有数据、权重或运行产物。开始新实验前，由协作者先读取上述内部资料和 `EXPERIMENT_SPEC.md`，并在根目录 `实验记录.md` 登记问题、对照、数据、配置、预算和停止条件。
+## 运行前准备
+
+将已有数据和同名manifest放在`experiments/original_400k/data/`。v9首次使用需按其README中的命令生成本机配置；原流程续训还需要原run的检查点。数据、权重和检查点不随Git仓库分发。
+
+日志和模型分别保存到两条路线各自的`runs/`目录。`_archive/`保存维护历史，不参与实验执行。

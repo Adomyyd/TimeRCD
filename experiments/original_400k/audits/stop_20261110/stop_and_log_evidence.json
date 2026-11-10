@@ -1,0 +1,433 @@
+{
+  "time_utc": "2026-11-10T14:12:18.146325+00:00",
+  "pid": 408588,
+  "before": {
+    "state": "R",
+    "start_ticks": "1147117336",
+    "argv": [
+      "/home/omnisky/anaconda3/envs/time-rcd/bin/python3.10",
+      "/diskA/YYD/TimeRCD/experiments/train_400k.py",
+      "--resume",
+      "/diskA/YYD/TimeRCD/experiments/runs/time_rcd_400k_20261108/checkpoints/pretrain_checkpoint_latest.pth"
+    ],
+    "cwd": "/diskA/YYD/TimeRCD/experiments"
+  },
+  "signals": [
+    "SIGTERM"
+  ],
+  "after": null,
+  "checkpoints": [
+    {
+      "name": "pretrain_checkpoint_best.pth",
+      "bytes": 444828365,
+      "mtime_utc": "2026-11-10T10:50:55.475184+00:00"
+    },
+    {
+      "name": "pretrain_checkpoint_epoch_0.pth",
+      "bytes": 444828484,
+      "mtime_utc": "2026-11-08T10:17:32.811877+00:00"
+    },
+    {
+      "name": "pretrain_checkpoint_epoch_10.pth",
+      "bytes": 444830145,
+      "mtime_utc": "2026-11-10T10:50:54.975175+00:00"
+    },
+    {
+      "name": "pretrain_checkpoint_epoch_5.pth",
+      "bytes": 444828484,
+      "mtime_utc": "2026-11-09T01:38:38.176029+00:00"
+    },
+    {
+      "name": "pretrain_checkpoint_latest.pth",
+      "bytes": 444829255,
+      "mtime_utc": "2026-11-10T13:55:52.265257+00:00"
+    },
+    {
+      "name": "pretrained_ts_encoder.pth",
+      "bytes": 142882470,
+      "mtime_utc": "2026-11-10T10:50:59.011245+00:00"
+    }
+  ],
+  "logs": {
+    "resume_console.log": {
+      "bytes": 48752,
+      "averages": [
+        {
+          "epoch": 10,
+          "total": 0.0609,
+          "reconstruction": 0.0423,
+          "classification": 0.0186,
+          "line": 988
+        },
+        {
+          "epoch": 11,
+          "total": 155.505,
+          "reconstruction": 155.4366,
+          "classification": 0.0685,
+          "line": 1952
+        }
+      ],
+      "epoch11_top_logged": [
+        {
+          "epoch": 11,
+          "batch": 400,
+          "batches": 23750,
+          "total": 0.533,
+          "reconstruction": 0.4677,
+          "classification": 0.0653,
+          "line": 1016
+        },
+        {
+          "epoch": 11,
+          "batch": 1800,
+          "batches": 23750,
+          "total": 0.5278,
+          "reconstruction": 0.428,
+          "classification": 0.0998,
+          "line": 1072
+        },
+        {
+          "epoch": 11,
+          "batch": 3000,
+          "batches": 23750,
+          "total": 0.4508,
+          "reconstruction": 0.3885,
+          "classification": 0.0623,
+          "line": 1120
+        },
+        {
+          "epoch": 11,
+          "batch": 1300,
+          "batches": 23750,
+          "total": 0.4071,
+          "reconstruction": 0.312,
+          "classification": 0.095,
+          "line": 1052
+        },
+        {
+          "epoch": 11,
+          "batch": 2800,
+          "batches": 23750,
+          "total": 0.3946,
+          "reconstruction": 0.2645,
+          "classification": 0.1301,
+          "line": 1112
+        },
+        {
+          "epoch": 11,
+          "batch": 600,
+          "batches": 23750,
+          "total": 0.3861,
+          "reconstruction": 0.2575,
+          "classification": 0.1285,
+          "line": 1024
+        },
+        {
+          "epoch": 11,
+          "batch": 900,
+          "batches": 23750,
+          "total": 0.3784,
+          "reconstruction": 0.2616,
+          "classification": 0.1168,
+          "line": 1036
+        },
+        {
+          "epoch": 11,
+          "batch": 2700,
+          "batches": 23750,
+          "total": 0.3626,
+          "reconstruction": 0.2555,
+          "classification": 0.107,
+          "line": 1108
+        },
+        {
+          "epoch": 11,
+          "batch": 1100,
+          "batches": 23750,
+          "total": 0.3553,
+          "reconstruction": 0.2445,
+          "classification": 0.1109,
+          "line": 1044
+        },
+        {
+          "epoch": 11,
+          "batch": 3400,
+          "batches": 23750,
+          "total": 0.3505,
+          "reconstruction": 0.2572,
+          "classification": 0.0933,
+          "line": 1136
+        },
+        {
+          "epoch": 11,
+          "batch": 2900,
+          "batches": 23750,
+          "total": 0.3478,
+          "reconstruction": 0.2552,
+          "classification": 0.0926,
+          "line": 1116
+        },
+        {
+          "epoch": 11,
+          "batch": 4200,
+          "batches": 23750,
+          "total": 0.3448,
+          "reconstruction": 0.1952,
+          "classification": 0.1495,
+          "line": 1168
+        }
+      ],
+      "last_logged_batch": {
+        "epoch": 12,
+        "batch": 2100,
+        "batches": 23750,
+        "total": 0.1345,
+        "reconstruction": 0.1075,
+        "classification": 0.0269,
+        "line": 2045
+      },
+      "tail": [
+        "  Total Loss: 0.0878",
+        "  Recon Loss: 0.0562",
+        "  Anomaly Loss: 0.0316",
+        "Epoch 12, Batch 1900/23750",
+        "  Total Loss: 0.0966",
+        "  Recon Loss: 0.0636",
+        "  Anomaly Loss: 0.0330",
+        "Epoch 12, Batch 2000/23750",
+        "  Total Loss: 0.0764",
+        "  Recon Loss: 0.0417",
+        "  Anomaly Loss: 0.0348",
+        "Epoch 12, Batch 2100/23750",
+        "  Total Loss: 0.1345",
+        "  Recon Loss: 0.1075",
+        "  Anomaly Loss: 0.0269"
+      ]
+    },
+    "train.log": {
+      "bytes": 283436,
+      "averages": [
+        {
+          "epoch": 0,
+          "total": 0.1612,
+          "reconstruction": 0.0966,
+          "classification": 0.0646,
+          "line": 982
+        },
+        {
+          "epoch": 1,
+          "total": 0.0891,
+          "reconstruction": 0.0519,
+          "classification": 0.0372,
+          "line": 1946
+        },
+        {
+          "epoch": 2,
+          "total": 0.0751,
+          "reconstruction": 0.0461,
+          "classification": 0.029,
+          "line": 2909
+        },
+        {
+          "epoch": 3,
+          "total": 0.072,
+          "reconstruction": 0.0452,
+          "classification": 0.0268,
+          "line": 3872
+        },
+        {
+          "epoch": 4,
+          "total": 0.066,
+          "reconstruction": 0.0428,
+          "classification": 0.0232,
+          "line": 4835
+        },
+        {
+          "epoch": 5,
+          "total": 0.0637,
+          "reconstruction": 0.0419,
+          "classification": 0.0218,
+          "line": 5796
+        },
+        {
+          "epoch": 6,
+          "total": 1.1967,
+          "reconstruction": 1.1673,
+          "classification": 0.0294,
+          "line": 6760
+        },
+        {
+          "epoch": 7,
+          "total": 0.839,
+          "reconstruction": 0.7613,
+          "classification": 0.0776,
+          "line": 7721
+        },
+        {
+          "epoch": 8,
+          "total": 0.0708,
+          "reconstruction": 0.0464,
+          "classification": 0.0244,
+          "line": 8682
+        },
+        {
+          "epoch": 9,
+          "total": 0.0615,
+          "reconstruction": 0.0424,
+          "classification": 0.0191,
+          "line": 9643
+        },
+        {
+          "epoch": 10,
+          "total": 0.0609,
+          "reconstruction": 0.0423,
+          "classification": 0.0186,
+          "line": 11116
+        },
+        {
+          "epoch": 11,
+          "total": 155.505,
+          "reconstruction": 155.4366,
+          "classification": 0.0685,
+          "line": 12080
+        }
+      ],
+      "epoch11_top_logged": [
+        {
+          "epoch": 11,
+          "batch": 400,
+          "batches": 23750,
+          "total": 0.533,
+          "reconstruction": 0.4677,
+          "classification": 0.0653,
+          "line": 11144
+        },
+        {
+          "epoch": 11,
+          "batch": 1800,
+          "batches": 23750,
+          "total": 0.5278,
+          "reconstruction": 0.428,
+          "classification": 0.0998,
+          "line": 11200
+        },
+        {
+          "epoch": 11,
+          "batch": 3000,
+          "batches": 23750,
+          "total": 0.4508,
+          "reconstruction": 0.3885,
+          "classification": 0.0623,
+          "line": 11248
+        },
+        {
+          "epoch": 11,
+          "batch": 1300,
+          "batches": 23750,
+          "total": 0.4071,
+          "reconstruction": 0.312,
+          "classification": 0.095,
+          "line": 11180
+        },
+        {
+          "epoch": 11,
+          "batch": 2800,
+          "batches": 23750,
+          "total": 0.3946,
+          "reconstruction": 0.2645,
+          "classification": 0.1301,
+          "line": 11240
+        },
+        {
+          "epoch": 11,
+          "batch": 600,
+          "batches": 23750,
+          "total": 0.3861,
+          "reconstruction": 0.2575,
+          "classification": 0.1285,
+          "line": 11152
+        },
+        {
+          "epoch": 11,
+          "batch": 900,
+          "batches": 23750,
+          "total": 0.3784,
+          "reconstruction": 0.2616,
+          "classification": 0.1168,
+          "line": 11164
+        },
+        {
+          "epoch": 11,
+          "batch": 2700,
+          "batches": 23750,
+          "total": 0.3626,
+          "reconstruction": 0.2555,
+          "classification": 0.107,
+          "line": 11236
+        },
+        {
+          "epoch": 11,
+          "batch": 1100,
+          "batches": 23750,
+          "total": 0.3553,
+          "reconstruction": 0.2445,
+          "classification": 0.1109,
+          "line": 11172
+        },
+        {
+          "epoch": 11,
+          "batch": 3400,
+          "batches": 23750,
+          "total": 0.3505,
+          "reconstruction": 0.2572,
+          "classification": 0.0933,
+          "line": 11264
+        },
+        {
+          "epoch": 11,
+          "batch": 2900,
+          "batches": 23750,
+          "total": 0.3478,
+          "reconstruction": 0.2552,
+          "classification": 0.0926,
+          "line": 11244
+        },
+        {
+          "epoch": 11,
+          "batch": 4200,
+          "batches": 23750,
+          "total": 0.3448,
+          "reconstruction": 0.1952,
+          "classification": 0.1495,
+          "line": 11296
+        }
+      ],
+      "last_logged_batch": {
+        "epoch": 12,
+        "batch": 2100,
+        "batches": 23750,
+        "total": 0.1345,
+        "reconstruction": 0.1075,
+        "classification": 0.0269,
+        "line": 12173
+      },
+      "tail": [
+        "  Total Loss: 0.0878",
+        "  Recon Loss: 0.0562",
+        "  Anomaly Loss: 0.0316",
+        "Epoch 12, Batch 1900/23750",
+        "  Total Loss: 0.0966",
+        "  Recon Loss: 0.0636",
+        "  Anomaly Loss: 0.0330",
+        "Epoch 12, Batch 2000/23750",
+        "  Total Loss: 0.0764",
+        "  Recon Loss: 0.0417",
+        "  Anomaly Loss: 0.0348",
+        "Epoch 12, Batch 2100/23750",
+        "  Total Loss: 0.1345",
+        "  Recon Loss: 0.1075",
+        "  Anomaly Loss: 0.0269"
+      ]
+    }
+  }
+}

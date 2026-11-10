@@ -21,10 +21,11 @@ if str(HERE) not in sys.path:
 import torch
 
 from src.audit import run_audit
-from src.config import ExperimentConfig, load_config
+from src.config import ExperimentConfig, load_config, validate_config
 from src.data import load_indices
 from src.evaluate import evaluate_model
 from src.models import build_model
+from src.parallel import prepare_model, unwrap_model
 from src.reporting import write_report
 from src.train import _device, run_smoke, set_seed, train_model
 
@@ -35,6 +36,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run-id", required=True, help="Unique output directory name")
     parser.add_argument("--mode", choices=["audit", "smoke", "train", "eval", "report", "all"], required=True)
     parser.add_argument("--checkpoint", help="Checkpoint path for eval mode")
+    parser.add_argument("--parallel", choices=["none", "data_parallel"], default=None,
+                        help="Override runtime.parallel; default uses JSON config")
+    parser.add_argument("--gpu-ids", type=int, nargs="+", default=None,
+                        help="Visible CUDA device ids for data_parallel; first id gathers outputs")
     return parser.parse_args()
 
 
@@ -68,6 +73,13 @@ def environment_record(config: ExperimentConfig) -> dict[str, Any]:
         "cuda_version": torch.version.cuda,
         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "requested_device": config.device,
+        "parallel": config.raw["runtime"].get("parallel", "none"),
+        "gpu_ids": config.raw["runtime"].get("gpu_ids"),
+        "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
+        "visible_gpus": [
+            {"id": index, "name": torch.cuda.get_device_name(index)}
+            for index in range(torch.cuda.device_count())
+        ],
         "git_revision": git_revision(),
     }
 
@@ -109,11 +121,22 @@ def save_run_metadata(run_dir: Path, config: ExperimentConfig, command: list[str
 def load_model(config: ExperimentConfig) -> torch.nn.Module:
     set_seed(config.seed)
     model = build_model(config.raw)
-    return model.to(_device(config.raw))
+    return prepare_model(model, config.raw)
+
+
+def apply_runtime_overrides(config: ExperimentConfig, args: argparse.Namespace) -> None:
+    if args.parallel is not None:
+        config.raw["runtime"]["parallel"] = args.parallel
+        if args.parallel == "none":
+            config.raw["runtime"]["gpu_ids"] = None
+    if args.gpu_ids is not None:
+        config.raw["runtime"]["gpu_ids"] = args.gpu_ids
+    validate_config(config.raw)
 
 
 def run_one(args: argparse.Namespace) -> None:
     config = load_config(args.config)
+    apply_runtime_overrides(config, args)
     run_dir = create_run_dir(args.run_id)
     save_run_metadata(run_dir, config, sys.argv)
     status = {"run_id": args.run_id, "mode": args.mode, "status": "running", "started_utc": utc_now()}
@@ -155,7 +178,7 @@ def run_one(args: argparse.Namespace) -> None:
                 raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
             model = load_model(config)
             payload = torch.load(checkpoint, map_location=_device(config.raw), weights_only=False)
-            model.load_state_dict(payload["model_state_dict"])
+            unwrap_model(model).load_state_dict(payload["model_state_dict"])
             _, test_indices = load_indices(config.data_path, float(config.raw["split"]["train_ratio"]), int(config.raw["split"]["seed"]))
             metrics = evaluate_model(model, config.raw, str(config.data_path), test_indices)
             write_json(run_dir / "metrics" / "eval.json", metrics)
@@ -164,7 +187,7 @@ def run_one(args: argparse.Namespace) -> None:
             checkpoint = run_dir / "checkpoints" / "best.pth"
             model = load_model(config)
             payload = torch.load(checkpoint, map_location=_device(config.raw), weights_only=False)
-            model.load_state_dict(payload["model_state_dict"])
+            unwrap_model(model).load_state_dict(payload["model_state_dict"])
             _, test_indices = load_indices(config.data_path, float(config.raw["split"]["train_ratio"]), int(config.raw["split"]["seed"]))
             metrics = evaluate_model(model, config.raw, str(config.data_path), test_indices)
             write_json(run_dir / "metrics" / "eval.json", metrics)

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "data": {
-    "path": "/diskA/YYD/TimeRCD/experiments/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
-    "manifest_path": "/diskA/YYD/TimeRCD/experiments/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
+    "path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
+    "manifest_path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
   },
   "split": {
     "train_ratio": 0.95,
@@ -22,19 +22,23 @@
   },
   "loss": {
     "reconstruction_weight": 1,
-    "classification_weight": 1
+    "classification_weight": 1,
+    "classification_padding": "ignore"
   },
   "optimization": {
     "batch_size": 16,
     "learning_rate": 0.0005,
-    "weight_decay": 0.00001,
+    "weight_decay": 1e-05,
     "epochs": 50,
     "early_stopping_patience": 7,
-    "num_workers": 0
+    "num_workers": 0,
+    "log_freq": 100
   },
   "runtime": {
     "seed": 72,
     "device": "cuda",
+    "parallel": "none",
+    "gpu_ids": null,
     "mixed_precision": false
   },
   "evaluation": {
@@ -46,6 +50,7 @@
     "input_mode": "masked_x",
     "target": "x",
     "mask_ratio": 0.15,
-    "mask_unit": "patch"
+    "mask_unit": "patch",
+    "mask_patch_size": 16
   }
 }

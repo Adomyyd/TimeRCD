@@ -1,0 +1,74 @@
+[
+  {
+    "file": "EXPERIMENT_SPEC.md",
+    "before_sha256": "a49730850840b421b1c18e00c19c4f5e142d8959ba6a73afd4a76b6569d659bb",
+    "after_sha256": "ccb5e60852473427d492fc01b11eb811662cdb4b8ec1fd96a8ae1b9d502b6d79",
+    "readback_matches": true
+  },
+  {
+    "file": "IMPLEMENTATION_DIFF.md",
+    "before_sha256": "26ebcb64eb3079d0cc5e61abc6af054dcbd0c54008e2fe2138bd75d570a9ea08",
+    "after_sha256": "4b5821dc532c8eaa0c6955a8d63de10608d00410188159f6317a2f222da6e784",
+    "readback_matches": true
+  },
+  {
+    "file": "README.md",
+    "before_sha256": "56024f8cdae74706c998c1f722e4d0d15f0a8f1c089f84605b30884b5e06036c",
+    "after_sha256": "63269bf607ee4aad00121c490432f55ec6e255356a189646904f55c698fab67f",
+    "readback_matches": true
+  },
+  {
+    "file": "configs/p0_mask_x.json",
+    "before_sha256": "55d0f90c19d468a628c83852c160bf491a10c26fdd265df8be39ed7a2e5ce2f4",
+    "after_sha256": "d80b41fb7147f993bf134a79ef1ed8619a31dc219a5be27ede74cdac6aa5a751",
+    "readback_matches": true
+  },
+  {
+    "file": "configs/p1_full_x.json",
+    "before_sha256": "aa30c459b1e1ee867f3caf59d4536ced690d4ce6d7faed3902375914439406a3",
+    "after_sha256": "335dac57c21043742730cf105f2f125048dc25c30459442404eb0c403c1220b7",
+    "readback_matches": true
+  },
+  {
+    "file": "configs/p2_full_x0.json",
+    "before_sha256": "88e29b9593085dd31352ee00c3f54b00d12967eb1d9f65be798d7a0112fb1044",
+    "after_sha256": "40da379e99305be63b7b201b990722e2568a0a12345bbe5dd88e77585072dc5b",
+    "readback_matches": true
+  },
+  {
+    "file": "run_experiment.py",
+    "before_sha256": "157b2a37195f7593fa10ea3d3f56a8ec63f3bad3f3fbbeae3b727ac9f3fd2726",
+    "after_sha256": "372c457134b6b4c7cda296b92b30ca6be161708a3968b013af62ea3fedda7cb1",
+    "readback_matches": true
+  },
+  {
+    "file": "src/config.py",
+    "before_sha256": "e3eed60ea1bf4cbe8f69a9ac9ed3a45dcd5acaef1a80e117804809c576c71854",
+    "after_sha256": "b31f54f2e177779372d0eb10ee9916d78416bbd20edb89d7d3a1a873bf10ffbe",
+    "readback_matches": true
+  },
+  {
+    "file": "src/parallel.py",
+    "before_sha256": null,
+    "after_sha256": "e0ac55c40ac47b674100c2c0d3d0944a2ccb831ac148abd58caa8407aa616997",
+    "readback_matches": true
+  },
+  {
+    "file": "src/train.py",
+    "before_sha256": "31ab3682cf561bf84a270c28208ba66e9ccff1eb9a5f702013c2ea384fd30388",
+    "after_sha256": "a8e399c348dc2b761f86bf4e85ff0670f09431b211f946a412909388ea4ab700",
+    "readback_matches": true
+  },
+  {
+    "file": "tests/run_checks.py",
+    "before_sha256": null,
+    "after_sha256": "cbc7eec7890fdd5c0fa107272d5d76ae29c7d25dce54186365b479215131b0bd",
+    "readback_matches": true
+  },
+  {
+    "file": "tests/test_parallel_contract.py",
+    "before_sha256": null,
+    "after_sha256": "3144cc126059b402d54d3d1a22cb40ac0f81ee0750cc705be8cd235c5ee9f07b",
+    "readback_matches": true
+  }
+]

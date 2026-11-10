@@ -1,0 +1,242 @@
+{
+  "created_utc": "2026-11-10T14:22:48.168531+00:00",
+  "protected": {
+    "experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json": {
+      "bytes": 902,
+      "inode": 184157507,
+      "mtime_ns": 1794091006724208559,
+      "sha256": "158bf2e7563c233a4d6e543a35fdae2a5db3080489575015a255586ba65a51a0"
+    },
+    "experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl": {
+      "bytes": 38865368343,
+      "inode": 184157506,
+      "mtime_ns": 1794090571806737493
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/pretrain_checkpoint_best.pth": {
+      "bytes": 444828365,
+      "inode": 184157515,
+      "mtime_ns": 1794307855475183843
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/pretrain_checkpoint_epoch_0.pth": {
+      "bytes": 444828484,
+      "inode": 184157514,
+      "mtime_ns": 1794133052811876539
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/pretrain_checkpoint_epoch_10.pth": {
+      "bytes": 444830145,
+      "inode": 184157535,
+      "mtime_ns": 1794307854975175197
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/pretrain_checkpoint_epoch_5.pth": {
+      "bytes": 444828484,
+      "inode": 184156283,
+      "mtime_ns": 1794188318176029532
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/pretrain_checkpoint_latest.pth": {
+      "bytes": 444829255,
+      "inode": 184157513,
+      "mtime_ns": 1794318952265256533
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/pretrained_ts_encoder.pth": {
+      "bytes": 142882470,
+      "inode": 184157516,
+      "mtime_ns": 1794307859011244866
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/resume_console.log": {
+      "bytes": 48752,
+      "inode": 184157472,
+      "mtime_ns": 1794319920715185736,
+      "sha256": "81293fe3582923e7a922aab957b5bcac5d4d77811422a1b85a3597c9395d0f21"
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/train.log": {
+      "bytes": 283436,
+      "inode": 184157511,
+      "mtime_ns": 1794319920715185736,
+      "sha256": "54500368813928768c7318de40414d221615709e451de220a5e9b7811836ef91"
+    },
+    "experiments/original_400k/runs/time_rcd_400k_20261108/train_config.json": {
+      "bytes": 951,
+      "inode": 184157512,
+      "mtime_ns": 1794296335713861131,
+      "sha256": "431c148d0a10c26ba0c54150a58703329dcf85f162997ba7d951562939780910"
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/audit.json": {
+      "bytes": 1858,
+      "inode": 184157409,
+      "mtime_ns": 1794240766796972900,
+      "sha256": "439d1f5fd721dc6bfdfde97f976d6f6dd403e5a562c6cebe3c61bdce86184ac3"
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/checkpoints/best.pth": {
+      "bytes": 444798601,
+      "inode": 184157467,
+      "mtime_ns": 1794294118646140773
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/checkpoints/epoch_0000.pth": {
+      "bytes": 444822071,
+      "inode": 184157466,
+      "mtime_ns": 1794251632997178815
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/checkpoints/epoch_0001.pth": {
+      "bytes": 444822071,
+      "inode": 184157468,
+      "mtime_ns": 1794262241635586172
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/checkpoints/epoch_0002.pth": {
+      "bytes": 444822071,
+      "inode": 184157469,
+      "mtime_ns": 1794272866293026998
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/checkpoints/epoch_0003.pth": {
+      "bytes": 444822071,
+      "inode": 184157470,
+      "mtime_ns": 1794283487163912320
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/checkpoints/epoch_0004.pth": {
+      "bytes": 444822071,
+      "inode": 184157471,
+      "mtime_ns": 1794294118142141954
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/command.txt": {
+      "bytes": 136,
+      "inode": 184157404,
+      "mtime_ns": 1794240766424972677,
+      "sha256": "cefa89dcb51c78d9267d48ed132877cfc61efda3dc87d42baef6291283f157ce"
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/config.json": {
+      "bytes": 1168,
+      "inode": 184157403,
+      "mtime_ns": 1794240766424972677,
+      "sha256": "dfa9da9d9d635603ff02e6406de53ac74459be88b397d6917f0969dc8bc8ca98"
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/data_manifest.json": {
+      "bytes": 1455,
+      "inode": 184157408,
+      "mtime_ns": 1794240766796972900,
+      "sha256": "97c5ae48cee1dcd21e67d8d0a962cbb730e23013554b60c14d3745f1bf05fc7f"
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/environment.json": {
+      "bytes": 393,
+      "inode": 184157405,
+      "mtime_ns": 1794240766524972736,
+      "sha256": "b086b21f5e79ad6a2580da4b3ee89d7c3d5993af4a5a14188c20d5a658018d88"
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/smoke.json": {
+      "bytes": 245,
+      "inode": 184157410,
+      "mtime_ns": 1794240768020973635,
+      "sha256": "485e9b7b63114161baad8866ae280f1273abdd0a86f57c2ce793c8cb8507bf18"
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/status.json": {
+      "bytes": 265,
+      "inode": 184157406,
+      "mtime_ns": 1794296854850508849,
+      "sha256": "f58ce0b9ef378cfa4c9575b1c7560a5a8ef52b35a592a230df7ca1d0a5b3ceff"
+    },
+    "experiments/ablation_v9/runs/p0_mask_x_seed072_old/train.log": {
+      "bytes": 287,
+      "inode": 184157465,
+      "mtime_ns": 1794294117686143024,
+      "sha256": "2e309195ca80165a6ff55c544fc1582901e0ec45ea6a4fec1700425181d398f7"
+    },
+    "experiments/ablation_v9/registry/experiments.jsonl": {
+      "bytes": 744,
+      "inode": 184157407,
+      "mtime_ns": 1794300401674726390,
+      "sha256": "100b4668ae21fae8a781757c22bbf120b18e026d3e01be64c7fa53e6c322943d"
+    },
+    "best_model/pretrain_checkpoint_best_multi.pth": {
+      "bytes": 444841116,
+      "inode": 184156277,
+      "mtime_ns": 1793942321181253449
+    },
+    "best_model/pretrain_checkpoint_best_uni.pth": {
+      "bytes": 444828860,
+      "inode": 184156276,
+      "mtime_ns": 1793942262461159370
+    }
+  },
+  "production": {
+    "experiments/original_400k/run_experiment.py": "025c3a7972340f06bb76506b9f25683a4fd72a323be5a9749a7a0ebe03916968",
+    "experiments/original_400k/src/compare_400k.py": "eb8e6ec4c4d3ae593406d4be39f6ead1a6afd834a39caa3a61e9db8131a79f5f",
+    "experiments/original_400k/src/generate_400k.py": "310304fd610e1f25f47f690c42d763d1b77e9fbc9352eaf6e6725dd0890c637d",
+    "experiments/original_400k/src/train_400k.py": "6250169ed61e20f9fe2b4a812a80076a84ec3da807afdb19635bab64cac8926c",
+    "experiments/ablation_v9/run_experiment.py": "372c457134b6b4c7cda296b92b30ca6be161708a3968b013af62ea3fedda7cb1",
+    "experiments/ablation_v9/src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/ablation_v9/src/audit.py": "145218cfdd2e2329b754957a48737a62756afe5c11d6f473574c632be1f84368",
+    "experiments/ablation_v9/src/config.py": "8e3588a24a0fe3f5bde20242b413b1ec75f771f3ef61507e17eb29fffe35ddbf",
+    "experiments/ablation_v9/src/data.py": "3b8e78a7d50b145c2bd15a41c5560ef97d8f9bcb4fa3833b17036e729919511d",
+    "experiments/ablation_v9/src/evaluate.py": "eb71210613880f420292f9b28b65421605d1c6fce639650cc0d8118d6b5c2343",
+    "experiments/ablation_v9/src/losses.py": "7db92a4c3190fc000e7fec7c6fb0639df5a1d99b1fb19dd2f51246e09972af4a",
+    "experiments/ablation_v9/src/models.py": "5344a86c919b388d9c757daabf7b008d85bce90d93082e893b79e895ea78ca4a",
+    "experiments/ablation_v9/src/parallel.py": "e0ac55c40ac47b674100c2c0d3d0944a2ccb831ac148abd58caa8407aa616997",
+    "experiments/ablation_v9/src/reporting.py": "70b5af635ceb5b625e2451c4a566434ab8d79b2130a508c7e2da069e82c89086",
+    "experiments/ablation_v9/src/sampling.py": "439993e7b25cc05233228a8a7581080dff21dff7320d7f49523ed71606c271dc",
+    "experiments/ablation_v9/src/train.py": "edc0596e114fbd950e95d6756bde4c3cd8d4daae08698212d0417c4dcbd38310",
+    "experiments/ablation_v9/configs/p0_mask_x.json": "5c65d58cc76cae36c40bd2382113cc64629a8c19a0f26880cddc7e1c1f1c0b9f",
+    "experiments/ablation_v9/configs/p0_mask_x_padding_official.json": "098bffd90e1de332a63e99f382e67e873bff2c5c086433ca07b8bc168a6fcf8e",
+    "experiments/ablation_v9/configs/p1_full_x.json": "3035ac50a9ab786d3bfe4f70545e703e23fd24f89ef6842f127a348ab7d25cf2",
+    "experiments/ablation_v9/configs/p1_full_x_padding_official.json": "bc7ed01b357796322e09bd1d6ea32cfb661f8460e43da152c9fe689c5e7a724b",
+    "experiments/ablation_v9/configs/p2_full_x0.json": "cbd845099fe4d2c2fa5e9312786afaedfe59cc3f5f357a5467510f51fc52bbe3",
+    "experiments/ablation_v9/configs/p2_full_x0_padding_official.json": "b7801ee58ede17eecdea76e9596e5b373cf11fd8e86e69b2322920b685e2939e",
+    "experiments/ablation_v9/tests/conftest.py": "6b0f1c1bd3dbe96460fcb75a3db1705a0cd6482ac8e3e3e321be3fd739f790c0",
+    "experiments/ablation_v9/tests/run_checks.py": "cbc7eec7890fdd5c0fa107272d5d76ae29c7d25dce54186365b479215131b0bd",
+    "experiments/ablation_v9/tests/test_config_contract.py": "1a8b9680934585dc6738ada83724265cb90f554af0ed3280bbb31b8dc6d20658",
+    "experiments/ablation_v9/tests/test_loss_contract.py": "8abf01aca10bfb20aca762a3e50d0d328441a0d04d6e5f3f34cdb082f8c0cd5c",
+    "experiments/ablation_v9/tests/test_padding_contract.py": "c614c30e3f260b5b92382b3dc78883e4f494cb5efb6e3ff1020aefcea4368bc5",
+    "experiments/ablation_v9/tests/test_parallel_contract.py": "a2ca86361a193dade038ae549630271cd65ed8e093a93fadffd15268547cfe73",
+    "experiments/ablation_v9/tests/test_patch_parity.py": "d01bd3bc3ec6600bd784368ec3255310124173fa703541fdd6ddc16ec95fba7f",
+    "experiments/ablation_v9/tests/test_sampling_contract.py": "95a4ea8b50b7201c29504aa7660e1b925c470edabe4f5cf2d57370baa7025db2"
+  },
+  "references": [],
+  "moves": [
+    {
+      "source": "/diskA/YYD/TimeRCD/experiments/original_400k/migrations",
+      "destination": "/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/original_400k_migrations",
+      "files": {
+        "before_compare_400k.py": "76f93ca1b4446938c8cad9131744435bc69de02a7cb48dc82f086e72cbce96d6",
+        "before_generate_400k.py": "50419108e7877611ff9912e9efeb23079830624cfde01634f4f4de9cf2607f82",
+        "before_train_400k.py": "deebaaadbb450caed2a48356916075e551af6bda6285f8e0c5b34e73992e3119",
+        "layout_20261110.json": "e9bc2c8f26f661d69a2c45083eb2a84acd7a0c7237a40fe78092a64c8c283dc0",
+        "runs_link_preparation.txt": "5dd0923ed8ab96318f8144c0757f933116537f37da26448daa757e5c097fdf37",
+        "v9_pytest_local.xml": "ba8e9318b89d28be3c425413e4d09945f4dd691a19d1935035e25f9ff326bfa6",
+        "verification_local.json": "9ead7088804b77af605aa1a87b2ce75a611b56aa44deb64f1f760f062410042f"
+      }
+    },
+    {
+      "source": "/diskA/YYD/TimeRCD/experiments/ablation_v9/audits/padding_20261110/before",
+      "destination": "/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/padding_before",
+      "files": {
+        "EXPERIMENT_SPEC.md": "ccb5e60852473427d492fc01b11eb811662cdb4b8ec1fd96a8ae1b9d502b6d79",
+        "IMPLEMENTATION_DIFF.md": "4b5821dc532c8eaa0c6955a8d63de10608d00410188159f6317a2f222da6e784",
+        "README.md": "63269bf607ee4aad00121c490432f55ec6e255356a189646904f55c698fab67f",
+        "configs/p0_mask_x.json": "d80b41fb7147f993bf134a79ef1ed8619a31dc219a5be27ede74cdac6aa5a751",
+        "configs/p1_full_x.json": "335dac57c21043742730cf105f2f125048dc25c30459442404eb0c403c1220b7",
+        "configs/p2_full_x0.json": "40da379e99305be63b7b201b990722e2568a0a12345bbe5dd88e77585072dc5b",
+        "src/config.py": "b31f54f2e177779372d0eb10ee9916d78416bbd20edb89d7d3a1a873bf10ffbe",
+        "src/evaluate.py": "34550154a4f35402e698bd3fa22bce467681377bc09233cd90798926c009f1e1",
+        "src/losses.py": "dc709383eab1cbf99340a975f6b0c8394bb3cf996684a3a5784db7f49193f260",
+        "src/train.py": "a8e399c348dc2b761f86bf4e85ff0670f09431b211f946a412909388ea4ab700",
+        "tests/test_config_contract.py": "6b4e4d65d952dd4756bc6103d82071fb4f7275dc01b080394fb06a54b1a8857d",
+        "tests/test_parallel_contract.py": "3144cc126059b402d54d3d1a22cb40ac0f81ee0750cc705be8cd235c5ee9f07b"
+      }
+    },
+    {
+      "source": "/diskA/YYD/TimeRCD/experiments/original_400k/audits/stop_20261110/stop_and_inspect.py",
+      "destination": "/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/one_off_scripts/stop_and_inspect.py",
+      "files": {
+        "stop_and_inspect.py": "4b7675816655d807a6c10476d956f82905fb37ae034c97621d1e31048464bd16"
+      }
+    }
+  ],
+  "remove_links": {
+    "/diskA/YYD/TimeRCD/experiments/train_400k.py": "/diskA/YYD/TimeRCD/experiments/original_400k/src/train_400k.py",
+    "/diskA/YYD/TimeRCD/experiments/generate_400k.py": "/diskA/YYD/TimeRCD/experiments/original_400k/src/generate_400k.py",
+    "/diskA/YYD/TimeRCD/experiments/compare_400k.py": "/diskA/YYD/TimeRCD/experiments/original_400k/src/compare_400k.py",
+    "/diskA/YYD/TimeRCD/experiments/EXPERIMENT_SPEC.md": "/diskA/YYD/TimeRCD/experiments/ablation_v9/EXPERIMENT_SPEC.md"
+  },
+  "keep_links": {
+    "/diskA/YYD/TimeRCD/experiments/runs": "/diskA/YYD/TimeRCD/experiments/original_400k/runs",
+    "/diskA/YYD/TimeRCD/experiments/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
+    "/diskA/YYD/TimeRCD/experiments/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
+  }
+}

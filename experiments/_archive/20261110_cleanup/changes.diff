@@ -1,0 +1,1229 @@
+--- before/AGENTS.md
++++ after/AGENTS.md
+@@ -1,30 +1,34 @@
+ # Time-RCD 项目协作规范
+ 
+-仅适用于本仓库。用户的明确要求优先。
++适用于本仓库；用户明确要求优先。远程连接为2080Ti，仓库为`/diskA/YYD/TimeRCD`。四份协作文档主要供代理和研究协作者阅读。
+ 
+-## 代码设计
++## 工作入口与执行
+ 
+-- 注释少而精，只说明不明显的设计原因、边界条件或重要约束。
+-- 遵循现有结构与风格，保持模块职责清晰，避免无关重写和过度抽象。
+-- 配置与核心逻辑分开，明确输入校验和失败路径，不吞异常。
++- 开始工作先读本文件、`研究问题和思路.md`、`方法设计.md`、`实验记录.md`；实际运行状态以日志和进程为准，旧记录不代表仍在运行。
++- 所有Python执行使用绝对解释器路径。远端使用conda环境time-rcd的`/home/omnisky/anaconda3/envs/time-rcd/bin/python3`，脚本和参数路径也使用绝对路径。SSH白名单匹配python/python3，不将python3.10命令格式不匹配解释成无法远程执行。
++- 新实验代码写在`/diskA/YYD/TimeRCD/experiments/`；写代码前先说明目录、文件职责及统一入口。
++- 原流程使用`experiments/original_400k/run_experiment.py`；P0/P1/P2使用`experiments/ablation_v9/run_experiment.py`。不另建重复训练入口。
++- 未获当前任务授权，不启动或恢复正式训练、生成数据、耗时评测，不替换官方权重。历史运行及计划不会自动授权重启。合成接口检查与正式训练必须区分。
+ 
+-## 项目约束
++## 代码与实验协议
+ 
+-- 未经用户明确要求，不重新训练或替换官方 TimeRCD 权重，不启动耗时测评或训练任务。
+-- 评测数据、权重、模型输出和缓存视为用户数据；修改前核实路径和影响范围。
+-- 新增实验代码时拆分数据准备、模型推理、模型逻辑和指标评估；核心算法应能脱离整套流程测试。
+-- 实验配置、随机种子、权重版本和数据来源必须可追溯；探索性结果不能写成最终结论。
++- 配置与逻辑分离，P0/P1/P2共用实现；注释只解释不明显的约束，不做无关重写和过度抽象。
++- 配置校验、失败路径和损失分母明确，不吞异常。核心算法应可脱离完整流程测试。
++- 模型patch与遮挡块独立配置，默认16/16，比例0.15。配置类初始默认4不是当前单卡400k的运行值。
++- padding是独立消融轴：ignore过滤分类padding，official复现官方行为；同一配对除该项外保持一致。历史400k不能单独隔离padding效应。
++- DataParallel的batch_size指总batch，标准化和mask在分卡前生成、损失在汇总后计算。检查点保存完整未封装模型状态。
++- 数据生成配置维持当前决定。实验初始化、划分、种子、权重、步数、评价与停止条件必须可追溯；不把重构改善当作检测、解耦或上下文利用的证明。
+ 
+-## 持续实验记录
++## 文档与资产
+ 
+-- 当前研究问题和思路、方法设计、实验状态分别记录在根目录的 `研究问题和思路.md`、`方法设计.md`、`实验记录.md`。
+-- 每次实验前登记问题、对照、数据和计划状态；完成、失败或中断后记录执行事实、产物、验证和解释边界。
+-- 只保留对当前路线有用的经验；历史脚本、权重、日志和结果留在 `experiments_archive_20261107/`，不作为当前执行指令。
+-- 不从历史记录自动恢复训练或追加实验。
++- `研究问题和思路.md`：问题、假设、相关工作与结论边界；`方法设计.md`：计算图、监督与对照；`实验记录.md`：当前状态、执行事实、证据与下一步。
++- 工程用法与功能范围写在各路线README；v9规范与差异分别写在EXPERIMENT_SPEC、IMPLEMENTATION_DIFF，避免持续追加相互矛盾的旧说明。
++- 数据、权重、日志、run配置快照、registry和审计证据视为用户资产。清理前核实引用和影响；不为整理而删除、改写或移动已有run。
++- `experiments/_archive/`存放旧文档、重复备份及一次性操作脚本，不是训练入口。旧数据/manifest/runs兼容链接仍被历史快照引用，须保留。
++- `ablation_v9/audits/patch_20261110/sources/`是回归测试依赖的官方/历史源码快照，不是无用副本；不得当作当前实现执行或随意删除。
+ 
+ ## 修改与验证
+ 
+-- 修改前检查相关模块、调用关系和用户已有改动，只处理请求范围。
+-- 为关键行为、边界情况和回归风险补充必要检查。
+-- 未运行或无法验证的测试必须明确说明，不声称验证已通过。
+-- 不为代码整洁而重写无关模块，不擅自覆盖用户数据。
++- 修改前检查调用关系与已有未提交改动，只处理当前范围，不覆盖他人修改。
++- 为关键行为和回归风险做必要检查；未验证的内容明确说明。通过适当检查后不无故重复扩大测试。
++- 每次实验前登记问题、对照、数据和计划；结束、中断或失败后记录执行事实、产物及解释边界。状态优先写清“已停止/历史中断/仅合成测试/尚未正式运行”。
+--- before/experiments/_archive/20261110_cleanup/README.md
++++ after/experiments/_archive/20261110_cleanup/README.md
+@@ -0,0 +1,28 @@
++# 2026-11-10目录与文档整理
++
++用户要求继续整理experiments代码、删除不需要的内容并同步协作文档。此次不改变训练算法或研究路线，不启动训练/生成/耗时评测。
++
++## 路径映射
++
++| 原位置（相对experiments） | 现位置（相对此目录） |
++|---|---|
++| original_400k/migrations/ | original_400k_migrations/ |
++| ablation_v9/audits/padding_20261110/before/ | padding_before/ |
++| original_400k/audits/stop_20261110/stop_and_inspect.py | one_off_scripts/stop_and_inspect.py |
++| 根协作文档、README及相关审计代码整理前原文 | before/（保留仓库相对目录） |
++
++从活动目录移除四个旧入口链接：experiments/{train_400k.py,generate_400k.py,compare_400k.py,EXPERIMENT_SPEC.md}。它们的真实目标保留，当前入口不依赖这些链接。link原目标记录在plan.json，便于核查/恢复。
++
++保留三个历史资产链接：experiments/runs、dataset_400000...pkl、同名manifest。保留所有data、runs、registry、官方权重及必要审计，patch审计sources仍被回归测试读取。
++
++## 证据
++
++- plan.json：变更前28个资产文件的身份/小文件哈希、30个活动代码/配置/测试哈希、移动清单、链接目标及引用检查。
++- before/：文档原文与audit.py/test_parallel_contract.py原文。实验记录原文包含过去逐次计划与完成登记，已保留但不作为当前状态。
++- result.json、removed_caches.json：实际归档/删除操作。
++- verification.json：资产保护、活动代码变化白名单、归档逐字节一致性、兼容链接与旧路径引用核查。
++- changes.diff、source_manifest.json：本次文档与两份代码的差异/哈希。
++- pytest_remote.xml、entry_help.json：远端合成回归及两入口帮助检查。
++- REPORT.md：本次完成事实与限制。
++
++audit.py的唯一行为修正是审计元数据随padding模式变化，相关现有入口测试增加断言。模型、损失、数据、采样、并行、训练、评价、六配置及两个正式入口保持原内容。缓存可重建，不作为研究证据保留。大型数据/权重没有复制或重算全文件哈希，使用inode/大小/mtime核对未改写。
+--- before/experiments/_archive/README.md
++++ after/experiments/_archive/README.md
+@@ -0,0 +1,7 @@
++# 实验维护归档
++
++本目录只保存整理前原文、旧代码备份、路径迁移记录与一次性操作，不作为当前实验入口。当前工作流分别位于../original_400k与../ablation_v9，使用各自run_experiment.py。
++
++- 20261110_cleanup/：2026-11-10二次目录/文档整理；before保留整理前文档与两份审计相关代码；original_400k_migrations保留首次迁移记录；padding_before保留padding修改前备份；one_off_scripts保留PID限定的旧停止脚本；operations保存本次有边界保护的维护脚本。
++
++不得从归档脚本自动重启、杀进程、生成数据或执行训练。数据/权重/run不在此次归档范围，原路径保留。详情见该次README、plan/result/verification与REPORT。
+--- before/experiments/ablation_v9/audits/README.md
++++ after/experiments/ablation_v9/audits/README.md
+@@ -0,0 +1,9 @@
++# v9审计证据
++
++这些目录用于核实来源和实现，不是训练入口：patch_20261110（官方与本地patch/遮挡）、parallel_20261110（DataParallel）、padding_20261110（padding开关）。各次REPORT及XML记录当时状态，不能当作当前进程状态或方法性能结论。
++
++patch_20261110/sources中的官方/历史源码被tests/test_patch_parity.py按AST读取，并验证默认配置和spawn行为，保留原文。不要把这些文件当作待清理的重复训练代码。
++
++padding_20261110/REPORT.md历史所指before/已移至`/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/padding_before/`，原文件哈希不变，报告/diff/manifest/XML保留原位。原400k迁移备份也位于同次归档original_400k_migrations。历史证据正文不为路径整理而改写，统一按该映射查找。
++
++早期patch报告中“SSH无法运行Python”及python3.10 -m pytest命令已由后续核查更正：time-rcd的绝对路径bin/python3配合tests/run_checks.py可执行，后续远端套件已通过。旧报告只保留当时执行事实，当前命令以路线README为准。
+--- before/experiments/ablation_v9/EXPERIMENT_SPEC.md
++++ after/experiments/ablation_v9/EXPERIMENT_SPEC.md
+@@ -1,169 +1,68 @@
+-# v9 消融实验工程规范
++# v9消融工程规范
+ 
+-版本：v1。更新时间：2026-11-10。
++更新时间：2026-11-10。本文约束当前实现与后续实验；实际功能范围见README，研究假设及推进条件见根方法设计.md。不将计划功能写成已实现能力。
+ 
+-本文只约束 v9 新消融实验的代码、配置、运行和产物组织，不改变现有 400k 原流程脚本、数据、权重或运行结果。研究问题、方法边界和阶段推进条件仍以根目录的 `研究问题和思路.md`、`方法设计.md`、`实验记录.md` 为准。
++## 1. 目录与职责
+ 
+-## 1. 总原则
++所有新v9代码位于`/diskA/YYD/TimeRCD/experiments/ablation_v9/`，只有run_experiment.py一个执行入口；original_400k为并列原流程。新增算法前先列目录、文件职责和调用链，再写代码。
+ 
+-1. 所有新消融代码、配置、测试和运行登记均放在 `/diskA/YYD/TimeRCD/experiments/ablation_v9/`。
+-2. v9 消融实验只有一个执行入口：`ablation_v9/run_experiment.py`；并列的原流程另有 `original_400k/run_experiment.py`。训练、评估、审计和报告都通过该入口调用。
+-3. P0/P1/P2 必须由配置区分，不复制三套近似训练脚本。配置中显式记录输入路径、目标、采样规则、模型结构、损失、优化器、种子和预算。
+-4. 运行产物写入独立的 run 目录，不覆盖已有数据、权重、日志或检查点。已完成的 run 目录视为不可变证据。
+-5. 代码、配置、数据 manifest、运行日志和指标必须能够互相追溯。任何结果都不能只存在于终端输出或临时文件中。
+-6. 未通过预检、接口检查和小批量梯度检查，不得启动正式训练。
++| 位置 | 职责 |
++|---|---|
++| configs/ | 六份P0/P1/P2 × ignore/official JSON，实验协议与数值参数 |
++| src/config.py | 读取配置，校验当前schema/变体/关键数值/并行/padding；缺省padding为ignore并写入生效配置 |
++| src/data.py | 读取配对数据、随机划分、全batch标准化与补齐 |
++| src/sampling.py | 依据有效长度生成M，应用输入置零 |
++| src/models.py | 骨干及双头，仅接收观测/可见mask，不读取监督 |
++| src/losses.py | 重构位置、分类padding策略及明确分母；空集合返回可反传0 |
++| src/parallel.py | 设备校验、DataParallel封装/解封装、并行信息 |
++| src/train.py | 已解析协议下的训练、日志、优化器、早停与检查点 |
++| src/evaluate.py | 固定验证M、当前分区域误差及点级检测指标 |
++| src/audit.py | 文件/manifest/协议核查与参数量；记录实际padding策略 |
++| src/reporting.py | 只读取eval.json生成列表，不重新训练或评价 |
++| tests/ | 小规模合成行为与回归检查；run_checks.py为测试入口 |
++| audits/ | 不可混作运行代码的来源、差异和验证证据；patch sources被测试读取 |
++| registry/、runs/ | 执行登记与独立产物，保留既有内容 |
+ 
+-## 2. 目录规划
++重复旧代码备份、文档原文和一次性操作统一放`experiments/_archive/`。数据/manifest/runs旧资产链接保持可达；不再提供experiments根目录旧脚本/规范入口。
+ 
+-目标目录如下：
++## 2. 配置与单因素约束
+ 
+-```text
+-experiments/
+-├── README.md
+-├── original_400k/
+-│   ├── run_experiment.py          # 原流程统一入口
+-│   ├── src/                      # 生成、训练、比较脚本
+-│   ├── data/                     # 400k 数据及 manifest，v9 共用
+-│   ├── runs/                     # 400k 运行产物
+-│   └── migrations/               # 路径迁移记录
+-└── ablation_v9/
+-    ├── run_experiment.py          # v9 唯一入口
+-    ├── EXPERIMENT_SPEC.md         # 本规范
+-    ├── README.md
+-    ├── IMPLEMENTATION_DIFF.md
+-    ├── configs/                  # P0/P1/P2 JSON
+-    ├── src/                      # data / sampling / models / losses / parallel / train / evaluate
+-    ├── tests/
+-    ├── audits/
+-    ├── registry/
+-    └── runs/                     # 每个 run 各自保存 config、日志、检查点和指标
+-```
++配置至少描述experiment_id、data、split、input、model、loss、optimization、runtime、evaluation及schema_version。当前严格拒绝未知顶层字段，并检查关键字段组合；并非所有子对象都已实现未知键拒绝，不声称校验覆盖所有误拼。
+ 
+-原流程脚本已归入 `original_400k/src/`，400k 数据归入 `original_400k/data/`，原流程日志和检查点归入 `original_400k/runs/`。v9 默认配置只读共用该数据；历史文件内容不改写，旧路径通过兼容符号链接保持可达。两个统一入口各自负责对应路线，不互相隐式调用。
++| 因素 | 当前合同 |
++|---|---|
++| P0 | masked_x，encoder V&~M，target=x |
++| P1 | full_x，encoder V，target=x |
++| P2 | full_x，encoder V，target=x0 |
++| patch | model.patch_size与input.mask_patch_size独立；当前默认16/16 |
++| M | 有效块均匀抽样，ratio0.15，按块数取整；不按Y选择，不越过V |
++| padding | loss.classification_padding只允许ignore/official；配对配置仅该项不同 |
++| parallel | runtime.parallel为none/data_parallel；单卡gpu_ids=null，多卡至少两个唯一非负可见ID |
+ 
+-## 3. 文件职责
++主方法比较固定相同padding策略；padding比较固定P组、初始化、数据划分/顺序、种子、标准化、M、总batch、优化器、设备和预算。历史400k有重排/随机源等差异，不能单独承担padding因果对照。
+ 
+-### 3.1 配置
++默认数据只读共用original_400k/data，不重新生成。当前split为随机95/5 seed42，尚未审计背景分组隔离。X与X^0用全batch观测X的同一均值/标准差变换，padding后不另改变统计；X^0和Y不得进入编码器。
+ 
+-`configs/*.json` 是实验协议的唯一来源。每个配置至少包含：
++## 3. 并行与损失
+ 
+-- `experiment_id`：`p0_mask_x`、`p1_full_x` 或 `p2_full_x0`；
+-- 数据路径、数据 manifest 路径及预期哈希；
+-- 数据划分、划分种子和事件隔离规则；
+-- `input_mode`、`target`、`mask_ratio`、`mask_unit`、`mask_patch_size`；
+-- `model.patch_size` 独立配置编码器 patch 大小，不能复用作遮挡块长度；
+-- 模型和头结构、dropout、参数初始化策略；
+-- 损失项及权重；
+-- 优化器、学习率、batch size、训练步数、早停和验证频率；
+-- 随机种子集合、设备和混合精度设置；
+-- 评估指标、阈值来源和输出目录规则。
++DataParallel只切batch维，不切时间维或Transformer层；总batch不随卡数增加。完整batch标准化、padding和采样之后再分卡，预测汇总后计算CE/MSE，不能改为每卡均值等权平均。单多卡随机和浮点轨迹可能不同，各组采用相同设备协议。
+ 
+-配置读取后必须做严格校验。未知字段、缺失字段、冲突字段和不允许的 P0/P1/P2 组合直接报错，不能静默使用默认值。
++ignore：先按valid及非负标签过滤，再二值化；official：先按官方阈值二值化，再过滤-1，padding因此被当正常点。开关只改变分类损失，不改变attention或重构mask。P0/P1/P2重构均仅在M有效位置计算，目标遵循配置。
+ 
+-并行运行显式使用 `runtime.parallel`（`none` / `data_parallel`）和 `runtime.gpu_ids`（单卡为 null，多卡为至少两个不重复的可见 GPU 编号）。旧配置缺少这两个字段时兼容单卡。统一入口允许 `--parallel` / `--gpu-ids` 覆盖，须在保存配置快照前完成校验。`batch_size` 统一指总 batch，标准化、采样和损失分母不得改成各 GPU 独立统计；三组对照使用一致设备和总 batch。
++验证同时保留目标classification/total和共同valid_classification/valid_total；两模式统一按valid_total早停/选best，保留配置权重、原重构项及batch均值汇总。ignore时与既有total相同。检测指标始终过滤padding，分母与模式显式记录。不同目标/分母的total不可直接作性能结论。
+ 
+-### 3.2 数据与采样
++## 4. 执行与产物
+ 
+-`data.py` 只负责读取和验证 `X`、配对正常值 `X^0`、时间异常标签 `Y`、有效标志 `V` 及划分，不负责模型逻辑。
++使用time-rcd绝对解释器`/home/omnisky/anaconda3/envs/time-rcd/bin/python3`和绝对脚本/配置路径。入口模式的实际行为见README：all当前为audit→smoke→train→eval，不自动report；v9当前无resume。不要直接运行src/train.py或另建未登记训练入口。
+ 
+-`sampling.py` 负责按 `input.mask_patch_size` 生成有效遮挡块位置标志 `M`；它与 `model.patch_size`（编码器 patch 大小）是独立配置。当前单 GPU 400k 与官方历史单 GPU 训练入口均为编码器 patch 16、遮挡块长度 16、比例 0.15；三份默认配置必须一致。原配置类默认 4 会被入口的同对象修改覆盖，详见 `ablation_v9/audits/patch_20261110/REPORT.md`。P0 的输入遮蔽和 P1/P2 的损失位置选择必须使用明确不同的接口，避免把 `M` 误传给模型。
++run-id必须唯一，已有目录拒绝覆盖。CLI并行覆盖在快照前完成；run保存实际config、command、environment、data_manifest、audit、status、smoke、日志、检查点、metrics和registry事件。保存未封装完整state_dict及优化器/epoch/验证/config，单多卡可加载。run失败不伪报完成，历史快照原文不改写。
+ 
+-P2 的硬约束：
++新正式训练应先完成相应接口检查，登记初始化、预算、种子、数据版本、评价/停止条件和产物位置。用户未要求时，不自动生成数据、恢复训练或耗时测评；只读审计和合成小测试明确标注范围。
+ 
+-- 完整 `X` 进入 Transformer；
+-- `M` 只选择正常参考损失位置；
+-- 不清零输入，不把 `M` 作为注意力键值标志；
+-- `X^0` 和 `Y` 只能作为监督；
+-- 正常和异常位置都可能被抽样。
++## 5. 验证与评价边界
+ 
+-### 3.3 模型与损失
++当前测试覆盖配置、输入/遮挡、官方采样一致性、padding的CE/梯度、六组合合成微型训练/验证、共同选择标准、检查点、入口快照、真实双GPU小模型/尾批次等。生产算法修改只补必要检查；不为目录或文案修改制造镜像测试。
+ 
+-`models.py` 只定义模型结构和前向输出，不在模型内部读取标签或决定损失位置。
++当前evaluate仅提供现有随机验证侧的区域重构/复制基线与点级分类指标；VUS、外部测试适配、密度分层、上下文干预、背景分组审计与多种子统计是后续要求。默认规模双卡峰值/吞吐尚未测，不能以合成测试宣称训练提速或方法收益。
+ 
+-`losses.py` 只根据前向输出、监督张量和有效标志计算损失。分母为零时必须显式跳过对应损失并记录，不能产生 NaN。
+-
+-P0/P1/P2 的原重构头和异常头结构、输出维度、通道聚合方式必须与方法设计中的协议一致。不得在实现中偷偷加入 B/Z、偏离头、额外掩码或新的时序聚合。
+-
+-### 3.4 训练、评估和报告
+-
+-`train.py` 只处理一个已解析配置下的训练生命周期；它不创建另一套实验协议，也不自行改变数据划分、损失权重或保存规则。
+-
+-`parallel.py` 只负责设备校验、模型封装/解封装和运行信息。单进程 DataParallel 按 batch 维分配完整序列，Transformer 不跨样本交换信息。训练/验证统一使用封装模型，日志和早停只有一份；检查点使用未封装的 state_dict，保持单卡加载兼容。
+-
+-`evaluate.py` 统一报告：
+-
+-- 正常区域和异常区域的正常参考误差；
+-- 复制观测 `X` 作为正常预测的基线误差；
+-- 选中位置与全有效区域误差；
+-- 异常检测指标和正常误报指标；
+-- 按局部异常占比、事件长度和事件频率分层的结果；
+-- 每个 run 的样本数、有效点数和抽样覆盖率。
+-
+-`reporting.py` 只读取已完成 run 的结构化产物生成汇总，不重新训练、不修改原始指标。
+-
+-## 4. 统一入口
+-
+-入口命令形式固定为：
+-
+-```bash
+-/home/omnisky/anaconda3/envs/time-rcd/bin/python3 /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
+-  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p2_full_x0.json \
+-  --run-id p2_full_x0_seed072 \
+-  --mode audit
+-```
+-
+-允许的模式：
+-
+-- `audit`：检查数据、配置、路径、模型形状、有效标志和对照协议；
+-- `smoke`：用小批量完成一次前向、损失和反向传播；
+-- `train`：仅在 audit 和 smoke 通过后训练；
+-- `eval`：加载指定不可变检查点并按统一协议评估；
+-- `report`：汇总已完成 run；
+-- `all`：按 audit → smoke → train → eval → report 顺序执行，任何一步失败立即停止。
+-
+-入口必须：
+-
+-1. 解析并冻结配置；
+-2. 创建不可重复使用的 run 目录；
+-3. 保存命令、环境、数据 manifest 和代码版本；
+-4. 登记 `registry/experiments.jsonl`；
+-5. 对失败、终止和完成状态写入 `status.json`；
+-6. 禁止覆盖已有 run 目录，除非显式使用新的 run id。
+-
+-不允许直接运行 `src/train.py`、在 notebook 中启动正式训练，或通过未登记的临时参数改变实验协议。
+-
+-## 5. 命名和运行规则
+-
+-- 实验变体使用 `p0_mask_x`、`p1_full_x`、`p2_full_x0` 等稳定名称。
+-- run id 至少包含变体和种子，例如 `p2_full_x0_seed072`；重复运行必须增加明确后缀。
+-- 代码文件使用小写下划线命名，类名使用 PascalCase，配置字段使用小写下划线。
+-- 一个 run 只对应一个配置快照、一个数据 manifest 和一个检查点选择过程。
+-- 训练数据、官方权重和已有检查点只读使用；新代码不得覆盖它们。
+-- 大数据集不复制进 run 目录，只保存绝对路径、文件大小和哈希。
+-- 日志中必须记录随机种子、有效样本数、损失分母、学习率、验证指标和检查点路径。
+-
+-## 6. 实现顺序
+-
+-在写模型代码前按以下顺序完成：
+-
+-1. 创建目录和三个配置草案；
+-2. 实现配置校验和数据 manifest 读取；
+-3. 实现 P0/P1/P2 的输入、目标和 `M` 语义检查；
+-4. 实现最小模型前向、损失和梯度 smoke test；
+-5. 实现统一入口的 `audit`、`smoke` 和产物登记；
+-6. 先做小规模接口检查；
+-7. 完成实验记录登记后，才允许正式训练；
+-8. 训练和评估完成后，再由 `report` 生成比较结果。
+-
+-本规范本身不授权启动训练、生成数据、修改官方权重或替换既有产物。
+-
+-
+-## 7. padding 单因素对照约束（2026-11-10）
+-
+-`loss.classification_padding` 只允许 `ignore` / `official`；缺省为ignore并写入实际配置。每个P组提供一对仅该项不同的配置，正式运行应明确模式，使用独立run-id。其余模型、数据划分/顺序、种子、标准化、mask、优化器、batch、并行设备、预算和选择协议保持一致。
+-
+-official仅复现官方异常分类损失中padding被二值化为正常点的行为，不改变注意力或重构padding策略。各模式训练和验证目标相匹配，同时验证/eval必须额外报告valid_classification与valid_total，以及目标损失点数、有效标签点数和padding点数。所有检测指标始终排除padding。
+-
+-两模式统一按valid_total早停与选best；它保留原权重/重构项、有效点分类CE和既有batch均值汇总方式。ignore模式与修改前的total相同。checkpoint保留完整模式配置和验证结果，训练结果注明selection_metric。模式不同的目标loss绝对大小不能直接作性能比较；用共同有效点指标或固定epoch检查点评估。
+-
+-该对照必须在v9内部进行，历史400k不能作为隔离padding效应的唯一对照。新增测试和证据位于tests/test_padding_contract.py与audits/padding_20261110/；不自动启动正式训练。
++正式研究评价还需按方法设计.md报告异常区域正常参考恢复、共同检测指标、误报、局部密度/事件长度/频率分层、合法上下文干预及容量匹配。阈值只由训练/验证确定，未获重复证据不推进方法主张。
+--- before/experiments/ablation_v9/IMPLEMENTATION_DIFF.md
++++ after/experiments/ablation_v9/IMPLEMENTATION_DIFF.md
+@@ -1,57 +1,59 @@
+-# P0/P1/P2 相对原始 TimeRCD 的实现差异
++# v9相对原始TimeRCD的实现差异
+ 
+-本文用于代码核对。新消融实现位于 `/diskA/YYD/TimeRCD/experiments/ablation_v9/`，原始实现文件未被修改。
++更新时间：2026-11-10。用于核实当前代码，不将历史补丁按时间堆叠成互相冲突的协议。原始根training.py未因v9改写；400k原流程继续调用它。模型、训练设置和监督需分别核对，P0不是官方全流程复制。
+ 
+-## 关键 patch 配置对应
++## 1. 结构与输入/目标
+ 
+-必须区分两个含义：
++复用time_rcd/_core/ts_encoder_bi_bias.py的TimeSeriesEncoder；重构头d→4d→4d→1，异常头d→floor(d/2)→2，隐藏层GELU/Dropout与原结构一致；logits按通道平均。当前num_features1，双向RoPE，patch投影后输出逐时间特征。
+ 
+-- `model.patch_size=16`：传给 `TimeSeriesEncoder`，决定编码器 patch 大小；
+-- `input.mask_patch_size=16`：传给遮挡采样函数，决定每个连续遮挡块的时间点数。
++| 组别 | 相对原遮蔽流程 |
++|---|---|
++| P0 | M处X置零、V&~M、M上重构X；保持原训练任务形态 |
++| P1 | 取消输入置零及attention遮蔽，完整X/V；仍仅同规则M上重构X |
++| P2 | P1相同前向，重构目标改为X^0 |
+ 
+-2026-11-10 全链路更正：官方历史训练入口和当前 400k 入口都执行 `config = default_config`，再执行 `config.ts_config.patch_size = 16`。这是对同一个对象的原地修改；单 GPU 直接调用、DataLoader workers=0 时，遮挡函数实际读取 16。不能将配置类初始化默认值 4 当成训练运行值。三份默认配置已统一为 16/16/0.15，仍保留两个字段以支持独立消融。
++共同forward只接收x/encoder_mask并返回h/reconstruction/logits。P0/P1/P2在train.make_batch_inputs、evaluate._make_eval_inputs及loss目标处分流。X^0/Y仅监督；没有B/Z、偏离头、基元、真实标签门控或额外时序聚合。
+ 
+-上游历史训练源码为 `thu-sail-lab/Time-RCD@ebf4f056b571f7ea90602ef666ae56f7d717ebfe/training.py`；当前官方 main 的库模块不是同一训练入口，默认 4 且以 0.1 倍高斯噪声替换。多 GPU spawn 也可能重新导入全局默认 4。详细来源、哈希和测试见 `audits/patch_20261110/REPORT.md`，不从发布权重的形状反推历史训练遮挡设置。
++## 2. patch/遮挡来源
+ 
+-原版采样每条序列的块数为 `ceil(valid_length / mask_patch_size)`，选取 `int(num_blocks * mask_ratio)` 个块，并把对应 X 置零；遮挡比例因整数取整略有偏差。v9 使用显式种子生成块位置，保持独立配置但具备可复现性。
++官方历史训练入口thu-sail-lab/Time-RCD@ebf4f056b571f7ea90602ef666ae56f7d717ebfe/training.py及本地400k均config=default_config后原地改patch16；当前单卡、workers0时原mask函数也读到16。不能用类默认4推断运行值。v9显式分为model.patch_size=16与input.mask_patch_size=16，mask_ratio0.15。
+ 
+-## P0/P1/P2
++原函数以ceil(valid_length/patch_size)块数选floor(P×ratio)块，范围裁到有效长度，M内X置零；v9保留该采样语义，训练采样使用独立显式种子。编码器把点可见性聚合为patch内任一点可见即token可见，只屏蔽全不可见token的Key/Value，Queries保留，不删除token。
+ 
+-- P0：遮挡 `X` 输入，传入 `V & ~M`，重构观测 `X`。编码器按每 16 点聚合可见标志，只在整个 token 无可见点时屏蔽该 key/value；部分被遮的 token 仍可见。
+-- P1：完整 `X` 输入，在相同遮挡采样位置重构 `X`。
+-- P2：完整 `X` 输入，在相同遮挡采样位置重构配对正常值 `X^0`。
++官方当前main库默认4/噪声替换与历史训练入口不同；spawn重导入全局默认4也是另一条路径，不等同当前400k或v9 DataParallel。论文附录D.5写patch16，正文mask15%，没有独立mask4依据。证据和回归来源见audits/patch_20261110/，其中sources仍是测试依赖。
+ 
+-三组共用相同模型和损失权重。默认 loss.classification_padding=ignore，仅使用有效标签位置；可选 official 复现原版先二值化再过滤而将 padding 当正常点的分类损失。即使使用 official，P0 仍有下述数据重排、随机源等差异，不能视为官方完整复制。
++## 3. 分类padding独立开关
+ 
+-patch 设置一致也不代表训练轨迹一致：v9 训练 DataLoader 为 `shuffle=False`，原版使用每轮重排的 DistributedSampler；v9 独立种子采样并固定验证 M，原版使用全局随机源。上述差异本次只核实披露，不混入 patch 修正；不能将历史两次训练的 loss 差异归因于遮挡长度。
++src/losses.py的classification_padding默认ignore：先用valid及labels>=0筛选再二值化；official复现先(labels>0.5).long()再labels!=-1，使padding=-1成为正常0，全部B×T参与CE。三份默认配置显式ignore，三份*_padding_official.json仅该字段不同；旧配置缺省ignore会写入生效快照。
+ 
+-## 原始模型结构复用
++开关不改模型、输入、attention、补齐、重构项、初始化或优化器。train/smoke/eval传递模式，日志、检查点、验证和结果记录模式及分母；audit协议字段随模式变化，避免official仍误报已过滤padding。
+ 
+-复用原始 `TimeSeriesEncoder`、重构头 `d_proj → 4d_proj → 4d_proj → 1`、异常头 `d_proj → floor(d_proj/2) → 2`、特征维 logits 均值和二分类交叉熵。新实验唯一入口是 `run_experiment.py`，负责 audit、smoke、train、eval、report 和运行登记。
++两模式共同按valid_total早停/选best，保留目标loss供诊断；ignore时与原total一致。检测指标始终排除padding。该选择协议用于隔离训练padding作用，与原脚本直接按其验证目标loss选best的行为须区分。
+ 
+-## Batch 日志
++## 4. 数据/随机性与评价
+ 
+-`optimization.log_freq` 控制训练 batch 日志频率，默认 100，记录 Total/Recon/Anomaly Loss；每轮结束写平均分项损失和验证总损失。
++| 项目 | 原400k流程 | v9 |
++|---|---|---|
++| 训练顺序 | DistributedSampler每轮shuffle | DataLoader shuffle=False |
++| 标准化 | batch观测X统计，配对共用 | 保持全batch观测统计、配对共用 |
++| 采样RNG | 原全局随机源 | 训练按seed/epoch/batch显式生成器 |
++| 验证M | 随全局随机流变化 | evaluation.validation_mask_seed固定 |
++| padding CE | 官方行为 | ignore默认/official可选 |
++| 最佳选择 | 原目标验证loss | 共同valid_total |
++| eval | 原比较脚本可做外部TSB-AD | 当前仅合成语料随机验证侧、分区域误差/复制基线与点级指标 |
+ 
+-原始实现与新实现的全部行为差异仍以实际代码为准；本文只记录当前 P0/P1/P2 协议及已核实差异。
++因此历史400k与P0的loss差异不能只归因于padding或mask大小。不同目标的总loss也不能直接说明P2优于P1。分组split、外部VUS、密度分层、合法上下文干预与多种子统计尚未在v9完整实现/执行。
+ 
+-## 2026-11-10 可选 DataParallel
++## 5. 可选并行、日志与运行管理
+ 
+-- `src/parallel.py`：新增单进程多 GPU 封装；显式检查可见 GPU 编号和总 batch 大小。保留默认单卡，未移植原版的多进程全局配置读取方式。
+-- `src/config.py`、`configs/*.json`：增加 `runtime.parallel` / `gpu_ids`，旧配置缺省时仍按单卡处理。
+-- `run_experiment.py`：增加 `--parallel` / `--gpu-ids`，保存覆盖后的实际配置与可见 GPU 信息；统一封装训练、验证、eval 和 smoke，加载权重前解封装。
+-- `src/train.py`：通过解封装访问编码器属性、保存无 `module.` 前缀的权重；记录实际并行模式、主卡和总 batch；smoke 按所选卡数提供足够样本。
+-- 标准化和采样在分卡前执行，loss 在汇总后执行。没有各卡独立标准化、各卡均值等权平均或按 GPU 数量增加总 batch。P0/P1/P2 的输入、mask、目标、模型和学习率保持原协议。
+-- 多卡 dropout 随机流及浮点归约顺序可能不同，不承诺单卡和多卡训练逐位一致。DataParallel 主卡负责汇总，速度和显存收益需实测；本次不提供 DDP / 多机模式，也不增加 resume。
+-- `tests/test_parallel_contract.py`：合成变长 batch 的汇总 loss/梯度、检查点与训练流程回归；双 GPU 测试在可见卡数不足时显式 skip。
++src/parallel.py实现单进程DataParallel，入口支持--parallel/--gpu-ids；原400k走根training.py的DDP路径（当前单进程world_size1）。v9只切batch维，全batch预处理/采样，汇总预测后计算loss，总batch和优化器步数不随卡数增加。首逻辑GPU为主卡。无DDP/FSDP/多机实现；默认规模双卡吞吐/显存未测，单多卡不承诺逐位一致。
+ 
++v9检查点保存未封装完整state_dict、优化器、epoch、验证和config；支持单多卡eval加载，但当前没有训练resume接口。400k入口支持本run模型/优化器恢复，也不是完整RNG/早停恢复。
+ 
+-## 2026-11-10 可选 padding 分类监督
++v9统一入口负责audit/smoke/train/eval/report/all与独立run登记；all实际为audit→smoke→train→best eval，不自动report。默认每100batch输出分项loss和分类点数，epoch记录分项/验证。尚未加入逐batch尖峰触发保存，不能承诺周期日志捕获所有异常。
+ 
+-- `src/losses.py`：增加 `classification_padding=ignore/official`，只切换分类点选择和原版标签转换顺序；重构计算保持不变。无 padding 的整数标签输入下两模式 loss/梯度一致。
+-- `src/config.py`：校验枚举，旧配置缺省 ignore；加载时将默认值写入生效配置，随快照和检查点保存。
+-- `configs/`：原三份配置显式 ignore，新增同名后缀 `_padding_official.json` 三份配置；每对只有该字段不同。
+-- `src/train.py`：训练和 smoke 传递模式，日志记录损失点数/有效点/padding点；两模式统一用 valid_total 早停和选best。ignore 的选择指标保持原值。
+-- `src/evaluate.py`：训练目标 loss 按模式计算，额外提供统一有效点CE和总损失、分母计数；检测指标一直排除padding。没有将补齐点加入F1/accuracy。
+-- `tests/test_padding_contract.py`：原版CE/梯度复现、过滤梯度、无padding等价、空集合、旧配置、严格校验、配对单变量差异、初始化/输入/mask/重构不变、两模式验证/训练/检查点及共同早停测试。既有并行测试扩展到两模式，配置列表测试纳入六份配置。
+-- `run_experiment.py` 及模型、数据、采样、并行模块保持不变。original_400k、根training.py、现有run/权重不修改，不启动正式训练。比较要求和命令见README。
++## 6. 核实位置与整理边界
++
++src/{models,sampling,losses,train,evaluate,parallel,audit,config}.py分别承担上述职责；README给出可执行命令，EXPERIMENT_SPEC约束工程行为。audits/patch_20261110、parallel_20261110、padding_20261110保留来源、差异、哈希与XML证据。
++
++本次整理只修正audit元数据及其断言、同步文档、归档旧备份并移除冗余入口/缓存，不改变模型/损失/训练/评价数值逻辑或六份配置。原migrations、padding的before备份和一次性停止脚本移入`/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/`；run、registry、数据、权重保留原位。
+--- before/experiments/ablation_v9/README.md
++++ after/experiments/ablation_v9/README.md
+@@ -1,125 +1,100 @@
+-# v9 P0/P1/P2 消融实验
++# v9 P0/P1/P2消融
+ 
+-本目录实现登记的 P0/P1/P2 消融协议。相对原始 TimeRCD 的实现差异见 `IMPLEMENTATION_DIFF.md`。统一入口是 `run_experiment.py`，配置与运行产物均位于本目录。
++更新时间：2026-11-10。统一入口为`/diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py`。六份当前配置尚未开展配对正式训练；历史P0中断产物见runs/p0_mask_x_seed072_old。合成检查通过不等于方法效果已验证。
+ 
+-本目录与 `/diskA/YYD/TimeRCD/experiments/original_400k/` 并列。默认数据路径为 `/diskA/YYD/TimeRCD/experiments/original_400k/data/`，工程规范见本目录 `EXPERIMENT_SPEC.md`。原流程和 v9 各有自己的统一入口和 runs；历史 run 快照不改写。
++## 当前协议与配置
+ 
+-三个配置分别为：P0 遮蔽输入并重构观测 `X`；P1 输入完整 `X` 并重构 `X`；P2 输入完整 `X` 并重构配对正常值 `X^0`。
++| 组别 | 模型输入 | encoder_mask | M选中位置的重构目标 |
++|---|---|---|---|
++| P0 | M处置零的X | V & ~M | X |
++| P1 | 完整X | V | X |
++| P2 | 完整X | V | 配对正常X^0 |
+ 
+-## 训练日志
++三组模型、原结构双头与损失权重相同。P1/P2前向相同，仅重构目标不同；X^0/Y仅监督。P1−P0共同取消输入置零和attention屏蔽；P2−P1检验正常参考监督，不自动证明解耦、反事实或正确使用上下文。
+ 
+-训练日志默认每 100 个 batch 写一次，格式与原版一致，包含 Total、Recon、Anomaly Loss；每个 epoch 还记录三项平均值和验证总损失。通过 `optimization.log_freq` 调整间隔。
++`model.patch_size=16`是编码器patch；`input.mask_patch_size=16`是遮挡/抽样块，独立配置；`input.mask_ratio=0.15`按有效块数取整抽样。历史官方单卡入口和本地400k在同进程也为16/16/0.15，类默认4不是该运行值。变更遮挡块只改input.mask_patch_size。
+ 
+-## 编码器 patch 与遮挡粒度
++配置均在`/diskA/YYD/TimeRCD/experiments/ablation_v9/configs/`：
+ 
+-二者是独立配置：
++| 组别 | ignore（默认） | official |
++|---|---|---|
++| P0 | p0_mask_x.json | p0_mask_x_padding_official.json |
++| P1 | p1_full_x.json | p1_full_x_padding_official.json |
++| P2 | p2_full_x0.json | p2_full_x0_padding_official.json |
+ 
+-- `model.patch_size=16` 是 TimeSeriesEncoder 的 patch 大小，与原版 400k 入口一致；
+-- `input.mask_patch_size=16` 是遮挡函数选择连续时间点块的长度，与官方历史训练入口及当前单 GPU 400k 复现一致；
+-- `input.mask_ratio=0.15` 是按遮挡块数量计算的选择比例。
++每对只差`loss.classification_padding`。ignore先筛选V及labels>=0，padding不参与CE；official严格复现先(labels>0.5).long()再过滤-1，使padding变成正常0，全部B×T参与CE。开关不改变实际padding、attention、重构、采样、初始化或优化器。主方法比较固定padding模式，padding比较固定P组与其他条件；历史400k不作单因素对照。
+ 
+-当前三组配置保持编码器 patch 为 16、遮挡块长度为 16、比例为 0.15。原配置类的默认值虽然是 4，但官方训练入口和 400k 入口使用 `config = default_config` 后将其原地改为 16，同进程遮挡函数也读到 16。之前“400k 是 16/4”的说明已更正。源码来源、多进程例外和测试证据见 `audits/patch_20261110/REPORT.md`。
++数据只读共用original_400k/data。默认d_model512、d_proj256、8层8头、单变量，batch16、lr5e-4、seed72、50轮上限，完整设置以JSON为准。旧run快照不改写，字段少于当前schema时不直接用于新运行。
+ 
+-调整遮挡粒度时只改 `input.mask_patch_size`；调整遮挡比例时只改 `input.mask_ratio`。不要为改变遮挡块长度修改 `model.patch_size`。16/4 可作为独立消融，但不能称为当前 400k 的复现设置。复制配置到新文件并使用新 run-id，保留既有 run 的配置快照。
++## 统一入口命令
+ 
+-例如，要测试遮挡比例 0.05，复制 P0 配置并只改 `input.mask_ratio`：
+-
+-```bash
+-cp /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x.json \
+-   /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x_ratio05.json
+-```
+-
+-随后通过统一入口使用新配置和唯一 run-id：
++只做合成小批量前向/反向（audit会检查真实数据文件和manifest，但不加载400k pickle）：
+ 
+ ```bash
+ CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
+   /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
+-  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x_ratio05.json \
+-  --run-id p0_mask_x_ratio05_seed072 \
+-  --mode all
++  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x.json \
++  --run-id p0_padignore_seed072_smoke_v2 --mode smoke
+ ```
+ 
+-Python 解释器使用 conda 环境的绝对路径。正式训练由用户决定启动。
+-
+-## 可选多 GPU
+-
+-默认 `runtime.parallel="none"`、`gpu_ids=null`，原单卡命令继续有效。
+-同机多卡采用单进程 `torch.nn.DataParallel`，通过统一入口启用：
++正式配对训练参考，由用户启动，使用不同run-id，保持同一设备及总batch：
+ 
+ ```bash
+-CUDA_VISIBLE_DEVICES=0,1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
++CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
+   /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
+   --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x.json \
+-  --run-id p0_mask_x_seed072_dp01 \
+-  --mode train --parallel data_parallel --gpu-ids 0 1
++  --run-id p0_padignore_seed072_train_v2 --mode train
++
++CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
++  /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
++  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x_padding_official.json \
++  --run-id p0_padofficial_seed072_train_v2 --mode train
+ ```
+ 
+-P1/P2 分别替换配置为 `p1_full_x.json` / `p2_full_x0.json`，并使用新的 run-id。
+-先将 `--mode train` 改成 `--mode smoke` 并换一个 run-id，可只做合成小批量前向/反向检查，不读取 400k pickle。
++P1/P2更换对应配置和run-id。每次创建独立runs/<run-id>，已有目录会拒绝覆盖。复制配置测试其他因素时，一次只改一个因素。当前没有v9 resume接口；保留优化器状态并不代表支持续训。
+ 
+-也可在复制的配置中设置 `runtime.parallel="data_parallel"`、`runtime.gpu_ids=[0,1]`，保持 `runtime.device="cuda"`。CLI 覆盖优先于 JSON，并将生效设置写入 run 的 `config.json`。设备编号相对于 `CUDA_VISIBLE_DEVICES`；如设置 `CUDA_VISIBLE_DEVICES=1,0`，`--gpu-ids 0 1` 的主卡是物理 GPU1。列表首卡保存参数、汇总输出和计算损失，显存使用可能更高；请先确认所选卡空闲。不指定可见设备环境变量时，编号对应当前进程可见的 CUDA 设备。
++| mode | 当前实际行为 |
++|---|---|
++| audit | 校验数据文件/manifest声明、划分数量、协议字段，构建CPU模型统计参数；不读取全部训练数据 |
++| smoke | audit后用合成batch做前向、损失和反向 |
++| train | audit → smoke → 训练及每轮验证/检查点 |
++| eval | audit后按给定配置加载--checkpoint，评价现有随机划分的验证侧 |
++| report | audit后汇总runs/*/metrics/eval.json；不会重新评测 |
++| all | audit → smoke → train → best检查点eval；当前没有自动调用report |
+ 
+-`optimization.batch_size` 始终是**总 batch**。例如 16 在两张卡间分摊，而非每卡 16；最后不足 GPU 数量的小 batch 自动使用可分配到的卡。标准化、padding 和随机 M 在完整 batch 上生成，损失在汇总预测上按全 batch 有效点计算，不对各卡均值再平均。因此模型、监督、学习率、样本顺序和更新步数不随卡数改变。并行归约和 dropout 随机流仍可能使数值轨迹不同，不能保证单卡/多卡逐位相同；比较 P0/P1/P2 时建议三组采用相同设备配置。
++eval使用新的run-id，显式给出绝对`--checkpoint`路径；当前输入/模型协议来自所选JSON，操作者须与检查点一致。all/eval会读取完整pickle，不是小测试。report目前只是指标列表，不提供统计检验或自动配对归因。
+ 
+-训练、验证、独立 eval 与 smoke 均复用同一封装。只由一个进程记录日志、早停和保存权重；检查点不带 `module.` 前缀，可通过 `--mode eval --checkpoint /绝对路径/best.pth` 在单卡/多卡加载。当前入口仍不支持恢复训练，本次没有增加 resume。
++## GPU与检查点
+ 
+-新增模块 `src/parallel.py` 负责配置校验、设备选择、封装与解封装。上述多卡改动没有修改模型结构及 `sampling.py`、`data.py`、`losses.py`、`evaluate.py` 的算法；不会出现原始 spawn 路径重新导入默认 mask 大小的问题，采样仍明确读取 `input.mask_patch_size=16`。
++默认runtime.parallel=none、gpu_ids=null。多卡在同一入口后增加：
+ 
+-## 检查命令
++```text
++--parallel data_parallel --gpu-ids 0 1
++```
++
++并设置CUDA_VISIBLE_DEVICES=0,1；也可在JSON设置runtime.parallel=data_parallel、runtime.gpu_ids=[0,1]、runtime.device=cuda。编号相对于可见GPU列表，首卡为主卡。CLI覆盖在保存配置快照之前生效。
++
++单进程DataParallel按batch维分配完整序列，每卡完整模型。batch_size始终指总batch，16在两卡分摊；标准化/补齐/M在分卡前完成，输出汇总后按完整batch计算损失，一次优化器更新。主卡汇总输出并持有优化器，默认规模吞吐和峰值显存尚未测；单多卡dropout及浮点归约不保证逐位一致。没有DDP/FSDP/多机实现。
++
++保存完整未封装模型state_dict（编码器+重构头+异常头，无module.前缀）、优化器、epoch、验证和实际配置，单多卡加载兼容。
++
++## 日志、评价与选择标准
++
++optimization.log_freq默认100，日志含Total/Recon/Anomaly、分类loss点数/有效点数/padding点数，每轮汇总分项与验证。仅周期日志可能漏掉短暂尖峰；逐batch异常触发保存尚未实现。
++
++- classification/total：所选padding模式的目标损失；两模式分母不同，绝对值不直接比较优劣。
++- valid_classification/valid_total：共同有效位置CE与加权总损失，保留重构项和既有batch均值汇总。
++- 两模式统一使用valid_total早停和选best；ignore时与原total相同。训练结果selection_metric=valid_total。
++- 分类accuracy/precision/recall/F1始终仅用有效标签点；classification_loss_points记录当前CE分母，classification_points为检测指标点数，padding_points为补齐点数。
++- 另报告M选中/全有效、正常/异常区域的重构误差，以及复制X作为正常预测的基线误差。
++
++当前eval未提供完整外部TSB-AD/VUS流程、密度分层、分组split审计、多种子统计或上下文干预。P2对X^0、P0/P1对X，各组目标total也不能直接横向判断方法优劣。正式对照需在共同检测协议、同预算/固定epoch等条件下评价。
++
++## 检查与资料
+ 
+ ```bash
+ /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
+   /diskA/YYD/TimeRCD/experiments/ablation_v9/tests/run_checks.py
+ ```
+ 
+-
+-## 分类损失的 padding 配对消融（2026-11-10）
+-
+-在同一 P 组内仅改变 `loss.classification_padding`，检验补齐位置参与分类监督的影响：
+-
+-```json
+-"loss": {
+-  "reconstruction_weight": 1,
+-  "classification_weight": 1,
+-  "classification_padding": "ignore"
+-}
+-```
+-
+-- `ignore`：先按 `valid & (labels >= 0)` 筛选，再二值化；padding 不参与 CE，分母是有效标签点数。默认及旧配置缺省行为保持这一模式。
+-- `official`：严格复现官方分类损失先 `(labels > 0.5).long()`、再 `labels != -1` 的顺序。padding=-1 变成正常标签0，全部 B×T 点参与 CE。只复现该损失行为，不代表完整复刻官方训练流程。
+-- 此开关不改变实际 padding、注意力 mask、重构 mask/目标、数据顺序、标准化、采样、模型初始化、优化器或并行方式。
+-
+-| 组别 | 排除 padding | 复现官方分类损失 |
+-|---|---|---|
+-| P0 | `configs/p0_mask_x.json` | `configs/p0_mask_x_padding_official.json` |
+-| P1 | `configs/p1_full_x.json` | `configs/p1_full_x_padding_official.json` |
+-| P2 | `configs/p2_full_x0.json` | `configs/p2_full_x0_padding_official.json` |
+-
+-每对配置仅该字段不同。统一入口和 GPU 参数继续通用。例如同一 GPU、同一 seed、同一总 batch 下的 P0 对照（由用户启动）：
+-
+-```bash
+-CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
+-  /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
+-  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x.json \
+-  --run-id p0_mask_x_padignore_seed072_v1 --mode train
+-
+-CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
+-  /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
+-  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x_padding_official.json \
+-  --run-id p0_mask_x_padofficial_seed072_v1 --mode train
+-```
+-
+-P1/P2 对应更换表中两份配置和 run-id。先后执行同一设备上的两次训练；如用多卡，各对照保持相同的 `--parallel`、`--gpu-ids` 和总 batch。训练前可用新 run-id 和 `--mode smoke` 检查。
+-
+-训练日志记录所选模式和每个已记录 batch 的分类损失点数、有效点数、padding 点数；配置快照、checkpoint.config、smoke 和训练结果也记录模式。
+-
+-验证/eval 同时报告：
+-
+-- `classification` / `total`：当前模式对应的分类/总目标损失，两种模式分母不同，不能据其绝对大小判断哪种训练更好。
+-- `valid_classification` / `valid_total`：统一排除 padding 的分类/总损失；总损失保留配置的原权重和原重构项，按现有 batch 均值方式汇总。
+-- `classification_loss_points`：实际参与所选模式 CE 的点数；`classification_points`：检测指标的有效标签点数；`padding_points`：补齐点数。
+-- accuracy、precision、recall、F1 始终只计算有效标签点。
+-
+-**两种模式的早停和 best 检查点都使用 `valid_total`**，从而保持选择标准一致；ignore 模式下它与原来的 `total` 完全相同。日志中的 `validation_loss`、训练结果的 `best_validation_loss` 均指此选择指标，结果另记 `selection_metric=valid_total`。若比较固定训练预算，可对同一 epoch 的检查点用相同 eval 协议评估，避免把不同最佳轮次误作相同步数。
+-
+-对照结果应来自本目录内的配对运行；历史 original_400k 还存在重排、随机源等差异，只作为原流程参考。当前没有因本次修改启动正式训练，亦没有 padding 对性能影响的结论。验证证据见 `audits/padding_20261110/`。
++检查仅用合成数据；有两张可见CUDA卡时执行真实双卡小模型检查，否则明确skip。patch审计sources是测试依赖，保留；历史修改前备份移至_archive，报告/哈希/差异仍在audits。工程规范见EXPERIMENT_SPEC.md，原版差异见IMPLEMENTATION_DIFF.md，运行事实见根实验记录.md。
+--- before/experiments/ablation_v9/src/audit.py
++++ after/experiments/ablation_v9/src/audit.py
+@@ -28,6 +28,7 @@
+ 
+     model = build_model(config.raw)
+     parameter_count = sum(parameter.numel() for parameter in model.parameters())
++    padding_policy = config.raw["loss"].get("classification_padding", "ignore")
+     return {
+         "status": "passed",
+         "experiment_id": config.experiment_id,
+@@ -42,7 +43,8 @@
+             "mask_patch_size": int(config.raw["input"]["mask_patch_size"]),
+             "mask_ratio": float(config.raw["input"]["mask_ratio"]),
+             "encoder_token_visible_if_any_point_visible": True,
+-            "classification_uses_valid_mask": True,
+-            "padding_label_is_not_used_as_normal": True,
++            "classification_padding": padding_policy,
++            "classification_uses_valid_mask": padding_policy == "ignore",
++            "padding_label_is_not_used_as_normal": padding_policy == "ignore",
+         },
+     }
+--- before/experiments/ablation_v9/tests/test_parallel_contract.py
++++ after/experiments/ablation_v9/tests/test_parallel_contract.py
+@@ -169,6 +169,10 @@
+     assert json.loads((run / "smoke.json").read_text())["global_batch_size"] == 16
+     assert json.loads((run / "config.json").read_text())["loss"]["classification_padding"] == policy
+     assert json.loads((run / "smoke.json").read_text())["classification_padding"] == policy
++    checks = json.loads((run / "audit.json").read_text())["protocol_checks"]
++    assert checks["classification_padding"] == policy
++    assert checks["classification_uses_valid_mask"] == (policy == "ignore")
++    assert checks["padding_label_is_not_used_as_normal"] == (policy == "ignore")
+     with pytest.raises(FileExistsError):
+         entry.run_one(args)
+ 
+--- before/experiments/original_400k/audits/README.md
++++ after/experiments/original_400k/audits/README.md
+@@ -0,0 +1,5 @@
++# 原流程审计证据
++
++stop_20261110/REPORT.md与stop_and_log_evidence.json保留2026-11-10停止400k和epoch11损失核查的原始事实。其历史引用的stop_and_inspect.py已移至`/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/one_off_scripts/stop_and_inspect.py`，不作常规进程管理工具。
++
++路径整理不改写历史报告中的命令、PID、时间或训练数值；当前状态见根实验记录.md。首次目录迁移的记录/旧脚本备份在同次归档original_400k_migrations/。
+--- before/experiments/original_400k/README.md
++++ after/experiments/original_400k/README.md
+@@ -1,45 +1,46 @@
+-# 原始 TimeRCD：400k 本地复现
++# 原始TimeRCD：400k本地复现
+ 
+-本目录与 `/diskA/YYD/TimeRCD/experiments/ablation_v9/` 并列。它保存基于原训练流程的 400k 本地复现，不代表官方训练数据和预算的完全复刻。
++更新时间：2026-11-10。此路线保存原训练流程的本地400k复现，不代表完整复刻官方语料和预算。与ablation_v9并列；v9只读共用本目录data，不复制数据。
+ 
+-## 目录
++## 文件职责
+ 
+-```text
+-original_400k/
+-├── run_experiment.py       # 生成、训练、比较的统一入口
+-├── src/
+-│   ├── generate_400k.py
+-│   ├── train_400k.py
+-│   └── compare_400k.py
+-├── data/                   # 数据及原始 manifest，v9 只读共用
+-├── runs/
+-│   └── time_rcd_400k_20261108/
+-└── migrations/             # 路径迁移记录及整理前脚本
++| 路径 | 职责 |
++|---|---|
++| run_experiment.py | 唯一工作流入口：generate/train/compare |
++| src/generate_400k.py | 生成400k数据及manifest，已有数据时拒绝覆盖 |
++| src/train_400k.py | 原流程续训配置，调用仓库根training.py |
++| src/compare_400k.py | 本地best与官方单变量权重的TSB-AD比较 |
++| data/ | 已有单变量数据及manifest，只读共用 |
++| runs/time_rcd_400k_20261108/ | 日志、配置快照、检查点；保留原内容 |
++| audits/stop_20261110/ | 停止身份、日志解析和epoch11尖峰核查 |
++
++旧migrations备份已归档至`/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/original_400k_migrations/`，不参与训练。一次性停止脚本位于同次归档one_off_scripts，不作常规工具执行。
++
++## 当前运行状态与协议
++
++最初从头训练，后从本run断点恢复。2026-11-10 22:12按用户要求停止PID408588，最后打印epoch12 batch2100/23750；epoch12未完成部分没有保存，不自动恢复。
++
++原代码与官方padding分类行为保留。模型patch16、遮挡块16、mask_ratio0.15，batch16、lr5e-4、weight_decay1e-5、seed72、FP32、最多50轮、patience7、workers0、log_freq100、save_freq5、物理GPU0。模型/损失与参数实现仍读取根training.py；训练不是v9的P0。
++
++epoch11平均train total155.5050，主要来自recon155.4366；classification0.0685，validation total0.0948。周期batch日志未捕获大幅异常，根因未明，不能直接归因于padding。完整事实见根实验记录及本目录审计。
++
++## 命令参考（不会自动执行）
++
++只查看入口帮助：
++
++```bash
++/home/omnisky/anaconda3/envs/time-rcd/bin/python3 /diskA/YYD/TimeRCD/experiments/original_400k/run_experiment.py --help
+ ```
+ 
+-`src/train_400k.py` 继续调用仓库根目录 `/diskA/YYD/TimeRCD/training.py`，不复制或改写原模型与损失。编码器 patch=16、遮挡采样块=16、遮挡比例=0.15，batch size=16，学习率=5e-4。此轮目录整理只调整路径，训练数值配置不变。
+-
+-## 命令
+-
+-现有 400k 已在续训，不要重复启动。以后恢复同一运行时使用：
++以后用户决定恢复同一run时：
+ 
+ ```bash
+-/home/omnisky/anaconda3/envs/time-rcd/bin/python3.10 \
++/home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
+   /diskA/YYD/TimeRCD/experiments/original_400k/run_experiment.py \
+   --mode train \
+   --resume /diskA/YYD/TimeRCD/experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/pretrain_checkpoint_latest.pth
+ ```
+ 
+-该命令仍使用原脚本指定的物理 GPU 0。目录整理没有增加或改变设备参数。
++当前train模式默认从latest恢复，缺失会报错；它不是新的“从头训练”接口。恢复模型/优化器并从下一epoch开始，但不恢复完整RNG和早停历史，不保证逐位等价。按现有日志/保存逻辑latest为epoch11、best为本次续训epoch10（val0.0678），本次未重新加载权重核内部元数据。入口固定GPU0，外部设置CUDA_VISIBLE_DEVICES会被原脚本覆盖。
+ 
+-入口支持 `--mode generate` 和 `--mode compare`，分别调用原生成脚本与比较脚本。数据已存在时生成脚本拒绝覆盖；训练和比较不会自动串联，运行前应登记并获得相应任务授权。只查看帮助不会执行这些阶段：
+-
+-```bash
+-/home/omnisky/anaconda3/envs/time-rcd/bin/python3.10 /diskA/YYD/TimeRCD/experiments/original_400k/run_experiment.py --help
+-```
+-
+-## 旧路径兼容
+-
+-`experiments/` 根目录的旧脚本、数据文件、manifest、runs 路径保留为符号链接。当前已启动进程仍持有旧路径，通过链接访问原数据和同一输出目录。旧 run 的配置快照、原 manifest 的 `data_path`、v9 历史 audit 源码保留原文，路径对应关系见 `migrations/layout_20261110.json`。
+-
+-后续代码和命令使用本目录的新路径。不要删除兼容链接，直到相关运行和历史引用已另行处理。
++generate、compare不会与训练自动串联，均需明确任务授权再执行。历史数据/manifest/runs链接保留，新命令使用本目录的绝对路径。
+--- before/experiments/README.md
++++ after/experiments/README.md
+@@ -1,32 +1,40 @@
+ # 实验工作区
+ 
+-两条实验路线各自管理代码、配置和产物，目录并列：
++更新时间：2026-11-10。当前有两条并列路线，各有一个执行入口。400k原流程已停止，旧P0已中断；六组padding配对正式训练尚未开展。状态和数值见根目录实验记录.md。
+ 
+ ```text
+ /diskA/YYD/TimeRCD/experiments/
+ ├── README.md
+-├── original_400k/
++├── original_400k/        # 原流程本地400k复现
+ │   ├── run_experiment.py
+-│   ├── src/                 # 原流程的数据生成、训练和比较
+-│   ├── data/                # 400k 数据及 manifest，v9 只读共用
+-│   ├── runs/                # 原流程运行产物
+-│   └── migrations/          # 路径迁移记录
+-└── ablation_v9/
+-    ├── run_experiment.py
+-    ├── EXPERIMENT_SPEC.md
+-    ├── configs/
+-    ├── src/
+-    ├── tests/
+-    ├── audits/
+-    ├── registry/
+-    └── runs/
++│   ├── src/             # generate / train / compare
++│   ├── data/            # 唯一400k数据及manifest
++│   ├── runs/            # 日志、检查点及历史快照
++│   └── audits/          # 停止与日志核查证据
++├── ablation_v9/          # P0/P1/P2 × padding配置驱动
++│   ├── run_experiment.py
++│   ├── configs/         # 三P组各ignore/official，共六份
++│   ├── src/             # 共享数据、模型、损失、并行、训练与评价
++│   ├── tests/
++│   ├── audits/          # patch/并行/padding证据，含测试依赖源码快照
++│   ├── registry/
++│   └── runs/
++└── _archive/             # 整理前文档、旧代码备份、一次性操作，不是实验入口
+ ```
+ 
+-- 原流程入口：`/diskA/YYD/TimeRCD/experiments/original_400k/run_experiment.py`；使用方法见该目录 README。现有 400k 在续训，勿重复启动。
+-- v9 入口：`/diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py`；P0/P1/P2 共享实现，由 JSON 配置区分。P0 旧 run 已中断，详情见根目录实验记录。
+-- v9 工程规范：`/diskA/YYD/TimeRCD/experiments/ablation_v9/EXPERIMENT_SPEC.md`。
+-- 两条路线读取同一份 400k 数据，v9 的默认配置指向 `original_400k/data/`，不复制或重新生成数据。
++此外保留dataset_400000...pkl、同名manifest和runs三个旧资产链接。历史run快照仍引用它们；它们指向同一份资产，不是额外副本。旧train/generate/compare脚本及EXPERIMENT_SPEC链接已移除，所有新操作使用路线内入口。
+ 
+-原来散落在 experiments 根目录的脚本、数据、runs 和规范路径现为兼容符号链接，用于当前运行和历史快照；它们不是独立代码副本。迁移详情见 `/diskA/YYD/TimeRCD/experiments/original_400k/migrations/layout_20261110.json`。
++| 资料 | 负责内容 |
++|---|---|
++| /diskA/YYD/TimeRCD/AGENTS.md | 执行约束与代码规范 |
++| /diskA/YYD/TimeRCD/研究问题和思路.md | 问题、假设、文献及结论边界 |
++| /diskA/YYD/TimeRCD/方法设计.md | 计算图、监督、对照与推进条件 |
++| /diskA/YYD/TimeRCD/实验记录.md | 当前状态、历史运行、证据与下一步 |
++| original_400k/README.md | 原流程入口与恢复限制 |
++| ablation_v9/README.md | 六配置、命令、GPU与当前评价能力 |
++| ablation_v9/EXPERIMENT_SPEC.md | 工程职责和实验合同 |
++| ablation_v9/IMPLEMENTATION_DIFF.md | 相对原版的当前差异，供核实 |
+ 
+-开展工作前阅读 `/diskA/YYD/TimeRCD/AGENTS.md`、`研究问题和思路.md`、`方法设计.md` 和 `实验记录.md`。目录整理不改变实验协议，也不授权自动重启训练、生成数据或测评。
++远端Python固定使用`/home/omnisky/anaconda3/envs/time-rcd/bin/python3`，脚本和数据使用绝对路径。不从README或归档计划自动启动训练、生成或测评。历史400k有其他流程差异，不能作为隔离padding作用的唯一对照；数据生成配置保持不变。
++
++清理清单、旧文档、迁移记录和保护校验见`/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/README.md`。
+--- before/README.md
++++ after/README.md
+@@ -2,13 +2,13 @@
+ 
+ Time-RCD 是一个用于时间序列异常检测的零样本基础模型项目，支持单变量和多变量序列推理，并保留训练、合成数据生成和 TSB-AD 评测代码。
+ 
+-## 当前状态（2026-11-09）
++## 当前状态（2026-11-10）
+ 
+ - `time_rcd.TimeRCDDetector` 是当前面向用户的零样本推理 API。
+ - `best_model/` 中保留单变量和多变量官方初始化权重，可直接进行本地推理。
+ - 当前科研路线以根目录三份 v9 文档为准：`研究问题和思路.md`、`方法设计.md`、`实验记录.md`。
+-- v9 的 P0/P1/P2 代码已实现，但尚未训练或测评；最终 B/Z 方案仍是后续计划。不要从历史记录自动启动新实验。
+-- 既有原流程 400k 训练的运行事实和产物记录在 `实验记录.md`，不等同于 v9 新方案结果。
++- v9已实现P0/P1/P2、padding配对开关与可选DataParallel，并通过合成检查；历史P0中断，六组配对正式训练尚未开展，B/Z仍是后续计划。
++- 原流程400k已于2026-11-10按用户要求停止，日志/检查点保留；状态与epoch11重构loss尖峰见`实验记录.md`。两条并列路线、入口和归档说明见`experiments/README.md`，不自动恢复历史任务。
+ 
+ ## 快速开始
+ 
+--- before/实验记录.md
++++ after/实验记录.md
+@@ -1,225 +1,101 @@
+ # 实验记录
+ 
+-更新时间：2026-11-09。当前口径：v9。主线为完整上下文下的正常参考预测、偏离重构与异常判别，再验证异常基元和少样本迁移。P0/P1/P2 工程代码已实现，尚未训练或测评；最终 B/Z 方法未实现，没有性能增益结论。
++更新时间：2026-11-10。本文是当前状态与证据索引；数值以原run日志为准。逐次追加的整理前全文保存在`/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/before/实验记录.md`。不从历史计划自动启动任务。
+ 
+-## 1. 当前研究与执行边界
++## 1. 当前状态
+ 
+-用户明确决定沿用当前数据生成配置，只更新研究表述。本次未修改生成器、配置、标签、采样规则或训练入口，未生成数据、加载模型、启动训练或耗时评测，未替换官方权重。
++| 路线/工作 | 已执行事实 | 当前状态 |
++|---|---|---|
++| original_400k | 400k单变量数据、原流程从头训练，之后从同一run恢复到epoch10继续 | 2026-11-10 22:12按用户要求停止PID408588，最后打印epoch12 batch2100/23750 |
++| 历史v9 P0 | 训练到epoch4并保存0–4轮检查点 | 用户已中断；run目录现为p0_mask_x_seed072_old，不是完成实验 |
++| 当前P0/P1/P2 × padding两模式 | 六份配置、共享训练/验证、配置与检查点记录已实现 | 仅合成微型训练与接口/梯度测试通过，未开展六组配对正式训练 |
++| 单卡/双卡 | 单进程DataParallel、完整batch损失、便携检查点 | 已做真实双GPU小模型检查；未测默认规模正式训练吞吐/峰值显存 |
++| P3/P4/P5 | H三任务、B/Z、基元及少样本方案已讨论 | 未实现、未训练，无收益结论 |
+ 
+-配置不变是研究控制变量选择，不等同于已证明语料覆盖充分。当前下一步为 P2：完整输入、原双头，随机约 15% patch 仅选择正常参考损失位置，同时保留 H 上异常分类。P0/P1/P2 代码已写入 experiments/ablation_v9/，但新方案尚未运行；B/Z、偏离监督与基元仍是后续阶段，不能把最终架构当作立即执行指令。既有原流程训练在运行。
++当前没有因本文或目录整理自动启动任何训练、数据生成或耗时测评。GPU和进程快照不作为持续监控。
+ 
+-## 1.1 已有原流程 400k 训练（活动实验，非本次启动）
++## 2. 资产与入口
+ 
+-【核实：只读检查，远程时间 2026-11-09T14:25:17+08:00】PID 2411367 的 python -u train_400k.py 仍在运行，工作目录 /diskA/YYD/TimeRCD/experiments。最近日志进度：Epoch 7, Batch 13600/23750。这是当次快照，不是持续监控或完成报告。
++所有路径均相对于`/diskA/YYD/TimeRCD/`：
+ 
+-- 入口：experiments/train_400k.py；配置：experiments/runs/time_rcd_400k_20261108/train_config.json。
+-- 日志：experiments/runs/time_rcd_400k_20261108/train.log；权重：同目录 checkpoints/。
+-- 数据 400000 条单变量序列；batch 16、patch 16、学习率 5e-4、weight decay 1e-5、dropout 0.1、seed 72、最多 50 轮、early stopping patience 7、不使用混合精度。
+-- 入口 continuation_checkpoint=None，调用原 training.py 的 train_worker；这是原流程从头训练，不是官方检查点继续训练。保留了原标签 padding 行为。
+-- 配置记录原数据类随机 95/5 划分（seed 42）；是否满足同基底分组尚未审计。
+-- 前次读取日志的最佳验证总损失约 0.0690（epoch 5），epoch 6 升至约 0.3944；这是训练日志事实，非最终检测效果或因果判断，不据此中断任务。
+-- 当前任务没有读取权重张量、重启／停止进程或修改运行脚本。未来可复用产物，但需按方法设计.md 的初始化与预算协议另设严格对照。
++| 资产 | 位置与用途 |
++|---|---|
++| 原流程入口 | experiments/original_400k/run_experiment.py；train调用根training.py，保留官方padding行为 |
++| v9入口 | experiments/ablation_v9/run_experiment.py；P0/P1/P2配置驱动，默认ignore，可选official |
++| 数据 | experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl及manifest；单份数据只读共用；manifest声明长度1000–10000、平均3940.472515，文件38865368343字节，本次未重算 |
++| 原流程产物 | experiments/original_400k/runs/time_rcd_400k_20261108/；train.log、resume_console.log、train_config.json、checkpoints/ |
++| 历史P0产物 | experiments/ablation_v9/runs/p0_mask_x_seed072_old/；保留原快照、日志与检查点 |
++| 官方权重 | best_model/pretrain_checkpoint_best_uni.pth、pretrain_checkpoint_best_multi.pth；未替换 |
++| 当前代码证据 | 两条路线的audits/；patch审计sources仍被test_patch_parity使用 |
++| 整理历史 | experiments/_archive/20261110_cleanup/；文档原文、迁移记录、旧代码备份与一次性脚本 |
+ 
+-## 2. 可复用资产与代码事实
++experiments根目录保留数据、manifest、runs三个资产兼容链接，以支持历史快照；旧脚本/规范入口链接已移除。历史快照原文不改写。初次迁移的大数据inode/大小核对见归档迁移记录；本次未重新哈希或复制大型数据/权重。
+ 
+-| 资产 | 用途 | 限制 |
++## 3. 已运行训练的关键事实
++
++### 3.1 400k原流程
++
++配置：400000条单变量序列，随机95/5划分seed42，batch16，编码器patch16，遮挡块16，mask_ratio0.15，lr5e-4，weight_decay1e-5，dropout0.1，seed72，最多50轮，patience7，FP32，num_workers0，物理GPU0。它是本地400k复现，不宣称完整复刻官方训练语料和预算。
++
++初次从头训练中断后，2026-11-10从本run的latest恢复模型与优化器，由epoch10继续；没有恢复完整RNG/早停历史，不能称逐位等价续训。停止前最近完整轮次：
++
++| epoch（从0起） | 平均训练Total | Recon | Anomaly | 验证Total |
++|---|---:|---:|---:|---:|
++| 10 | 0.0609 | 0.0423 | 0.0186 | 0.0678 |
++| 11 | 155.5050 | 155.4366 | 0.0685 | 0.0948 |
++
++epoch11的100+是全轮平均；每100batch打印一次，该轮已打印batch最大total仅0.5330，巨大贡献没有被周期日志捕获。主要异常在重构项，具体样本/触发batch/根因未知；分类padding不能据此被认定为直接原因，也不能排除共享编码器梯度的间接影响。
++
++停止：向核实身份的PID408588发送SIGTERM，进程消失，随后GPU0为6MiB/0%。epoch12未完成状态未保存；原run日志和权重均保留。按日志和保存逻辑，latest对应epoch11，best对应本次续训epoch10（val0.0678）；未为此次核查加载检查点内部元数据。
++
++证据：`/diskA/YYD/TimeRCD/experiments/original_400k/audits/stop_20261110/REPORT.md`及stop_and_log_evidence.json。PID限定的一次性停止脚本已归档，不作为常规入口。
++
++### 3.2 历史P0
++
++旧run原名p0_mask_x_seed072，当前目录p0_mask_x_seed072_old。用户在epoch4后中断，保留epoch0–4检查点。epoch3 train_loss=129.51721267、validation_loss=0.19006942；epoch4回落至0.22294384/0.12581957。当时没有batch分项日志，不能确定原因。
++
++旧P0的编码器与遮挡块均为16，不能声称其遮挡比400k更大，也不能因patch审计而将其作废。它与原流程仍有padding、顺序、随机源等差异，不是严格单因素对照。旧run快照字段可能少于当前schema，不直接当作当前配置执行。
++
++## 4. 当前工程协议与验证
++
++P0：遮蔽X、V&~M、选中M上预测X；P1：完整X、V、同M预测X；P2：完整X、V、同M预测X^0。模型/头结构相同，X^0和Y仅监督。默认patch16/遮挡16/ratio0.15，模型d_model512/d_proj256/layers8/heads8/单变量，batch16，lr5e-4，50轮上限。完整数值以六份JSON为准。
++
++padding轴：loss.classification_padding=ignore/official。三份原配置为ignore，三份*_padding_official.json仅该字段不同。ignore先过滤padding；official复现先二值化使-1变0的原CE。主方法比较固定同一模式，padding比较固定同一P组。历史400k与P0不能单独隔离padding影响。
++
++两模式验证均提供目标loss和valid_classification/valid_total；都使用valid_total早停/选best，检测指标始终排除padding。目标loss分母不同，不直接比较绝对大小。默认每100batch记录Total/Recon/Anomaly及分类点数；异常触发诊断尚未实现。
++
++DataParallel按batch分配完整样本，每卡完整模型；全batch标准化/补齐/采样，汇总后计算loss，总batch不随卡数增加。保存完整未封装state_dict，单多卡可加载；v9仍无resume，不支持DDP/FSDP。dropout与浮点归约不保证逐位一致。
++
++| 核查/实现 | 最近已完成验证 | 证据 |
+ |---|---|---|
+-| best_model/pretrain_checkpoint_best_uni.pth、pretrain_checkpoint_best_multi.pth | 官方初始化与基线 | 只读保留；预训练暴露尚未完整追溯 |
+-| dataset_gen/ | 配对数据接口与机制分析 | 保持配置；配对噪声、缩放、标签含义仍需解释 |
+-| datasets/TSB-AD-U/、datasets/TSB-AD-M/ | 外部检测评价 | 不能代替故障类型真值 |
+-| experiments/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl 及 manifest | 已有原流程 400k 训练正在使用的约 37 GiB 数据 | 未为本版整体载入、统计或验证分组 |
+-| experiments_archive_20261107/ | 历史追溯 | 不自动恢复任务，不作为本版方法证据 |
++| patch与官方路径 | 初次本地20项；后续远程套件已覆盖相关回归 | ablation_v9/audits/patch_20261110/ |
++| DataParallel | 初次远端40项通过，含三P组真实双GPU | ablation_v9/audits/parallel_20261110/ |
++| padding配对开关 | 本地69通过6跳过；远端75通过，无跳过，9.88秒 | ablation_v9/audits/padding_20261110/ |
++| 本次目录/文档整理 | 远端75项通过、无跳过，8.11秒；两入口help通过；28项受保护资产未变，不计作方法性能实验 | _archive/20261110_cleanup/ |
+ 
+-2026-11-08 静态审计事实保留：
+-- training.py 读取正常配对，但原重构仅在随机遮蔽位置拟合观测；与分类共用遮蔽前向，优化器包含骨干。
+-- 原重构头为逐位置 MLP；patch 内时间位置具有不同投影。异常头通道聚合后产生逐时间分数，常规推理不使用重构头。
+-- 配置默认 patch 4、常用入口 16，须核实际配置；attention 权重不是直接返回项。
+-- padding 标签先二值化再过滤会将无效位置当正常；未修复。
+-- batch 观测统计与推理标准化需核查；生成前以异常观测统计共同缩放配对，噪声过程也读取异常形态。配对不自动等于干预独立的因果反事实。
+-- training.py 与 TimeRCD_pretrain_multi.py 有重复定义，训练／推理须保持一致。
+-- 骨干更新后旧冻结特征缓存失效；冻结读出不证明骨干表征增强。
++小测试只用合成数据，不加载400k训练数据。覆盖默认规模CPU smoke、小模型真实双卡、loss/梯度/尾batch、六组合微型训练/验证/检查点、配置单变量差异、共同早停等。尚无P1/P2正式结果、外部检测增益、密度分层或正常参考有效性的证据。
+ 
+-详细位置见方法设计.md 第 2、7 节。以上不是新方法运行结果。
++## 5. 已纠正事项与证据边界
+ 
+-## 3. 既有文献调研
++- patch：config=default_config后原地改为16，当前单卡400k同进程mask读到16；初始默认4不是运行值。历史spawn可重导入默认4，是另一路径。论文附录D.5列patch16，正文mask15%，没有据此得出独立mask4。
++- SSH：绝对路径bin/python3可运行time-rcd；此前bin/python3.10、conda run不匹配白名单，不能泛化为SSH拒绝Python。MCP配置未修改。
++- 代码状态：当前P0不是官方全流程复制；统一过滤/复现padding只控制一个因素，不消除DistributedSampler重排、全局随机源和验证M等差异。
++- 数据：沿用生成配置；单变量35%标签占比限制、连续/多点异常能力不代表实际局部密度分布已统计；多变量不直接套用此上限。
++- 配对：X^0不是已证明的独立因果反事实；共同缩放、噪声和标签语义仍需审计。随机95/5 split尚未证实背景分组隔离，不能写成已满足。
++- 文献：TimeRCD频繁异常可能被局部参考吸收的限制及相关工作边界见研究问题和思路.md；此前检索范围不因本次整理扩大。已不存在的旧归档路径和/tmp证据不再当作可用资产承诺。
+ 
+-2026-11-08 已核查 TimeRCD、Anomaly Transformer、DCdetector、AnomalyBERT、TimeRadar、HieraNTP、Normality Constraint Learning 的相关正文；Anlu 改核 PDF §3。复合故障字典与零样本部分工作仅核元数据／摘要。来源与范围保留在研究问题和思路.md 第 7 节，本次没有重跑这些工作。
++## 6. 下一步（待执行，不自动授权正式训练）
+ 
+-当前方法更接近正常／异常因素分离、残差辅助多任务与条件重构，其最近邻全文仍需补查。既有列表不能证明首次或 TimeRCD 独有优势。
++1. 优先定位loss尖峰：设计逐batch异常触发记录，保存样本索引、输入/目标/预测统计和梯度；先用合成数据验证。诊断开关及阈值应在配对组一致。
++2. 明确padding配对的预算、种子、设备和评价标准，再在同一P组内比较ignore/official；不要拿历史400k与旧P0直接归因。
++3. 在固定padding策略下做P0/P1/P2同预算筛选；P1−P0是值置零与attention屏蔽共同取消，P2−P1才是正常参考目标变化。
++4. 补充配对质量、分组split、复制基线/局部捷径、外部评价、密度分层与合法上下文干预；这些并非当前eval已全部实现。
++5. 证据充分后按方法设计推进P3、P4、P5；相同分类器/标签/预算对照H/Z/A，真实故障类型数据仍待定。最近邻全文仍需补核。
+ 
+-## 4. 2026-11-09 密集异常核查
++阈值/超参不在测试集挑选。配对副本、同运行相邻窗口应分组隔离，但调整split必须对全部新组一致，不能混入方法收益。冻结特征缓存随骨干更新而失效；低重构误差、稀疏或正交不证明上下文理解、解耦或机制语义。
+ 
+-类型：只读论文与代码核查，非训练实验。
++## 7. 本次整理范围
+ 
+-【核实】项目内 2026 PDF 与 https://arxiv.org/html/2509.21190 当前版本 Limitations 明确描述：同一大窗口内频繁出现的异常点可能被部分吸收为局部参考模式，削弱异常信号；以 Stock 为例。当前表 8 的 Stock 平均异常率为 9.4%。该事实不能升级成注意力关注无关异常的因果证明，也不能将密集异常等同于总体占比超过一半。早期 v1 与当前版本不同，不跨版本回填限制描述。
++保留两条路线代码、六份配置、run/registry、数据/权重与必要审计。migrations、padding修改前备份和一次性停止脚本移入_archive；移除四个旧代码/规范链接和可重建缓存，保留三个历史资产链接。旧文档全文和文件身份清单先备份后修改。
+ 
+-核查留存：/tmp/timer_rcd_paper_audit.txt、/tmp/timer_rcd_current.html、/tmp/timer_rcd_v1.html。
+-
+-本次核查项目 HEAD：c5ff387a1610c84c6951cca466fdd02e252b9ea7。
+-
+-| 代码位置 | 当前项目行为 |
+-|---|---|
+-| ts_multi_generator.py:48、:154 | 单变量标签占比超过 0.35 拒绝 |
+-| 同文件 :148、:572、:606 | 异常区间重叠拒绝，重新生成直至通过 |
+-| 同文件 :404 | 属性集默认可采样 0–3 个局部变化位置 |
+-| 同文件 :589 | 满足条件时额外加入多个 outlier |
+-| ts_generator.py:1264 等 | 支持连续震荡、尖峰和宽尖峰等 |
+-| generate_dataset.py:437、:260 | anomaly_sample_ratio=1.0 指含异常样本比例 |
+-| ts_multi_generator.py:685–724 | 多变量标签可能传播扩展，不直接套用单变量比例上限 |
+-
+-代码位于 dataset_gen/src/。支持生成连续、多点及局部密集异常，不代表实际语料各密度的频数已经统计。
+-
+-当前项目远端为 Adomyyd/TimeRCD。本次官方 https://github.com/thu-sail-lab/Time-RCD 的 main 文件树（SHA 372bb980426b2f67007311c6f3165ab789c79bef）未包含当前 dataset_gen 文件。未证明当前配置就是官方检查点训练配置。
+-
+-未载入 37 GiB 数据、未统计真实训练密度分布、未加载模型或做注意力实验。“训练充分覆盖密集异常”和“失效必然源于特征约束”均未证实；用户决定保持现有生成配置，本次不调整分布。
+-
+-## 5. 文档修订记录
+-
+-2026-11-08：v7/v7.1 提出遮蔽正常路径、完整观测路径、条件重构与正常零约束，并完成原流程静态审计。该设计已由后续讨论取代，不再作为执行指令。核查事实保留，旧文档在备份中追溯。
+-
+-2026-11-09：v8 统一修订：
+-1. 核心目标为正常预期、异常语义／事件关系和偏离信息的提取与利用，不声称 H 原本没有这些信息。
+-2. 完整上下文一次骨干前向，全部位置使用预测的 Z；取消强制遮蔽、双前向和正常 Z 零正则。
+-3. 当前候选为正常参考预测＋仅从 Z 解码配对偏离＋从 Z 分类；相加得到观测重构。
+-4. 二分类不直接监督类型／事件归属；正确关注、完全解耦与密集场景改善均为待验证目标。
+-5. 数据配置保持不变，动机采用局部参照吸收异常的准确表述。
+-6. 保留同监督直接 H／多任务强对照、基元与真实少样本目标。
+-7. 仅修改三份正式 Markdown；未改代码、配置、数据、历史产物或权重。
+-
+-2026-11-09：v8.1 输出头结构决策（仅文档，非实验）：
+-1. 再次核对 training.py:101、:112 和 time_rcd/_core/TimeRCD_pretrain_multi.py:56、:67，确认两个定义中的原重构头与异常头结构一致。
+-2. D_n、D_a 固定完整复用原重构头 d→4d→4d→1；C 固定复用原异常头 d→floor(d/2)→2，隐藏层 GELU／Dropout 位置及 dropout 配置均沿用。头之间参数独立。
+-3. 新增 N、E 固定为 d→d→d 的逐位置两层 MLP（中间 GELU），B/Z 与 H 同维。第一版取消压缩维度候选；N/E 不冒称原有头。
+-4. 统一公式为通道 logits 均值、双类 softmax 概率和交叉熵，明确有效位置过滤；仅沿用结构，不继承 padding 错误。
+-5. 计划骨干初始化后联合训练，新模块随机初始化；补充单次迭代流程、容量匹配与恒等提取器消融。初始化、训练均未执行。
+-6. 结构复用不是参数共享，不代表整网参数量不增加；贡献定位仍是分支职责和监督约束，非新 MLP 架构。
+-7. 仅同步三份正式文档，保留原有未提交修改；代码、配置、数据和权重未改，未启动训练或测试。
+-
+-2026-11-09：v9 分步验证决策（文档规划）：
+-1. 区分最终研究目标与下一步：P2 暂不增加 N/E、B/Z、偏离头、基元或不确定性。
+-2. P2 完整 X→H，沿用原重构头预测 X^0；按 patch 均匀选约 15% 有效位置计算 MSE，M 只选择损失，不遮蔽输入或注意力；原异常头继续读取 H。
+-3. 固定 P0 原遮蔽／X、P1 完整输入／X、P2 完整输入／X^0 三组的相同 15% 重构位置策略，分别区分输入可见性与正常参考目标的影响。
+-4. 后续先 H 三任务 P3，再 B/Z P4，再基元／少样本 P5。各组独立初始化、预算匹配，组内联合训练。
+-5. 重读论文第 3–4 页与附录 C.3/C.4 及实际代码：确认原版遮蔽值和注意力键，保留查询，重构损失仅在选中位置；配对正常监督不自动替代原掩码约束。
+-6. 补充已有原流程 400k 活动训练，纠正“没有任何运行实验”或“该运行是继续训练”的潜在误读；新方法仍未运行。P0/P1/P2 工程代码随后已单独实现，但未启动训练。
+-7. 补充复制基线、分区域恢复误差、密度分层、上下文干预和阶段推进条件；仅改三份正式文档。
+-
+-验证范围为读回、三文件术语／计算图一致性、数学定界符与变更范围；不计为模型测试。实际验证结果以此次工具输出为准。
+-
+-2026-11-09：P0/P1/P2 工程实现完成（未训练、未测评）：
+-1. 在 experiments/ablation_v9/ 建立配置、共享数据/采样/模型/损失/训练/评估模块和统一入口 run_experiment.py。
+-2. 三个配置分别固定 P0 原始遮蔽/X、P1 完整输入/X、P2 完整输入/X^0；共享当前 400k 的模型头结构和训练预算。
+-3. 新实现显式过滤有效标签，修复 padding 标签参与分类损失的实现风险；该统一处理适用于 P0/P1/P2，P0 不再是原脚本的字节级复制。
+-4. 增加配置快照、数据 manifest、代码版本、日志、检查点、评估指标和 run 登记；未读取 37 GiB 数据进行训练，未启动新任务。
+-
+-## 6. 下一步与后续计划
+-
+-以下新任务均未启动，不构成新增训练／生成授权。活动 400k 原流程见第 1.1 节，不重复启动。
+-
+-| 编号 | 问题与对照 | 数据与指标 | 状态／推进条件 |
+-|---|---|---|---|
+-| Q0 | 配对、有效标志、原流程与初始化协议审计 | 现有 400k 数据的有限样本；配对差值／标签、坐标、split 与配置快照 | 下一步先完成；不修改生成配置 |
+-| Q1 | P1/P2 的小规模前向、损失与梯度检查 | 小批次；确认 M 不进入完整输入路径，X^0 仅作监督，CE 处理有效位置 | 代码已实现；待远程 audit/smoke，通过后再训练 |
+-| Q2 | P0/P1/P2 同预算筛选 | 相同数据划分；固定验证 M、正常／异常区域 MSE、复制基线、检测及密度分层 | 待预算与初始化路线；P2−P1 归因正常参考监督 |
+-| Q3 | 正常参考是否可重复恢复、检测是否改善 | 关键组多种子与合法上下文干预 | 未获证据则诊断复制／覆盖／配对，不直接堆模块 |
+-| Q4 | P3 偏离监督与 P4 显式分支的增量 | 同监督 H、容量匹配、删除损失；数值监督位置策略匹配 | 后续；正常参考假设未成立时须另登记探索假设 |
+-| Q5 | P5 基元、留出组合与真实 K-shot | 同分类器比较 H/Z/A，真实类型数据集待定 | 后续；扩容与不确定性暂缓 |
+-| QL | 正常／异常分离、残差多任务与条件重构近邻全文 | 文献来源与监督／划分对照 | 待检索，不影响先明确最小协议 |
+-
+-开跑前登记初始化 checkpoint／哈希或从头规则、数据划分、种子、批量、学习率、步数、早停与选择规则、padding／标准化策略、产物路径及停止条件。不能把不同目标总损失横向当作优劣；原样历史基线与统一修正实现的严格对照分开报告。
+-
+-最终方向不变：正常参考与偏离表征 → 可组合异常基元 → 少样本故障类型迁移。当前只验证其中第一步。历史 T0–T6、S1、WP-MIN1 等计划不自动恢复；已运行 400k 原流程按事实保留，不能误当未启动历史计划。
+-
+-## 7. 保留的实验纪律
+-
+-同基底与干预副本、同运行相邻窗口不跨 split；阈值和超参数仅用训练／验证信息。所有对照匹配监督、更新预算和事件边界。故障类型真值与时间异常标签分开。
+-
+-基元语义、跨背景稳定性与程度含义须验证；低误差、稀疏、正交不自动证明解释性。参考误差不等于未知机制。没有配对的真实数据不伪造正常真值。原始与修正版基线分别记录。
+-
+-
+-## 8. 2026-11-10 P0 首次训练中断与日志改进
+-
+-- P0 run：`experiments/ablation_v9/runs/p0_mask_x_seed072`，配置使用 `patch_size=16`、`mask_ratio=0.15`、batch size 16、学习率 5e-4。
+-- 用户在 epoch 4 完成后停止训练。最后已保存 epoch 0–4 checkpoint；旧 run 产物保留，状态登记为 interrupted，不作为完成实验。
+-- epoch 3 的 train loss 为 129.51721267，validation loss 为 0.19006942；epoch 4 train loss 回落至 0.22294384，validation loss 为 0.12581957。旧训练未记录 batch 级分项损失，无法定位异常 batch，也不能据此断言由遮挡造成。
+-- 先前诊断已撤回（2026-11-10 全链路补核）：P0 旧采样为 16；当前 400k 的 `config = default_config` 会原地将全局配置也改为 16，故同进程原遮挡函数同样读取 16。没有证据表明 P0 的遮挡块比当前 400k 更大，不能据此解释 epoch 3 的高 loss。
+-- 已在 v9 训练循环加入与原版格式一致的 batch 级 Total/Recon/Anomaly Loss 日志，默认每 100 batch 记录一次，同时保留 epoch 平均分项和验证总损失。新增配置字段为 `optimization.log_freq`。
+-- 三个默认配置仍为 `patch_size=16`、`mask_ratio=0.15`。后续遮挡强度对照应复制配置、单独改一个因素、使用新 run-id；当前代码改动未启动训练。
+-- 验证限制：远程 SSH 白名单拒绝 Python 命令，尚未能运行 pytest 或 Python 语法检查；已读回核实代码片段、配置内容和 P0 状态写入。
+-
+-
+-此前“400k 是编码器 16、遮挡 4”的更正同样撤回：它遗漏了 `config` 与 `default_config` 是同一对象。拆分配置字段仍然正确，但三份默认实验配置现已统一为 `model.patch_size=16` 与 `input.mask_patch_size=16`，遮挡比例 0.15。单独做 4 点遮挡消融时只改 `input.mask_patch_size`，不能改变编码器结构。
+-
+-## 9. 2026-11-10 patch 与遮挡全链路审计
+-
+-- 问题：追溯官方源码、400k 入口与 P0/P1/P2 的有效设置；只做源码核查与小测试，不启动训练，不改已有 run 数据或检查点。
+-- 官方证据：历史训练入口为 `thu-sail-lab/Time-RCD@ebf4f056b571f7ea90602ef666ae56f7d717ebfe/training.py`。该版本配置类和编码器与服务器文件 SHA-256 相同。官方当前 main 库不是该训练入口，保留默认 4 且使用噪声替换，应区分来源。
+-- 核实结果：历史官方默认单 GPU 和当前 400k 单 GPU 均为编码器 16、遮挡块 16、比例 0.15、选中值置零。`spawn` 子进程可能收到模型 16 却重导入全局默认 4；不可将其等同于当前 400k 路径。
+-- 修改：P0/P1/P2 默认采样块从上次误设的 4 改回 16；训练与评估均继续读取独立字段。audit、smoke 和新训练日志显式记录两种 patch 大小与比例。旧 P0 使用模型 patch=16 采样，本项与当前 400k 相同，其 interrupted 状态及原产物保留，不能因本项将旧结果作废。
+-- 验证：本地 Windows CPU 的 20 项 pytest 已通过（含三组默认模型前向和反向），覆盖官方原函数同种子采样/置零一致性、短序列/padding、多通道、配置对象别名、spawn 全局重新初始化、训练/验证三组输入、真实编码器 token 掩码聚合。没有运行服务器 time-rcd 环境的 GPU smoke，远程 Python 命令仍被 SSH MCP 白名单拒绝。
+-- 产物：`experiments/ablation_v9/audits/patch_20261110/REPORT.md`、`sources/`、`source_manifest.json` 和 `pytest_local.xml`。patch 一致不等于整个训练完全相同；padding CE、数据重排、随机源和验证 M 仍有已披露差异。
+-
+-
+-## 10. 2026-11-10 experiments 目录整理
+-
+-状态：已规划，正在执行；仅整理目录和路径，不启动训练、生成数据或测评。
+-
+-- 问题：400k 原流程脚本、数据和 runs 散落在 experiments 根目录，与 ablation_v9 不对称。
+-- 目标：original_400k 与 ablation_v9 两个并列实验目录；400k 的 src/data/runs 收拢到 original_400k，v9 默认配置读取同一份 400k 数据。
+-- 迁移：旧脚本、数据、runs 和规范路径保留兼容符号链接；正在运行的进程继续使用旧路径。已有 run 快照、manifest 原文和审计源码不改写，由路径迁移记录解释。
+-- 验证计划：核对迁移前后文件身份、大小和路径可达性；本地语法检查、入口帮助、原计算函数 AST 一致性及现有 v9 测试；观察原训练日志继续增长。远程 Python 测试仍受 SSH 白名单限制。
+-
+-状态更新：目录整理已完成。
+-
+-- 原流程统一入口：`/diskA/YYD/TimeRCD/experiments/original_400k/run_experiment.py`；生成/训练/比较脚本在其 src，数据在 data，原运行产物在 runs。与 ablation_v9 并列。
+-- v9 工程规范归入 `ablation_v9/EXPERIMENT_SPEC.md`，三份默认配置的数据与 manifest 路径改为 `original_400k/data/`；全部数值超参不变。
+-- 旧脚本、数据、manifest、runs、规范共 7 个旧路径保留符号链接。历史 run 配置、manifest 原文和 v9 审计快照不改写。迁移详情及整理前脚本见 `original_400k/migrations/`。
+-- 数据 inode=184157506，manifest inode=184157507，runs inode=184164387，原 run inode=184164388，latest checkpoint inode=184157513；迁移前后保持一致，大小不变，没有复制 38.9 GB 数据或修改检查点。保留原 manifest 中的已声明 SHA-256，本次未重算大文件哈希。
+-- 迁移后原训练日志由 epoch 10 batch 5800 继续到 batch 6000；未启动、停止或重启训练。
+-- 本地验证：三个原脚本函数/类 AST 一致；Python 语法、入口帮助、三种模式路由及错误参数拒绝检查通过，未执行实际工作流；v9 20 项 CPU 测试通过。远程 time-rcd Python/GPU 测试未运行，受 SSH MCP 白名单限制。
+-
+-
+-## 11. 2026-11-10 P0/P1/P2 可选多 GPU 数据并行
+-
+-状态：实现与小测试准备中；不启动正式训练。
+-
+-- 问题：在同一消融协议下可选单卡/多卡，统一入口执行。
+-- 方案：单进程 DataParallel，仅在 batch 维分配模型前向；标准化、采样和损失仍按完整 batch 处理。保持总 batch_size、数据顺序、两种 patch 设置、监督及优化器步数语义。
+-- 文件规划：新增 ablation_v9/src/parallel.py 和 tests/test_parallel_contract.py；修改 run_experiment.py、src/config.py、src/train.py、三份默认配置和相关说明。默认单卡；检查点保存未封装模型的 state_dict。
+-- 数据与验证：沿用 original_400k 数据路径，但测试仅使用合成小样本，检查全局 loss/梯度、权重兼容、配置及错误路径；GPU 可用性/实际测试结论随后补记。
+-
+-状态更新：可选多 GPU 已实现并通过远程验证，未启动正式训练。
+-
+-- 统一入口新增 --parallel data_parallel --gpu-ids 0 1，也可在 JSON 设置 runtime.parallel/gpu_ids；单卡默认 none/null，原命令保持兼容。总 batch_size=16 不随卡数增加；全 batch 标准化/采样、汇总后计算原损失；model/mask patch 仍为 16/16，ratio 0.15。
+-- 保存未封装 state_dict，单卡/多卡评估通用；训练日志/早停/检查点仍只有一份。本次不增加 resume。
+-- 本地 CPU 37 passed, 3 skipped。服务器 time-rcd 环境最终 40 passed，含 P0/P1/P2 真实双卡小模型的输出/全局 loss/梯度、优化器更新、变长尾 batch 和 dropout smoke，以及合成小数据训练/验证与权重兼容。默认规模模型执行 CPU smoke；未测正式 batch 的双卡峰值显存或吞吐。
+-- 12 个发布文件读回一致，语法检查及既有配置值/输入函数 AST 一致性检查通过。差异、哈希、报告和 XML 在 ablation_v9/audits/parallel_20261110/；模型、data/sampling/loss/evaluate 算法文件未修改，既有运行产物不覆盖。
+-- SSH 更正：核对本地 MCP 配置后，确认白名单允许绝对路径 bin/python 或 bin/python3，不匹配此前使用的 bin/python3.10，也没有 conda run 规则。已成功使用 /home/omnisky/anaconda3/envs/time-rcd/bin/python3（Python 3.10.22）执行全部远程测试；没有修改 MCP 配置。此前“无法远程运行 Python”的泛化结论撤回。
+-
+-
+-## 2026-11-10：padding 分类损失配对消融（实施前登记）
+-
+-- 问题：官方异常分类损失先二值化标签，使 padding=-1 变成正常标签0；v9 当前过滤 padding。不能用历史400k与P0的差异单独归因于 padding。
+-- 计划：仅在 ablation_v9 增加 loss.classification_padding=ignore/official；每个P组提供仅该字段不同的两份配置。默认保持 ignore，模型、数据划分、顺序、标准化、mask、优化器和并行方式不变。
+-- 对照评估：两种模式均报告有效位置CE、total与检测指标；统一使用 valid_total 早停和选择best，避免padding比例改变选择标准。模式对应的原目标loss同时保留。
+-- 文件：src/losses.py、config.py、train.py、evaluate.py；三份默认配置及三份official配置；tests/test_padding_contract.py；README、IMPLEMENTATION_DIFF、EXPERIMENT_SPEC；audits/padding_20261110。
+-- 数据与状态：只用小规模合成数据验证，不加载400k训练数据、不启动正式训练、不干预既有进程和产物。尚未完成或得出性能结论。
+-
+-
+-## 2026-11-10：padding 分类损失配对消融（实施完成）
+-
+-- 已在ablation_v9内增加loss.classification_padding=ignore/official；原三份配置显式ignore，新增三份*_padding_official.json。核实每对只有这一字段不同，原有配置值未改。
+-- official复现官方padding=-1先二值化为正常0、再过滤失效的分类CE及梯度；ignore继续只用有效标签点。输入、attention/mask、重构项、模型、标准化、顺序、优化器和并行逻辑不变。
+-- train/smoke/eval均传递开关。日志、快照、检查点、验证及结果记录模式和分母；检测指标始终过滤padding。共同早停/选best指标为valid_total，ignore时等于既有total，保留目标loss供诊断。
+-- 测试：本地69通过6跳过（无双CUDA）；远端time-rcd 75通过、无跳过、9.88秒。覆盖官方loss/梯度、padding梯度、无padding等价、空集合、默认/枚举校验、单因素配置、三组输入/初始化/mask/重构不变、六组合合成微型训练/验证/检查点、共同早停、统一入口smoke、两种模式×三P组真实双GPU检查。
+-- 部署16文件，逐字节回读一致；源文件前后哈希和本次diff/备份见experiments/ablation_v9/audits/padding_20261110/。run_experiment.py及models/data/sampling/parallel/audit/reporting保持实施前内容。
+-- 只进行了合成数据检查，未启动正式训练、未加载400k训练数据、未干预原400k进程/历史run/权重。历史400k不作隔离padding效应的唯一对照；尚无padding影响实际性能的结论。
+-
+-
+-## 2026-11-10 22:12：按用户要求停止400k续训并核查epoch11尖峰
+-
+-- 已核实并仅终止PID408588：time-rcd/bin/python3.10 experiments/train_400k.py --resume ...pretrain_checkpoint_latest.pth。发送SIGTERM后进程不存在；随后GPU0显存6MiB、利用率0%，GPU1显存270MiB、利用率0%。未重启训练。
+-- 停止时最后打印epoch12 batch2100/23750；原日志/检查点保留，没有保存未完成epoch12。按日志和保存逻辑latest为已完成epoch11，best为续训epoch10（val0.0678）；未加载检查点内部元数据。
+-- epoch10平均train total0.0609/recon0.0423/anomaly0.0186，val0.0678；epoch11平均train total155.5050/recon155.4366/anomaly0.0685，val0.0948。
+-- epoch11每100batch周期日志的最大total仅0.5330，巨大贡献未被周期日志捕获，根因/触发batch未知。主要异常在重构项，不能直接归因于分类padding；也不排除分类梯度对共享编码器的间接影响。原流程出现同类尖峰，不能只据P0历史尖峰认定v9或mask配置错误。
+-- 审计与停止证据：experiments/original_400k/audits/stop_20261110/{REPORT.md,stop_and_log_evidence.json,stop_and_inspect.py}。仅做进程核实/停止与日志检查，未修改训练算法、重跑或加载400k数据。
++顺带修正audit.json中固定声明“过滤padding”的字段，使其随ignore/official变化，并补回归断言；不改变训练、损失或评价算法。本次未启动正式训练、生成新数据或耗时评测。详细操作/验证以本次归档REPORT为准。
+--- before/方法设计.md
++++ after/方法设计.md
+@@ -1,14 +1,14 @@
+ # 方法设计
+ 
+-目录约定（2026-11-10）：原流程位于 `/diskA/YYD/TimeRCD/experiments/original_400k/`，v9 位于 `/diskA/YYD/TimeRCD/experiments/ablation_v9/`，二者并列且各有统一入口与 runs。v9 只读共用 `original_400k/data/`；工程规范位于 `ablation_v9/EXPERIMENT_SPEC.md`。旧路径保留兼容链接，历史记录中的路径按迁移记录解析。
++目录约定（2026-11-10）：原流程位于 `/diskA/YYD/TimeRCD/experiments/original_400k/`，v9 位于 `/diskA/YYD/TimeRCD/experiments/ablation_v9/`，二者并列且各有统一入口与 runs。v9 只读共用 `original_400k/data/`；工程规范位于 `ablation_v9/EXPERIMENT_SPEC.md`。历史数据、manifest及runs路径保留兼容链接；旧脚本/规范链接已移除。迁移记录与旧代码备份归档在`/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/`。
+ 
+-版本：v9。更新时间：2026-11-09。状态：P0/P1/P2 代码已实现，尚未训练；最终 B/Z 架构仍是后续设计。已有原流程 400k 训练在运行，详见实验记录.md；本次不启动训练。数据生成配置保持不变。
++版本：v9。更新时间：2026-11-10。P0/P1/P2、padding配对开关和可选DataParallel已实现并通过合成测试。历史P0中断，400k原流程已停止；当前六份配置的配对正式训练未开展。最终B/Z仍是后续设计，数据生成配置不变。状态与证据见实验记录.md。
+ 
+ ## 1. 最终目标与当前范围
+ 
+ 最终研究目标：增强 TimeRCD 的 H，使其支持正常预期、异常判别及上下文关联、偏离形态与程度的读取；进一步验证可组合异常基元在少样本故障类型识别中的价值。H 可能已包含这些信息，研究的是监督与显式提取是否有效，而不是预设原 H 没有信息。
+ 
+-当前只推进正常参考监督的最小验证，不一次性实现最终架构。P0/P1/P2 的配置、共享代码和统一入口已完成，下一步是先做 audit/smoke，再按登记协议训练；阶段递进指实验因素递进，不指沿用上一组训练权重逐层叠加。每组内部仍联合训练。
++当前只推进正常参考监督的最小验证，不一次性实现最终架构。P0/P1/P2 的配置、共享代码和统一入口已完成，合成前向/梯度与并行检查已通过；下一步先补充loss尖峰诊断，再按登记协议做配对训练；阶段递进指实验因素递进，不指沿用上一组训练权重逐层叠加。每组内部仍联合训练。
+ 
+ 符号：X 为完整观测，X^0 为生成器提供的配对正常序列，Y 为时间异常标签，V 为有效时间标志，M 为随机抽中位置标志。X、X^0 必须处于同一数值坐标，X^0/Y 不作为模型输入。M 与 padding 标志 V 严格分开。
+ 
+@@ -79,7 +79,7 @@
+ 
+ | 阶段 | 输入 | 数值监督与分类 | 要回答的问题 |
+ |---|---|---|---|
+-| P0 | 原版遮蔽 15% patch | 选中位置预测 X；原异常分类 | 原流程基线 |
++| P0 | 遮蔽 15% patch | 选中位置预测 X；同模式异常分类 | v9内部遮蔽基线，非官方全流程复制 |
+ | P1 | 完整 X | 同规则选中 15% 位置预测 X；同分类 | P1−P0：输入可见性（置零及注意力屏蔽一起取消）的影响 |
+ | P2（当前目标） | 完整 X | 同规则选中 15% 位置预测 X^0；同分类 | P2−P1：正常参考监督的增量 |
+ | P3（后续） | 完整 X | H 直接接正常、偏离、异常三个头 | 偏离监督的增量 |
+@@ -94,13 +94,33 @@
+ 
+ ### 4.1 初始化、预算与实现一致性
+ 
+-- 已有 400k 原流程为从头训练，不是官方检查点继续训练，也不是我们的新方案训练。保留其产物，不重复启动或中断。
++- 400k原流程最初从头训练，后从同一run断点恢复；不是从官方发布权重继续训练。2026-11-10已按用户要求停止，产物保留，不自动重启；它不是v9新方法结果。
+ - 若后续也从头训练，匹配数据、初始参数分布、划分、训练步数及选择规则；相同种子不自动保证不同结构的共享参数一致，须显式核对。
+ - 若用已有训练完成后的固定检查点做小预算消融，所有组从同一不可变检查点独立启动，并包含原方法同预算继续训练 P0。登记 checkpoint 哈希、优化器是否重置、输出头是否继承；禁止一组继续训练、一组从头训练后直接归因。
+ - P0/P1/P2 结构相同，应尽可能复制相同初始模型状态；P3/P4 新增头使用一致初始化规则，并控制已有头的继承策略。此前 v8.1“加载骨干、新头随机”的设想不再是唯一既定协议。
+-- 原代码 padding 处理错误与预处理差异不能混入方法收益。既有原样运行保持不动；新消融组统一有效位置处理，必要时登记修正版 P0。原版历史结果不单独承担严格因果对照。
++- padding与方法因素分开：当前每个P组提供ignore/official一对配置，仅该字段不同。主方法比较固定同一padding模式；padding影响在同一P组内比较。原版历史结果不单独承担严格因果对照。
+ - 各组固定相同数据／分组、优化器、学习率、batch、训练步数、验证频率及检查点选择规则，报告参数量与实际计算开销。不同目标的总损失不可直接跨组比较；早停需披露实际预算，不能仅说最多同样轮数。
+ - 具体初始化路线、子集规模、预算、种子集合、停止阈值及验证指标须在实现／开跑前登记；本次不擅自确定或启动。
++
++### 4.2 padding独立对照轴
++
++默认`loss.classification_padding="ignore"`，先按V与非负标签筛选，再二值化，公式中的CE_V按此定义。可选`official`严格复现官方顺序：先(labels>0.5).long()，再判断labels!=-1，padding=-1因此变为正常0，CE分母为B×T。这个开关不改变attention、重构位置、目标或实际补齐策略。
++
++每个P组有两份配置：原文件为ignore，同名增加`_padding_official.json`后缀为official。相同种子、初始化、数据/顺序、标准化、M、总batch、优化器、设备与预算下，只比较此开关；同组两份配置已做单变量一致性检查。启用official也不等于复刻原DistributedSampler重排和全局随机源。
++
++训练目标loss按模式计算；验证/eval同时报告模式对应的classification/total与共同的valid_classification/valid_total。两模式都用valid_total早停和选择best（重构项及权重不变、只过滤分类padding、沿用既有batch均值汇总）。ignore时等于原total。F1/accuracy/precision/recall始终过滤padding。不能用不同分母的目标loss绝对大小判断训练质量；固定预算时另比较同一epoch检查点。
++
++### 4.3 可选多GPU与可复现性
++
++当前是单进程torch.nn.DataParallel；每卡保留完整模型，按batch维分配完整序列，不切时间轴或Transformer层。总batch=16在两卡分摊，标准化/补齐/采样在分卡前完成，输出汇总到主卡后按完整batch计算loss，再一次优化器更新。第一张逻辑卡为主卡，编号相对于CUDA_VISIBLE_DEVICES。
++
++各组保持相同设备和并行方式。单多卡dropout随机流及浮点归约可能不同，不承诺逐位一致；默认规模双卡吞吐和峰值显存未测。保存的是完整、无module.前缀的模型state_dict与优化器等信息。当前v9没有resume接口；保存优化器状态不等于已实现恢复训练。
++
++### 4.4 实现范围与后续诊断
++
++当前eval提供分区域/选中与全有效位置的重构误差、复制基线及点级分类指标。VUS、外部测试集完整适配、密度分层、上下文干预、背景分组split与多种子统计仍待实现或执行；下节是评价要求，不是已完成能力。
++
++400k的epoch11平均train total155.5050，其中recon155.4366、classification0.0685；每100batch打印的total最大仅0.5330，验证total0.0948。尖峰主要在重构项，具体batch/根因未捕获，不能直接归因于padding或mask大小。下一步需要逐batch异常触发记录及可追溯样本索引/输入统计/预测幅值/梯度；诊断代码尚未加入。
+ 
+ ## 5. 评价与进入下一阶段的条件
+ 
+--- before/研究问题和思路.md
++++ after/研究问题和思路.md
+@@ -1,6 +1,6 @@
+ # 研究问题和思路
+ 
+-版本：v9。更新时间：2026-11-09。状态：P0/P1/P2 工程代码已实现，尚未训练或测评；最终 B/Z 架构尚未实现，未获得实验增益。数据生成配置沿用现状。
++版本：v9。更新时间：2026-11-10。P0/P1/P2及padding配对开关、可选DataParallel已实现；合成小测试已通过。历史P0训练已中断，400k原流程已按用户要求停止；当前六组padding配对正式训练尚未开展。最终B/Z架构未实现，没有方法增益结论。运行事实见实验记录.md；数据生成配置不变。
+ 
+ ## 1. 核心研究问题
+ 
+@@ -80,11 +80,11 @@
+ 
+ 【推断】正常参考监督能够惩罚异常位置的直接复制，但正常区域仍可能靠复制完成，模型也可能依赖局部平滑或合成伪迹。15% 抽样没有原掩码补全的信息缺失约束，不保证充分使用上下文、学会反事实或完成解耦。
+ 
+-必要的第一阶段对照：P0 为原流程（输入遮蔽 15%、在选中位置预测 X）；P1 为完整输入、同样抽取 15% 位置预测 X；P2 为完整输入、同样位置预测 X^0。三组保留原异常分类任务。P1 与 P0 比较输入可见性变化，P2 与 P1 比较正常参考目标变化。P1 不改成全位置重构，否则同时改变监督覆盖率。
++必要的第一阶段对照：P0 为v9遮蔽基线（输入遮蔽 15%、在选中位置预测 X，非官方全流程的逐项复制）；P1 为完整输入、同样抽取 15% 位置预测 X；P2 为完整输入、同样位置预测 X^0。三组保留原异常分类任务。P1 与 P0 比较输入可见性变化，P2 与 P1 比较正常参考目标变化。P1 不改成全位置重构，否则同时改变监督覆盖率。
+ 
+ 后续顺序为：P3 在 H 上增加偏离重构 → P4 引入 B/Z 分支并做容量／删除损失对照 → P5 验证异常基元与少样本迁移。各组独立初始化并匹配预算，不默认把前一组训练后的权重顺序传给后一组。每组内部联合训练，具体推进条件见方法设计.md。
+ 
+-当前 P0/P1/P2 代码已写入 experiments/ablation_v9/，但尚未启动训练；现有 experiments/train_400k.py 原流程从头训练仍在运行，不能误记为没有任何活动实验或官方权重继续训练。本次不启动新任务、不干预既有训练。
++当前代码位于`/diskA/YYD/TimeRCD/experiments/ablation_v9/`。padding处理作为独立工程对照轴：每个P组分别采用ignore与official，其他配置相同；不能将历史400k与P0的差异直接归因于padding。主研究对照P1−P0、P2−P1应在同一padding模式内比较。原流程与旧P0只作为历史证据，不用其训练loss直接证明方法优劣。
+ 
+ ## 4. 数据范围与当前决定
+ 
+@@ -143,4 +143,4 @@
+ 
+ ## 8. 文档职责和当前状态
+ 
+-本文件管理问题、口径和文献边界；方法设计.md 管理 v9 分步验证、计算图、监督、对照与协议；实验记录.md 记录执行事实、资产与待执行计划。v7/v7.1 强制遮蔽和双前向设计已被取代，详见历史备份。本次补充了 P0/P1/P2 工程实现和实验规范，尚未运行本版方法。
++本文件管理问题、假设和文献边界；方法设计.md管理计算图、监督与对照；实验记录.md管理执行事实和待办。工程入口、当前能力和代码差异以experiments下各路线说明为准。旧v7/v7.1强制遮蔽、双前向方案已被取代，不自动恢复。当前没有正常参考改善检测、密集异常改善、B/Z解耦或基元迁移收益的证据。整理前文档原文存于`/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/before/`。

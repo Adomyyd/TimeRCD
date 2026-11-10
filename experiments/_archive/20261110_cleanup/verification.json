@@ -1,0 +1,11 @@
+{
+  "protected_files_unchanged": 28,
+  "changed_production": [
+    "experiments/ablation_v9/src/audit.py",
+    "experiments/ablation_v9/tests/test_parallel_contract.py"
+  ],
+  "archived_files_byte_identical": true,
+  "legacy_asset_links_valid": true,
+  "live_training": [],
+  "live_legacy_references": []
+}

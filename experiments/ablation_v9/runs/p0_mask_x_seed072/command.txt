@@ -1,1 +1,0 @@
-experiments/ablation_v9/run_experiment.py --config experiments/ablation_v9/configs/p0_mask_x.json --run-id p0_mask_x_seed072 --mode all

@@ -164,3 +164,7 @@ logs/
 wandb/
 # Local research experiment directories; do not publish to GitHub
 
+
+# Experiment outputs after the 2026-11-10 directory reorganization
+/experiments/original_400k/runs/
+/experiments/ablation_v9/runs/

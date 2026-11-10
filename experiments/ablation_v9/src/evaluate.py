@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from .data import PairedTimeSeriesDataset, collate_samples
-from .losses import compute_losses
+from .losses import classification_ce, compute_losses
 from .sampling import apply_input_mask, sample_patch_mask
 
 
@@ -26,6 +26,8 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
         "total": 0.0,
         "reconstruction": 0.0,
         "classification": 0.0,
+        "valid_classification": 0.0,
+        "valid_total": 0.0,
         "selected_normal_reconstruction": 0.0,
         "selected_anomalous_reconstruction": 0.0,
         "full_normal_reconstruction": 0.0,
@@ -40,6 +42,8 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
         "full_normal_points": 0,
         "full_anomalous_points": 0,
         "classification_points": 0,
+        "classification_loss_points": 0,
+        "padding_points": 0,
         "classification_correct": 0,
         "true_positive": 0,
         "false_positive": 0,
@@ -61,10 +65,24 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
                 float(config["loss"]["reconstruction_weight"]),
                 float(config["loss"]["classification_weight"]),
                 mask.to(device),
+                classification_padding=config["loss"].get("classification_padding", "ignore"),
             )
             sums["total"] += float(losses["total"])
             sums["reconstruction"] += float(losses["reconstruction"])
             sums["classification"] += float(losses["classification"])
+            if config["loss"].get("classification_padding", "ignore") == "ignore":
+                valid_classification = losses["classification"]
+            else:
+                valid_classification, _ = classification_ce(
+                    output["logits"], batch_device["y"], batch_device["valid"]
+                )
+            sums["valid_classification"] += float(valid_classification)
+            sums["valid_total"] += float(
+                float(config["loss"]["reconstruction_weight"]) * losses["reconstruction"]
+                + float(config["loss"]["classification_weight"]) * valid_classification
+            )
+            counts["classification_loss_points"] += losses["classification_count"]
+            counts["padding_points"] += int((~batch_device["valid"]).sum())
 
             target = (
                 batch_device["x0"]
@@ -125,22 +143,19 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
         "total": sums["total"] / max(1, counts["batches"]),
         "reconstruction": sums["reconstruction"] / max(1, counts["batches"]),
         "classification": sums["classification"] / max(1, counts["batches"]),
+        "valid_classification": sums["valid_classification"] / max(1, counts["batches"]),
+        "valid_total": sums["valid_total"] / max(1, counts["batches"]),
+        "classification_padding": config["loss"].get("classification_padding", "ignore"),
         "selected_normal_reconstruction": mean(
             "selected_normal_reconstruction", "selected_normal_points"
         ),
         "selected_anomalous_reconstruction": mean(
             "selected_anomalous_reconstruction", "selected_anomalous_points"
         ),
-        "full_normal_reconstruction": mean(
-            "full_normal_reconstruction", "full_normal_points"
-        ),
-        "full_anomalous_reconstruction": mean(
-            "full_anomalous_reconstruction", "full_anomalous_points"
-        ),
+        "full_normal_reconstruction": mean("full_normal_reconstruction", "full_normal_points"),
+        "full_anomalous_reconstruction": mean("full_anomalous_reconstruction", "full_anomalous_points"),
         "copy_full_normal_error": mean("copy_full_normal_error", "full_normal_points"),
-        "copy_full_anomalous_error": mean(
-            "copy_full_anomalous_error", "full_anomalous_points"
-        ),
+        "copy_full_anomalous_error": mean("copy_full_anomalous_error", "full_anomalous_points"),
         "classification_accuracy": counts["classification_correct"]
         / max(1, counts["classification_points"]),
         "classification_precision": precision,
@@ -153,7 +168,7 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
 def _make_eval_inputs(batch, config: dict, generator: torch.Generator):
     mask = sample_patch_mask(
         batch["valid"],
-        int(config["model"]["patch_size"]),
+        int(config["input"]["mask_patch_size"]),
         float(config["input"]["mask_ratio"]),
         generator,
     )

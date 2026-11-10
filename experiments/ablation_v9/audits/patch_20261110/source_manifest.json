@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-10",
+  "upstream_training_commit": "ebf4f056b571f7ea90602ef666ae56f7d717ebfe",
+  "upstream_main_commit": "b031773e323bc0e6c9dcd8c9119b800ec4d70f8c",
+  "server_git_head": "1c2d34cc0fb0192490b9006888f394ca26423c88",
+  "files": [
+    {
+      "path": "sources\\local_training.py",
+      "sha256": "2b10b05c2811b5dc07f655c26d380e018cb254497707025be3ec586fa1107f56"
+    },
+    {
+      "path": "sources\\time_rcd_config.py",
+      "sha256": "ebfeac0a971dc784d47d9c01a0622ebadaf46f9e41588f37f610d746dce8c967"
+    },
+    {
+      "path": "sources\\train_400k.py",
+      "sha256": "2e402934e8d183a762de3665c6a96f830e692e710f00eed6bb653bd06787c3f7"
+    },
+    {
+      "path": "sources\\upstream_encoder.py",
+      "sha256": "04f07035dc99940db923c3524a479056b601d192ab937cdc6ca00499962f4c4c"
+    },
+    {
+      "path": "sources\\upstream_main_library.py",
+      "sha256": "f05b70d9daaf2f5d4e2867cb2d6daa0b235d5d3941bbc0862eff71614b349028"
+    },
+    {
+      "path": "sources\\upstream_training.py",
+      "sha256": "311bfc8eece430c99a8fc4fac0bcc24b877ec9193f8d3292214611887a238b23"
+    }
+  ],
+  "core_file_comparison": {
+    "time_rcd_config.py": {
+      "server_snapshot_sha256": "ebfeac0a971dc784d47d9c01a0622ebadaf46f9e41588f37f610d746dce8c967",
+      "upstream_sha256": "ebfeac0a971dc784d47d9c01a0622ebadaf46f9e41588f37f610d746dce8c967",
+      "equal": true
+    },
+    "ts_encoder_bi_bias.py": {
+      "server_snapshot_sha256": "04f07035dc99940db923c3524a479056b601d192ab937cdc6ca00499962f4c4c",
+      "upstream_sha256": "04f07035dc99940db923c3524a479056b601d192ab937cdc6ca00499962f4c4c",
+      "equal": true
+    }
+  },
+  "test_environment": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "scope": "local CPU only; no remote GPU or dataset training"
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/__pycache__",
+    "files": 1,
+    "bytes": 7620
+  },
+  {
+    "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/audits/patch_20261110/sources/__pycache__",
+    "files": 1,
+    "bytes": 2920
+  },
+  {
+    "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/tests/__pycache__",
+    "files": 8,
+    "bytes": 61858
+  },
+  {
+    "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/src/__pycache__",
+    "files": 11,
+    "bytes": 33393
+  }
+]

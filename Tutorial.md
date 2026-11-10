@@ -104,7 +104,7 @@ Lookup order: `weights_dir=` argument, then `TIMERCD_WEIGHTS_DIR`, then
 `<dir>/best_model/pretrain_checkpoint_best_*.pth` layouts are accepted.
 
 ```bash
-export TIMERCD_WEIGHTS_DIR=/data/weights   # keep weights outside the repo
+export TIMERCD_WEIGHTS_DIR=weights   # keep weights outside the repo
 ```
 
 If a file is missing, `from_project()` falls back to the Hub download. Pass

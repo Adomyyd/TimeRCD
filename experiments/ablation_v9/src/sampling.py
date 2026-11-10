@@ -3,21 +3,28 @@ from __future__ import annotations
 import torch
 
 
-def sample_patch_mask(valid: torch.Tensor, patch_size: int, ratio: float, generator: torch.Generator) -> torch.Tensor:
+def sample_patch_mask(
+    valid: torch.Tensor,
+    mask_patch_size: int,
+    ratio: float,
+    generator: torch.Generator,
+) -> torch.Tensor:
     if valid.ndim != 2:
         raise ValueError("valid must have shape (batch, time)")
-    batch, max_len = valid.shape
+    if mask_patch_size <= 0:
+        raise ValueError("mask_patch_size must be positive")
+    batch, _ = valid.shape
     mask = torch.zeros_like(valid, dtype=torch.bool)
     for row in range(batch):
         length = int(valid[row].sum().item())
-        num_patches = (length + patch_size - 1) // patch_size
+        num_patches = (length + mask_patch_size - 1) // mask_patch_size
         count = int(num_patches * ratio)
         if count <= 0:
             continue
         selected = torch.randperm(num_patches, generator=generator)[:count]
         for patch in selected.tolist():
-            start = patch * patch_size
-            end = min(start + patch_size, length)
+            start = patch * mask_patch_size
+            end = min(start + mask_patch_size, length)
             mask[row, start:end] = True
     return mask & valid
 

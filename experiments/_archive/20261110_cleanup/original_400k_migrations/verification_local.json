@@ -1,0 +1,8 @@
+{
+  "generate_400k_function_bodies_unchanged": true,
+  "train_400k_function_bodies_unchanged": true,
+  "compare_400k_function_bodies_unchanged": true,
+  "syntax": "passed",
+  "dispatcher_all_modes": "passed_without_executing_workflows",
+  "dispatcher_invalid_args": "rejected_before_workflow"
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "path": "configs/p0_mask_x.json",
+    "before_sha256": "d80b41fb7147f993bf134a79ef1ed8619a31dc219a5be27ede74cdac6aa5a751",
+    "after_sha256": "5c65d58cc76cae36c40bd2382113cc64629a8c19a0f26880cddc7e1c1f1c0b9f"
+  },
+  {
+    "path": "configs/p0_mask_x_padding_official.json",
+    "before_sha256": null,
+    "after_sha256": "098bffd90e1de332a63e99f382e67e873bff2c5c086433ca07b8bc168a6fcf8e"
+  },
+  {
+    "path": "configs/p1_full_x.json",
+    "before_sha256": "335dac57c21043742730cf105f2f125048dc25c30459442404eb0c403c1220b7",
+    "after_sha256": "3035ac50a9ab786d3bfe4f70545e703e23fd24f89ef6842f127a348ab7d25cf2"
+  },
+  {
+    "path": "configs/p1_full_x_padding_official.json",
+    "before_sha256": null,
+    "after_sha256": "bc7ed01b357796322e09bd1d6ea32cfb661f8460e43da152c9fe689c5e7a724b"
+  },
+  {
+    "path": "configs/p2_full_x0.json",
+    "before_sha256": "40da379e99305be63b7b201b990722e2568a0a12345bbe5dd88e77585072dc5b",
+    "after_sha256": "cbd845099fe4d2c2fa5e9312786afaedfe59cc3f5f357a5467510f51fc52bbe3"
+  },
+  {
+    "path": "configs/p2_full_x0_padding_official.json",
+    "before_sha256": null,
+    "after_sha256": "b7801ee58ede17eecdea76e9596e5b373cf11fd8e86e69b2322920b685e2939e"
+  },
+  {
+    "path": "EXPERIMENT_SPEC.md",
+    "before_sha256": "ccb5e60852473427d492fc01b11eb811662cdb4b8ec1fd96a8ae1b9d502b6d79",
+    "after_sha256": "048963dde93ce146d7597598834b958dd313a60ab79926d9b940c61811731389"
+  },
+  {
+    "path": "IMPLEMENTATION_DIFF.md",
+    "before_sha256": "4b5821dc532c8eaa0c6955a8d63de10608d00410188159f6317a2f222da6e784",
+    "after_sha256": "4be36d4e1201e50b6f182e2c57c3dd43615ea1880b26cc8f24760fd7e74de5e6"
+  },
+  {
+    "path": "README.md",
+    "before_sha256": "63269bf607ee4aad00121c490432f55ec6e255356a189646904f55c698fab67f",
+    "after_sha256": "4c479535c8e618eb080a18bb975e43b5afa75de45c98e48eabcdb56936442092"
+  },
+  {
+    "path": "src/config.py",
+    "before_sha256": "b31f54f2e177779372d0eb10ee9916d78416bbd20edb89d7d3a1a873bf10ffbe",
+    "after_sha256": "8e3588a24a0fe3f5bde20242b413b1ec75f771f3ef61507e17eb29fffe35ddbf"
+  },
+  {
+    "path": "src/evaluate.py",
+    "before_sha256": "34550154a4f35402e698bd3fa22bce467681377bc09233cd90798926c009f1e1",
+    "after_sha256": "eb71210613880f420292f9b28b65421605d1c6fce639650cc0d8118d6b5c2343"
+  },
+  {
+    "path": "src/losses.py",
+    "before_sha256": "dc709383eab1cbf99340a975f6b0c8394bb3cf996684a3a5784db7f49193f260",
+    "after_sha256": "7db92a4c3190fc000e7fec7c6fb0639df5a1d99b1fb19dd2f51246e09972af4a"
+  },
+  {
+    "path": "src/train.py",
+    "before_sha256": "a8e399c348dc2b761f86bf4e85ff0670f09431b211f946a412909388ea4ab700",
+    "after_sha256": "edc0596e114fbd950e95d6756bde4c3cd8d4daae08698212d0417c4dcbd38310"
+  },
+  {
+    "path": "tests/test_config_contract.py",
+    "before_sha256": "6b4e4d65d952dd4756bc6103d82071fb4f7275dc01b080394fb06a54b1a8857d",
+    "after_sha256": "1a8b9680934585dc6738ada83724265cb90f554af0ed3280bbb31b8dc6d20658"
+  },
+  {
+    "path": "tests/test_padding_contract.py",
+    "before_sha256": null,
+    "after_sha256": "c614c30e3f260b5b92382b3dc78883e4f494cb5efb6e3ff1020aefcea4368bc5"
+  },
+  {
+    "path": "tests/test_parallel_contract.py",
+    "before_sha256": "3144cc126059b402d54d3d1a22cb40ac0f81ee0750cc705be8cd235c5ee9f07b",
+    "after_sha256": "a2ca86361a193dade038ae549630271cd65ed8e093a93fadffd15268547cfe73"
+  }
+]

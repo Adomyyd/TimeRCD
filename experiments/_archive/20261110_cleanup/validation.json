@@ -1,0 +1,36 @@
+{
+  "original_400k": {
+    "command": [
+      "/home/omnisky/anaconda3/envs/time-rcd/bin/python3",
+      "-B",
+      "/diskA/YYD/TimeRCD/experiments/original_400k/run_experiment.py",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: run_experiment.py [-h] --mode {compare,generate,train}\n                         [--resume RESUME]\n\nRun the original TimeRCD 400k workflow\n\noptions:\n  -h, --help            show this help message and exit\n  --mode {compare,generate,train}\n  --resume RESUME       Absolute checkpoint path for train mode; defaults to\n                        the latest checkpoint\n",
+    "stderr": ""
+  },
+  "ablation_v9": {
+    "command": [
+      "/home/omnisky/anaconda3/envs/time-rcd/bin/python3",
+      "-B",
+      "/diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: run_experiment.py [-h] --config CONFIG --run-id RUN_ID --mode\n                         {audit,smoke,train,eval,report,all}\n                         [--checkpoint CHECKPOINT]\n                         [--parallel {none,data_parallel}]\n                         [--gpu-ids GPU_IDS [GPU_IDS ...]]\n\nRun TimeRCD v9 ablation experiments\n\noptions:\n  -h, --help            show this help message and exit\n  --config CONFIG       Path to a JSON experiment config\n  --run-id RUN_ID       Unique output directory name\n  --mode {audit,smoke,train,eval,report,all}\n  --checkpoint CHECKPOINT\n                        Checkpoint path for eval mode\n  --parallel {none,data_parallel}\n                        Override runtime.parallel; default uses JSON config\n  --gpu-ids GPU_IDS [GPU_IDS ...]\n                        Visible CUDA device ids for data_parallel; first id\n                        gathers outputs\n",
+    "stderr": ""
+  },
+  "regression": {
+    "command": [
+      "/home/omnisky/anaconda3/envs/time-rcd/bin/python3",
+      "-B",
+      "/diskA/YYD/TimeRCD/experiments/ablation_v9/tests/run_checks.py",
+      "-p",
+      "no:cacheprovider",
+      "--junitxml",
+      "/diskA/YYD/TimeRCD/experiments/_archive/20261110_cleanup/pytest_remote.xml"
+    ],
+    "returncode": 0
+  }
+}

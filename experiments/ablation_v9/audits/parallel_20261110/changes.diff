@@ -1,0 +1,595 @@
+--- before/EXPERIMENT_SPEC.md
++++ after/EXPERIMENT_SPEC.md
+@@ -32,7 +32,7 @@
+     ├── README.md
+     ├── IMPLEMENTATION_DIFF.md
+     ├── configs/                  # P0/P1/P2 JSON
+-    ├── src/                      # data / sampling / models / losses / train / evaluate
++    ├── src/                      # data / sampling / models / losses / parallel / train / evaluate
+     ├── tests/
+     ├── audits/
+     ├── registry/
+@@ -60,6 +60,8 @@
+ 
+ 配置读取后必须做严格校验。未知字段、缺失字段、冲突字段和不允许的 P0/P1/P2 组合直接报错，不能静默使用默认值。
+ 
++并行运行显式使用 `runtime.parallel`（`none` / `data_parallel`）和 `runtime.gpu_ids`（单卡为 null，多卡为至少两个不重复的可见 GPU 编号）。旧配置缺少这两个字段时兼容单卡。统一入口允许 `--parallel` / `--gpu-ids` 覆盖，须在保存配置快照前完成校验。`batch_size` 统一指总 batch，标准化、采样和损失分母不得改成各 GPU 独立统计；三组对照使用一致设备和总 batch。
++
+ ### 3.2 数据与采样
+ 
+ `data.py` 只负责读取和验证 `X`、配对正常值 `X^0`、时间异常标签 `Y`、有效标志 `V` 及划分，不负责模型逻辑。
+@@ -86,6 +88,8 @@
+ 
+ `train.py` 只处理一个已解析配置下的训练生命周期；它不创建另一套实验协议，也不自行改变数据划分、损失权重或保存规则。
+ 
++`parallel.py` 只负责设备校验、模型封装/解封装和运行信息。单进程 DataParallel 按 batch 维分配完整序列，Transformer 不跨样本交换信息。训练/验证统一使用封装模型，日志和早停只有一份；检查点使用未封装的 state_dict，保持单卡加载兼容。
++
+ `evaluate.py` 统一报告：
+ 
+ - 正常区域和异常区域的正常参考误差；
+@@ -102,7 +106,7 @@
+ 入口命令形式固定为：
+ 
+ ```bash
+-/home/omnisky/anaconda3/envs/time-rcd/bin/python3.10 /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
++/home/omnisky/anaconda3/envs/time-rcd/bin/python3 /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
+   --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p2_full_x0.json \
+   --run-id p2_full_x0_seed072 \
+   --mode audit
+--- before/IMPLEMENTATION_DIFF.md
++++ after/IMPLEMENTATION_DIFF.md
+@@ -34,3 +34,13 @@
+ `optimization.log_freq` 控制训练 batch 日志频率，默认 100，记录 Total/Recon/Anomaly Loss；每轮结束写平均分项损失和验证总损失。
+ 
+ 原始实现与新实现的全部行为差异仍以实际代码为准；本文只记录当前 P0/P1/P2 协议及已核实差异。
++
++## 2026-11-10 可选 DataParallel
++
++- `src/parallel.py`：新增单进程多 GPU 封装；显式检查可见 GPU 编号和总 batch 大小。保留默认单卡，未移植原版的多进程全局配置读取方式。
++- `src/config.py`、`configs/*.json`：增加 `runtime.parallel` / `gpu_ids`，旧配置缺省时仍按单卡处理。
++- `run_experiment.py`：增加 `--parallel` / `--gpu-ids`，保存覆盖后的实际配置与可见 GPU 信息；统一封装训练、验证、eval 和 smoke，加载权重前解封装。
++- `src/train.py`：通过解封装访问编码器属性、保存无 `module.` 前缀的权重；记录实际并行模式、主卡和总 batch；smoke 按所选卡数提供足够样本。
++- 标准化和采样在分卡前执行，loss 在汇总后执行。没有各卡独立标准化、各卡均值等权平均或按 GPU 数量增加总 batch。P0/P1/P2 的输入、mask、目标、模型和学习率保持原协议。
++- 多卡 dropout 随机流及浮点归约顺序可能不同，不承诺单卡和多卡训练逐位一致。DataParallel 主卡负责汇总，速度和显存收益需实测；本次不提供 DDP / 多机模式，也不增加 resume。
++- `tests/test_parallel_contract.py`：合成变长 batch 的汇总 loss/梯度、检查点与训练流程回归；双 GPU 测试在可见卡数不足时显式 skip。
+--- before/README.md
++++ after/README.md
+@@ -32,7 +32,7 @@
+ 随后通过统一入口使用新配置和唯一 run-id：
+ 
+ ```bash
+-CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3.10 \
++CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
+   /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
+   --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x_ratio05.json \
+   --run-id p0_mask_x_ratio05_seed072 \
+@@ -41,9 +41,33 @@
+ 
+ Python 解释器使用 conda 环境的绝对路径。正式训练由用户决定启动。
+ 
+-## 检查
++## 可选多 GPU
++
++默认 `runtime.parallel="none"`、`gpu_ids=null`，原单卡命令继续有效。
++同机多卡采用单进程 `torch.nn.DataParallel`，通过统一入口启用：
+ 
+ ```bash
+-/home/omnisky/anaconda3/envs/time-rcd/bin/python3.10 -m pytest \
+-  /diskA/YYD/TimeRCD/experiments/ablation_v9/tests
++CUDA_VISIBLE_DEVICES=0,1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
++  /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
++  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x.json \
++  --run-id p0_mask_x_seed072_dp01 \
++  --mode train --parallel data_parallel --gpu-ids 0 1
+ ```
++
++P1/P2 分别替换配置为 `p1_full_x.json` / `p2_full_x0.json`，并使用新的 run-id。
++先将 `--mode train` 改成 `--mode smoke` 并换一个 run-id，可只做合成小批量前向/反向检查，不读取 400k pickle。
++
++也可在复制的配置中设置 `runtime.parallel="data_parallel"`、`runtime.gpu_ids=[0,1]`，保持 `runtime.device="cuda"`。CLI 覆盖优先于 JSON，并将生效设置写入 run 的 `config.json`。设备编号相对于 `CUDA_VISIBLE_DEVICES`；如设置 `CUDA_VISIBLE_DEVICES=1,0`，`--gpu-ids 0 1` 的主卡是物理 GPU1。列表首卡保存参数、汇总输出和计算损失，显存使用可能更高；请先确认所选卡空闲。不指定可见设备环境变量时，编号对应当前进程可见的 CUDA 设备。
++
++`optimization.batch_size` 始终是**总 batch**。例如 16 在两张卡间分摊，而非每卡 16；最后不足 GPU 数量的小 batch 自动使用可分配到的卡。标准化、padding 和随机 M 在完整 batch 上生成，损失在汇总预测上按全 batch 有效点计算，不对各卡均值再平均。因此模型、监督、学习率、样本顺序和更新步数不随卡数改变。并行归约和 dropout 随机流仍可能使数值轨迹不同，不能保证单卡/多卡逐位相同；比较 P0/P1/P2 时建议三组采用相同设备配置。
++
++训练、验证、独立 eval 与 smoke 均复用同一封装。只由一个进程记录日志、早停和保存权重；检查点不带 `module.` 前缀，可通过 `--mode eval --checkpoint /绝对路径/best.pth` 在单卡/多卡加载。当前入口仍不支持恢复训练，本次没有增加 resume。
++
++新增模块 `src/parallel.py` 负责配置校验、设备选择、封装与解封装。模型结构及 `sampling.py`、`data.py`、`losses.py`、`evaluate.py` 的算法未改；不会出现原始 spawn 路径重新导入默认 mask 大小的问题，采样仍明确读取 `input.mask_patch_size=16`。
++
++## 检查命令
++
++```bash
++/home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
++  /diskA/YYD/TimeRCD/experiments/ablation_v9/tests/run_checks.py
++```
+--- before/configs/p0_mask_x.json
++++ after/configs/p0_mask_x.json
+@@ -36,6 +36,8 @@
+   "runtime": {
+     "seed": 72,
+     "device": "cuda",
++    "parallel": "none",
++    "gpu_ids": null,
+     "mixed_precision": false
+   },
+   "evaluation": {
+--- before/configs/p1_full_x.json
++++ after/configs/p1_full_x.json
+@@ -36,6 +36,8 @@
+   "runtime": {
+     "seed": 72,
+     "device": "cuda",
++    "parallel": "none",
++    "gpu_ids": null,
+     "mixed_precision": false
+   },
+   "evaluation": {
+--- before/configs/p2_full_x0.json
++++ after/configs/p2_full_x0.json
+@@ -36,6 +36,8 @@
+   "runtime": {
+     "seed": 72,
+     "device": "cuda",
++    "parallel": "none",
++    "gpu_ids": null,
+     "mixed_precision": false
+   },
+   "evaluation": {
+--- before/run_experiment.py
++++ after/run_experiment.py
+@@ -21,10 +21,11 @@
+ import torch
+ 
+ from src.audit import run_audit
+-from src.config import ExperimentConfig, load_config
++from src.config import ExperimentConfig, load_config, validate_config
+ from src.data import load_indices
+ from src.evaluate import evaluate_model
+ from src.models import build_model
++from src.parallel import prepare_model, unwrap_model
+ from src.reporting import write_report
+ from src.train import _device, run_smoke, set_seed, train_model
+ 
+@@ -35,6 +36,10 @@
+     parser.add_argument("--run-id", required=True, help="Unique output directory name")
+     parser.add_argument("--mode", choices=["audit", "smoke", "train", "eval", "report", "all"], required=True)
+     parser.add_argument("--checkpoint", help="Checkpoint path for eval mode")
++    parser.add_argument("--parallel", choices=["none", "data_parallel"], default=None,
++                        help="Override runtime.parallel; default uses JSON config")
++    parser.add_argument("--gpu-ids", type=int, nargs="+", default=None,
++                        help="Visible CUDA device ids for data_parallel; first id gathers outputs")
+     return parser.parse_args()
+ 
+ 
+@@ -68,6 +73,13 @@
+         "cuda_version": torch.version.cuda,
+         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+         "requested_device": config.device,
++        "parallel": config.raw["runtime"].get("parallel", "none"),
++        "gpu_ids": config.raw["runtime"].get("gpu_ids"),
++        "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
++        "visible_gpus": [
++            {"id": index, "name": torch.cuda.get_device_name(index)}
++            for index in range(torch.cuda.device_count())
++        ],
+         "git_revision": git_revision(),
+     }
+ 
+@@ -109,11 +121,22 @@
+ def load_model(config: ExperimentConfig) -> torch.nn.Module:
+     set_seed(config.seed)
+     model = build_model(config.raw)
+-    return model.to(_device(config.raw))
++    return prepare_model(model, config.raw)
++
++
++def apply_runtime_overrides(config: ExperimentConfig, args: argparse.Namespace) -> None:
++    if args.parallel is not None:
++        config.raw["runtime"]["parallel"] = args.parallel
++        if args.parallel == "none":
++            config.raw["runtime"]["gpu_ids"] = None
++    if args.gpu_ids is not None:
++        config.raw["runtime"]["gpu_ids"] = args.gpu_ids
++    validate_config(config.raw)
+ 
+ 
+ def run_one(args: argparse.Namespace) -> None:
+     config = load_config(args.config)
++    apply_runtime_overrides(config, args)
+     run_dir = create_run_dir(args.run_id)
+     save_run_metadata(run_dir, config, sys.argv)
+     status = {"run_id": args.run_id, "mode": args.mode, "status": "running", "started_utc": utc_now()}
+@@ -155,7 +178,7 @@
+                 raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
+             model = load_model(config)
+             payload = torch.load(checkpoint, map_location=_device(config.raw), weights_only=False)
+-            model.load_state_dict(payload["model_state_dict"])
++            unwrap_model(model).load_state_dict(payload["model_state_dict"])
+             _, test_indices = load_indices(config.data_path, float(config.raw["split"]["train_ratio"]), int(config.raw["split"]["seed"]))
+             metrics = evaluate_model(model, config.raw, str(config.data_path), test_indices)
+             write_json(run_dir / "metrics" / "eval.json", metrics)
+@@ -164,7 +187,7 @@
+             checkpoint = run_dir / "checkpoints" / "best.pth"
+             model = load_model(config)
+             payload = torch.load(checkpoint, map_location=_device(config.raw), weights_only=False)
+-            model.load_state_dict(payload["model_state_dict"])
++            unwrap_model(model).load_state_dict(payload["model_state_dict"])
+             _, test_indices = load_indices(config.data_path, float(config.raw["split"]["train_ratio"]), int(config.raw["split"]["seed"]))
+             metrics = evaluate_model(model, config.raw, str(config.data_path), test_indices)
+             write_json(run_dir / "metrics" / "eval.json", metrics)
+@@ -187,4 +210,4 @@
+ 
+ 
+ if __name__ == "__main__":
+-    run_one(parse_args())+    run_one(parse_args())
+--- before/src/config.py
++++ after/src/config.py
+@@ -4,6 +4,8 @@
+ from dataclasses import dataclass
+ from pathlib import Path
+ from typing import Any
++
++from .parallel import validate_parallel_config
+ 
+ 
+ VARIANTS = {"p0_mask_x", "p1_full_x", "p2_full_x0"}
+@@ -93,6 +95,7 @@
+         raise ValueError("optimization.log_freq must be positive")
+     if not raw["data"]["path"] or not raw["data"]["manifest_path"]:
+         raise ValueError("data paths must be provided")
++    validate_parallel_config(raw)
+ 
+ 
+ def config_to_json(config: ExperimentConfig) -> str:
+--- before/src/parallel.py
++++ after/src/parallel.py
+@@ -0,0 +1,67 @@
++from __future__ import annotations
++
++import torch
++from torch import nn
++
++
++def validate_parallel_config(config: dict) -> None:
++    runtime = config["runtime"]
++    mode = runtime.get("parallel", "none")
++    ids = runtime.get("gpu_ids")
++    if mode not in {"none", "data_parallel"}:
++        raise ValueError("runtime.parallel must be 'none' or 'data_parallel'")
++    if ids is not None and (
++        not isinstance(ids, list) or not ids
++        or any(type(index) is not int or index < 0 for index in ids)
++        or len(set(ids)) != len(ids)
++    ):
++        raise ValueError("runtime.gpu_ids must be null or a non-empty list of unique non-negative integers")
++    if mode == "none" and ids is not None:
++        raise ValueError("runtime.gpu_ids requires runtime.parallel='data_parallel'; use runtime.device for single GPU")
++    if mode == "data_parallel":
++        if str(runtime["device"]) != "cuda":
++            raise ValueError("data_parallel requires runtime.device='cuda'; select devices through gpu_ids")
++        if ids is None or len(ids) < 2:
++            raise ValueError("data_parallel requires at least two explicit runtime.gpu_ids")
++        if int(config["optimization"]["batch_size"]) < len(ids):
++            raise ValueError("global batch_size must be at least the number of selected GPUs")
++
++
++def resolve_device(config: dict) -> torch.device:
++    validate_parallel_config(config)
++    runtime = config["runtime"]
++    device = torch.device(str(runtime["device"]))
++    if device.type == "cuda":
++        if not torch.cuda.is_available():
++            raise RuntimeError("CUDA was requested but is not available")
++        if runtime.get("parallel", "none") == "data_parallel":
++            ids = runtime["gpu_ids"]
++        else:
++            ids = [device.index if device.index is not None else torch.cuda.current_device()]
++        count = torch.cuda.device_count()
++        if any(index >= count for index in ids):
++            raise ValueError(f"Requested GPU ids {ids}, but only {count} CUDA devices are visible; ids are relative to CUDA_VISIBLE_DEVICES")
++        device = torch.device("cuda", ids[0])
++    return device
++
++
++def prepare_model(model: nn.Module, config: dict) -> nn.Module:
++    device = resolve_device(config)
++    model = model.to(device)
++    if config["runtime"].get("parallel", "none") == "data_parallel":
++        ids = config["runtime"]["gpu_ids"]
++        return nn.DataParallel(model, device_ids=ids, output_device=ids[0], dim=0)
++    return model
++
++
++def unwrap_model(model: nn.Module) -> nn.Module:
++    return model.module if isinstance(model, nn.DataParallel) else model
++
++
++def parallel_record(model: nn.Module, config: dict) -> dict:
++    return {
++        "parallel": config["runtime"].get("parallel", "none"),
++        "gpu_ids": list(model.device_ids) if isinstance(model, nn.DataParallel) else [],
++        "primary_device": str(next(model.parameters()).device),
++        "global_batch_size": int(config["optimization"]["batch_size"]),
++    }
+--- before/src/train.py
++++ after/src/train.py
+@@ -10,6 +10,7 @@
+ from .data import PairedTimeSeriesDataset, collate_samples, load_indices
+ from .evaluate import evaluate_model
+ from .losses import compute_losses
++from .parallel import parallel_record, resolve_device, unwrap_model
+ from .sampling import apply_input_mask, sample_patch_mask
+ 
+ 
+@@ -24,10 +25,7 @@
+ 
+ 
+ def _device(config: dict) -> torch.device:
+-    requested = str(config["runtime"]["device"])
+-    if requested.startswith("cuda") and not torch.cuda.is_available():
+-        raise RuntimeError("CUDA was requested but is not available")
+-    return torch.device(requested)
++    return resolve_device(config)
+ 
+ 
+ def make_batch_inputs(batch, config: dict, generator: torch.Generator):
+@@ -48,7 +46,8 @@
+ 
+ def run_smoke(model, config: dict) -> dict:
+     device = next(model.parameters()).device
+-    batch_size = min(2, int(config["optimization"]["batch_size"]))
++    gpu_count = len(model.device_ids) if isinstance(model, torch.nn.DataParallel) else 1
++    batch_size = min(max(2, gpu_count), int(config["optimization"]["batch_size"]))
+     length = 320
+     batch = {
+         "x": torch.randn(batch_size, length, 1),
+@@ -77,7 +76,8 @@
+             for key, value in losses.items()
+         },
+         "mask_count": int(mask.sum().item()),
+-        "encoder_patch_size": model.encoder.patch_size,
++        "encoder_patch_size": unwrap_model(model).encoder.patch_size,
++        **parallel_record(model, config),
+         "mask_patch_size": int(config["input"]["mask_patch_size"]),
+         "mask_ratio": float(config["input"]["mask_ratio"]),
+     }
+@@ -108,7 +108,8 @@
+     log_path = run_dir / "train.log"
+     log_freq = int(config["optimization"]["log_freq"])
+     patch_log = (
+-        f"Patch settings: encoder_patch_size={model.encoder.patch_size}, "
++        f"Parallel settings: {parallel_record(model, config)}\n"
++        f"Patch settings: encoder_patch_size={unwrap_model(model).encoder.patch_size}, "
+         f"mask_patch_size={int(config['input']['mask_patch_size'])}, "
+         f"mask_ratio={float(config['input']['mask_ratio'])}, "
+         f"input_mode={config['input']['input_mode']}\n"
+@@ -184,7 +185,7 @@
+ 
+         checkpoint = {
+             "epoch": epoch,
+-            "model_state_dict": model.state_dict(),
++            "model_state_dict": unwrap_model(model).state_dict(),
+             "optimizer_state_dict": optimizer.state_dict(),
+             "validation": validation,
+             "config": config,
+--- before/tests/run_checks.py
++++ after/tests/run_checks.py
+@@ -0,0 +1,9 @@
++"""Run synthetic regression checks through an absolute script path."""
++from pathlib import Path
++import sys
++
++import pytest
++
++
++if __name__ == "__main__":
++    raise SystemExit(pytest.main([str(Path(__file__).resolve().parent), "-q", *sys.argv[1:]]))
+--- before/tests/test_parallel_contract.py
++++ after/tests/test_parallel_contract.py
+@@ -0,0 +1,208 @@
++"""Small synthetic checks; never loads the 400k dataset."""
++import argparse
++import copy
++import json
++from pathlib import Path
++import pickle
++
++import pytest
++import torch
++
++from src.config import load_config, validate_config
++from src.data import Sample, collate_samples
++from src.losses import compute_losses
++from src.models import build_model
++from src.parallel import prepare_model, resolve_device, unwrap_model
++from src.train import make_batch_inputs, run_smoke, set_seed, train_model
++from run_experiment import apply_runtime_overrides
++import run_experiment as entry
++
++ROOT = Path(__file__).resolve().parents[1]
++VARIANTS = ["p0_mask_x", "p1_full_x", "p2_full_x0"]
++
++
++def config_for(variant="p0_mask_x"):
++    config = load_config(ROOT / "configs" / f"{variant}.json").raw
++    config["runtime"].update(device="cpu", parallel="none", gpu_ids=None)
++    config["model"].update(d_model=32, d_proj=8, num_layers=1, num_heads=4,
++                           dropout=0.0, d_ff_dropout=0.0)
++    return config
++
++
++@pytest.fixture(autouse=True)
++def few_threads():
++    previous = torch.get_num_threads()
++    torch.set_num_threads(2)
++    yield
++    torch.set_num_threads(previous)
++
++
++def batch_for_test():
++    generator = torch.Generator().manual_seed(13)
++    return collate_samples([
++        Sample(torch.randn(length, 1, generator=generator),
++               torch.randn(length, 1, generator=generator),
++               (torch.arange(length) % 3 == 0).long(), None)
++        for length in [113, 167, 129, 181, 155]
++    ])
++
++
++@pytest.mark.parametrize("runtime,batch_size", [
++    ({"parallel": "ddp"}, 16),
++    ({"parallel": "data_parallel", "gpu_ids": [0]}, 16),
++    ({"parallel": "data_parallel", "gpu_ids": [0, 0]}, 16),
++    ({"parallel": "data_parallel", "gpu_ids": [-1, 0]}, 16),
++    ({"parallel": "data_parallel", "gpu_ids": [False, 1]}, 16),
++    ({"parallel": "data_parallel", "gpu_ids": "0,1"}, 16),
++    ({"parallel": "data_parallel", "gpu_ids": [0, 1], "device": "cpu"}, 16),
++    ({"parallel": "data_parallel", "gpu_ids": [0, 1], "device": "cuda:0"}, 16),
++    ({"parallel": "data_parallel", "gpu_ids": [0, 1]}, 1),
++    ({"parallel": "none", "gpu_ids": [0, 1]}, 16),
++])
++def test_invalid_settings(runtime, batch_size):
++    config = config_for()
++    config["runtime"].update(device="cuda", **{k: v for k, v in runtime.items() if k != "device"})
++    if "device" in runtime:
++        config["runtime"]["device"] = runtime["device"]
++    config["optimization"]["batch_size"] = batch_size
++    with pytest.raises(ValueError):
++        validate_config(config)
++
++
++def test_old_configs_and_cli_override():
++    config = load_config(ROOT / "configs/p0_mask_x.json")
++    config.raw["runtime"].pop("parallel", None)
++    config.raw["runtime"].pop("gpu_ids", None)
++    validate_config(config.raw)
++    apply_runtime_overrides(config, argparse.Namespace(parallel="data_parallel", gpu_ids=[1, 0]))
++    assert config.raw["runtime"]["gpu_ids"] == [1, 0]
++    apply_runtime_overrides(config, argparse.Namespace(parallel="none", gpu_ids=None))
++    assert config.raw["runtime"]["gpu_ids"] is None
++
++
++def test_device_selection_and_unavailable_ids(monkeypatch):
++    config = config_for()
++    config["runtime"].update(device="cuda", parallel="data_parallel", gpu_ids=[1, 0])
++    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
++    monkeypatch.setattr(torch.cuda, "device_count", lambda: 2)
++    assert resolve_device(config) == torch.device("cuda:1")
++    config["runtime"]["gpu_ids"] = [0, 2]
++    with pytest.raises(ValueError, match="visible"):
++        resolve_device(config)
++    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
++    with pytest.raises(RuntimeError, match="not available"):
++        resolve_device(config)
++
++
++@pytest.mark.parametrize("variant", VARIANTS)
++def test_global_loss_and_gradients_after_uneven_split(variant):
++    config = config_for(variant)
++    set_seed(72)
++    single = build_model(config).eval()
++    split = copy.deepcopy(single)
++    batch = batch_for_test()
++    x, visible, selected = make_batch_inputs(batch, config, torch.Generator().manual_seed(72))
++    expected = single(x, visible)
++    # Global normalization and padding happen before scatter, as in DataParallel.
++    pieces = [split(a, b) for a, b in zip(x.split([3, 2]), visible.split([3, 2]))]
++    gathered = {key: torch.cat([part[key] for part in pieces], dim=0) for key in expected}
++    for key in expected:
++        torch.testing.assert_close(gathered[key], expected[key], atol=2e-6, rtol=2e-5)
++    reference_loss = compute_losses(expected, batch, config["input"]["target"], 1, 1, selected)
++    gathered_loss = compute_losses(gathered, batch, config["input"]["target"], 1, 1, selected)
++    reference_loss["total"].backward()
++    gathered_loss["total"].backward()
++    torch.testing.assert_close(reference_loss["total"], gathered_loss["total"])
++    for a, b in zip(single.parameters(), split.parameters()):
++        if a.grad is not None:
++            torch.testing.assert_close(a.grad, b.grad, atol=3e-6, rtol=3e-4)
++
++
++def test_wrapped_training_saves_portable_checkpoint(tmp_path, monkeypatch):
++    config = config_for()
++    samples = []
++    for length in [129, 157, 145, 193, 171, 163]:
++        x = torch.linspace(-1, 1, length).unsqueeze(-1)
++        samples.append({"time_series": x, "normal_time_series": x * 0.9,
++                        "labels": (torch.arange(length) % 3 == 0).long()})
++    path = tmp_path / "synthetic.pkl"
++    with path.open("wb") as handle:
++        pickle.dump(samples, handle)
++    config["data"]["path"] = str(path)
++    config["split"]["train_ratio"] = 0.67
++    config["optimization"].update(batch_size=3, epochs=1, log_freq=1)
++    # Force CPU fallback even on a CUDA host; CUDA execution is checked below.
++    with monkeypatch.context() as context:
++        context.setattr(torch.cuda, "is_available", lambda: False)
++        model = torch.nn.DataParallel(prepare_model(build_model(config), config))
++    assert run_smoke(model, config)["status"] == "passed"
++    result = train_model(model, config, tmp_path)
++    assert result["status"] == "completed"
++    payload = torch.load(tmp_path / "checkpoints/best.pth", weights_only=False)
++    assert all(not name.startswith("module.") for name in payload["model_state_dict"])
++    unwrapped = build_model(config)
++    unwrapped.load_state_dict(payload["model_state_dict"], strict=True)
++    unwrap_model(model).load_state_dict(unwrapped.state_dict(), strict=True)
++    assert "Parallel settings:" in (tmp_path / "train.log").read_text()
++
++
++def test_entry_smoke_records_effective_config_and_status(tmp_path, monkeypatch):
++    config = config_for()
++    data_path = tmp_path / "not_loaded.pkl"
++    data_path.write_bytes(b"not a pickle; smoke must not load data")
++    manifest_path = tmp_path / "manifest.json"
++    manifest_path.write_text(json.dumps({"config": {"is_multivariate": False, "num_features": 1},
++                                         "actual_samples": 10}), encoding="utf-8")
++    config["data"].update(path=str(data_path), manifest_path=str(manifest_path))
++    config_path = tmp_path / "config.json"
++    config_path.write_text(json.dumps(config), encoding="utf-8")
++    monkeypatch.setattr(entry, "HERE", tmp_path)
++    args = argparse.Namespace(config=str(config_path), run_id="test_smoke", mode="smoke",
++                              parallel="none", gpu_ids=None, checkpoint=None)
++    entry.run_one(args)
++    run = tmp_path / "runs/test_smoke"
++    assert json.loads((run / "status.json").read_text())["status"] == "completed"
++    assert json.loads((run / "config.json").read_text())["runtime"]["parallel"] == "none"
++    assert json.loads((run / "smoke.json").read_text())["global_batch_size"] == 16
++    with pytest.raises(FileExistsError):
++        entry.run_one(args)
++
++
++@pytest.mark.skipif(torch.cuda.device_count() < 2, reason="requires two visible CUDA GPUs")
++@pytest.mark.parametrize("variant", VARIANTS)
++def test_actual_two_gpu_forward_gradients_and_tail(variant):
++    config = config_for(variant)
++    set_seed(72)
++    reference = build_model(config).to("cuda:0").eval()
++    config["runtime"].update(device="cuda", parallel="data_parallel", gpu_ids=[0, 1])
++    parallel = prepare_model(copy.deepcopy(reference), config).eval()
++    batch = batch_for_test()
++    x, visible, selected = make_batch_inputs(batch, config, torch.Generator().manual_seed(72))
++    device_batch = {key: value.to("cuda:0") for key, value in batch.items() if isinstance(value, torch.Tensor)}
++    x, visible, selected = x.to("cuda:0"), visible.to("cuda:0"), selected.to("cuda:0")
++    a, b = reference(x, visible), parallel(x, visible)
++    for key in a:
++        torch.testing.assert_close(a[key], b[key], atol=2e-5, rtol=2e-4)
++    loss_a = compute_losses(a, device_batch, config["input"]["target"], 1, 1, selected)
++    loss_b = compute_losses(b, device_batch, config["input"]["target"], 1, 1, selected)
++    loss_a["total"].backward()
++    loss_b["total"].backward()
++    for first, second in zip(reference.parameters(), unwrap_model(parallel).parameters()):
++        if first.grad is not None:
++            torch.testing.assert_close(first.grad, second.grad, atol=3e-5, rtol=5e-4)
++    optimizer = torch.optim.AdamW(parallel.parameters(), lr=1e-4)
++    before = unwrap_model(parallel).encoder.embedding_layer.weight.detach().clone()
++    optimizer.step()
++    assert not torch.equal(before, unwrap_model(parallel).encoder.embedding_layer.weight)
++    parallel.zero_grad(set_to_none=True)
++    tail = parallel(x[:1], visible[:1])
++    assert tail["logits"].shape[0] == 1
++    (tail["reconstruction"].square().mean() + tail["logits"].square().mean()).backward()
++    assert all(torch.isfinite(p.grad).all() for p in parallel.parameters() if p.grad is not None)
++    # Exercise dropout and wrapper attribute access in training mode too.
++    unwrap_model(parallel).load_state_dict(reference.state_dict())
++    for module in parallel.modules():
++        if isinstance(module, torch.nn.Dropout):
++            module.p = 0.1
++    parallel.train()
++    assert run_smoke(parallel, config)["status"] == "passed"

@@ -1,0 +1,1 @@
+Temporary file used to prepare the legacy runs symlink before the directory rename. Retained as migration evidence only.

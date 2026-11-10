@@ -1,99 +1,59 @@
-# P0/P1/P2 相对原始 TimeRCD 的实现差异
+# v9相对原始TimeRCD的实现差异
 
-本文用于代码核对。原始文件不修改；新实现全部位于：
+更新时间：2026-11-10。用于核实当前代码，不将历史补丁按时间堆叠成互相冲突的协议。原始根training.py未因v9改写；400k原流程继续调用它。模型、训练设置和监督需分别核对，P0不是官方全流程复制。
 
-`/diskA/YYD/TimeRCD/experiments/ablation_v9/`
+## 1. 结构与输入/目标
 
-## 1. 文件映射
+复用time_rcd/_core/ts_encoder_bi_bias.py的TimeSeriesEncoder；重构头d→4d→4d→1，异常头d→floor(d/2)→2，隐藏层GELU/Dropout与原结构一致；logits按通道平均。当前num_features1，双向RoPE，patch投影后输出逐时间特征。
 
-| 新文件 | 对应原始职责 | 变化 |
+| 组别 | 相对原遮蔽流程 |
+|---|---|
+| P0 | M处X置零、V&~M、M上重构X；保持原训练任务形态 |
+| P1 | 取消输入置零及attention遮蔽，完整X/V；仍仅同规则M上重构X |
+| P2 | P1相同前向，重构目标改为X^0 |
+
+共同forward只接收x/encoder_mask并返回h/reconstruction/logits。P0/P1/P2在train.make_batch_inputs、evaluate._make_eval_inputs及loss目标处分流。X^0/Y仅监督；没有B/Z、偏离头、基元、真实标签门控或额外时序聚合。
+
+## 2. patch/遮挡来源
+
+官方历史训练入口thu-sail-lab/Time-RCD@ebf4f056b571f7ea90602ef666ae56f7d717ebfe/training.py及本地400k均config=default_config后原地改patch16；当前单卡、workers0时原mask函数也读到16。不能用类默认4推断运行值。v9显式分为model.patch_size=16与input.mask_patch_size=16，mask_ratio0.15。
+
+原函数以ceil(valid_length/patch_size)块数选floor(P×ratio)块，范围裁到有效长度，M内X置零；v9保留该采样语义，训练采样使用独立显式种子。编码器把点可见性聚合为patch内任一点可见即token可见，只屏蔽全不可见token的Key/Value，Queries保留，不删除token。
+
+官方当前main库默认4/噪声替换与历史训练入口不同；spawn重导入全局默认4也是另一条路径，不等同当前400k或v9 DataParallel。论文附录D.5写patch16，正文mask15%，没有独立mask4依据。证据和回归来源见audits/patch_20261110/，其中sources仍是测试依赖。
+
+## 3. 分类padding独立开关
+
+src/losses.py的classification_padding默认ignore：先用valid及labels>=0筛选再二值化；official复现先(labels>0.5).long()再labels!=-1，使padding=-1成为正常0，全部B×T参与CE。三份默认配置显式ignore，三份*_padding_official.json仅该字段不同；旧配置缺省ignore会写入生效快照。
+
+开关不改模型、输入、attention、补齐、重构项、初始化或优化器。train/smoke/eval传递模式，日志、检查点、验证和结果记录模式及分母；audit协议字段随模式变化，避免official仍误报已过滤padding。
+
+两模式共同按valid_total早停/选best，保留目标loss供诊断；ignore时与原total一致。检测指标始终排除padding。该选择协议用于隔离训练padding作用，与原脚本直接按其验证目标loss选best的行为须区分。
+
+## 4. 数据/随机性与评价
+
+| 项目 | 原400k流程 | v9 |
 |---|---|---|
-| `src/data.py` | `training.py` 中的 `ChatTSAnomalyPretrainDataset` 和 `collate_fn` | 保留 batch 观测 `X` 统计并用于 `X^0`，改为显式返回 `x`、`x0`、`y`、`valid`；数据文件使用进程内缓存，避免 train/test 重复加载；95/5 划分使用与原始代码相同的 Python `random.shuffle` 规则 |
-| `src/sampling.py` | `training.py:create_random_mask` | 将“patch 位置选择”和“输入置零”拆成两个函数；只有 P0 调用输入置零 |
-| `src/models.py` | `training.py:TimeSeriesPretrainModel` | 复用同一个 `TimeSeriesEncoder` 和原重构头、异常头结构；暂不加入 B/Z、偏离头或新时序聚合 |
-| `src/losses.py` | `training.py:masked_reconstruction_loss`、`anomaly_detection_loss` | 重构目标由配置选择 `X` 或 `X^0`；分类损失按显式 `valid` 和非负标签过滤 |
-| `src/train.py` | `training.py:train_epoch` 和入口训练循环 | 三个变体共用同一训练循环，输入模式和目标由配置决定 |
-| `src/evaluate.py` | 原始验证逻辑及项目外部评测入口 | 增加正常/异常区域、选中/全有效区域误差、复制基线和分类统计 |
-| `run_experiment.py` | 原始 `experiments/train_400k.py` | 唯一入口，负责 audit、smoke、train、eval、report、配置快照和 run 登记 |
+| 训练顺序 | DistributedSampler每轮shuffle | DataLoader shuffle=False |
+| 标准化 | batch观测X统计，配对共用 | 保持全batch观测统计、配对共用 |
+| 采样RNG | 原全局随机源 | 训练按seed/epoch/batch显式生成器 |
+| 验证M | 随全局随机流变化 | evaluation.validation_mask_seed固定 |
+| padding CE | 官方行为 | ignore默认/official可选 |
+| 最佳选择 | 原目标验证loss | 共同valid_total |
+| eval | 原比较脚本可做外部TSB-AD | 当前仅合成语料随机验证侧、分区域误差/复制基线与点级指标 |
 
-## 2. P0/P1/P2 的实际差异
+因此历史400k与P0的loss差异不能只归因于padding或mask大小。不同目标的总loss也不能直接说明P2优于P1。分组split、外部VUS、密度分层、合法上下文干预与多种子统计尚未在v9完整实现/执行。
 
-### P0：`p0_mask_x.json`
+## 5. 可选并行、日志与运行管理
 
-与原始训练协议对应：
+src/parallel.py实现单进程DataParallel，入口支持--parallel/--gpu-ids；原400k走根training.py的DDP路径（当前单进程world_size1）。v9只切batch维，全batch预处理/采样，汇总预测后计算loss，总batch和优化器步数不随卡数增加。首逻辑GPU为主卡。无DDP/FSDP/多机实现；默认规模双卡吞吐/显存未测，单多卡不承诺逐位一致。
 
-- 选取约 15% 有效 patch；
-- 将选中的 `X` 输入值置零；
-- 将对应位置从 encoder 的键值有效标志中排除；
-- 重构目标是观测 `X`；
-- 异常分类使用同一次前向的 `H`。
+v9检查点保存未封装完整state_dict、优化器、epoch、验证和config；支持单多卡eval加载，但当前没有训练resume接口。400k入口支持本run模型/优化器恢复，也不是完整RNG/早停恢复。
 
-与原始 400k 入口相比，P0 有两处为消融协议做的统一化：
+v9统一入口负责audit/smoke/train/eval/report/all与独立run登记；all实际为audit→smoke→train→best eval，不自动report。默认每100batch输出分项loss和分类点数，epoch记录分项/验证。尚未加入逐batch尖峰触发保存，不能承诺周期日志捕获所有异常。
 
-1. patch size 从配置读取，当前配置为 16，与 `experiments/train_400k.py` 的训练配置一致；原始 `create_random_mask()` 实际读取全局 `default_config` 的默认值 4，因此新 P0 是按已登记协议固定为 16 的基线，不是原脚本的字节级复制；
-2. padding 标签通过 `valid & (label >= 0)` 过滤，不把 padding 当正常标签。原始 `training.py` 先将标签二值化，再用 `labels != -1` 判断，导致 padding 可能被当成正常位置。P0 因此是“统一有效位置处理后的原流程基线”，不是原脚本的字节级复制。
+## 6. 核实位置与整理边界
 
-### P1：`p1_full_x.json`
+src/{models,sampling,losses,train,evaluate,parallel,audit,config}.py分别承担上述职责；README给出可执行命令，EXPERIMENT_SPEC约束工程行为。audits/patch_20261110、parallel_20261110、padding_20261110保留来源、差异、哈希与XML证据。
 
-只改变输入可见性：
-
-- 输入为完整 `X`；
-- 不置零；
-- encoder 的键值标志为全部有效位置 `V`；
-- 仍只在同样约 15% patch 上重构；
-- 重构目标仍为 `X`；
-- 分类头、头结构、损失权重和训练预算保持 P0 一致。
-
-P1−P0 用于估计“取消输入值遮蔽和注意力键值屏蔽”的合并影响，不能继续拆成两个独立因果结论。
-
-### P2：`p2_full_x0.json`
-
-只在 P1 基础上改变数值监督目标：
-
-- 输入仍为完整 `X`；
-- 不置零，encoder 读取全部有效上下文；
-- 仍使用同样的 15% patch 损失位置；
-- 重构目标改为配对正常序列 `X^0`；
-- 异常分类仍直接读取 `H`，此阶段没有 Z 分支。
-
-P2−P1 用于估计“正常参考监督”的增量。P2 不把 `X^0` 或真实标签作为模型输入。
-
-## 3. 沿用的原始结构
-
-新模型中的以下结构与原始 `training.py` 保持一致：
-
-- `TimeSeriesEncoder`；
-- 重构头：`d_proj → 4d_proj → 4d_proj → 1`，两层 GELU/Dropout；
-- 异常头：`d_proj → floor(d_proj/2) → 2`，GELU/Dropout；
-- 异常 logits 的特征维均值；
-- 二分类交叉熵；
-- 当前 400k 配置的 patch size、dropout、batch size、学习率、weight decay、epoch 上限和 seed。
-
-新增的不是新的模型结构，而是把 P0/P1/P2 的输入与目标差异显式化，并让它们共用同一套训练和评估代码。
-
-## 4. 运行方式
-
-配置：
-
-- `configs/p0_mask_x.json`
-- `configs/p1_full_x.json`
-- `configs/p2_full_x0.json`
-
-统一入口：
-
-```bash
-python /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
-  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p2_full_x0.json \
-  --run-id p2_full_x0_seed072_audit \
-  --mode audit
-```
-
-`audit` 不读取 37 GiB pickle 数据，只核对配置、manifest 和模型结构。`smoke` 使用合成小批量验证前向、损失和反向传播。`train`、`eval` 和 `all` 才会读取 400k 数据快照。
-
-## 5. 当前没有改变的内容
-
-- 根目录原始 `training.py` 和模型文件；
-- 400k 数据快照、manifest、官方权重和已有运行产物；
-- 数据生成配置；
-- 原始 400k 训练进程；
-- 最终 B/Z、偏离重构和异常基元方案。
+本次整理只修正audit元数据及其断言、同步文档、归档旧备份并移除冗余入口/缓存，不改变模型/损失/训练/评价数值逻辑或六份配置。原migrations、padding的before备份和一次性停止脚本移入`experiments/_archive/20261110_cleanup/`；run、registry、数据、权重保留原位。

@@ -1,0 +1,6 @@
+{
+  "result": "Readback byte-identical: 16 files",
+  "method": "Downloaded each deployed path via SFTP and compared SHA256 with local staged source using verify_local.py --readback",
+  "files": 16,
+  "all_match": true
+}

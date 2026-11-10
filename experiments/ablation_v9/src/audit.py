@@ -28,6 +28,7 @@ def run_audit(config: ExperimentConfig) -> dict:
 
     model = build_model(config.raw)
     parameter_count = sum(parameter.numel() for parameter in model.parameters())
+    padding_policy = config.raw["loss"].get("classification_padding", "ignore")
     return {
         "status": "passed",
         "experiment_id": config.experiment_id,
@@ -38,7 +39,12 @@ def run_audit(config: ExperimentConfig) -> dict:
         "protocol_checks": {
             "input_mode": config.raw["input"]["input_mode"],
             "target": config.raw["input"]["target"],
-            "classification_uses_valid_mask": True,
-            "padding_label_is_not_used_as_normal": True,
+            "encoder_patch_size": model.encoder.patch_size,
+            "mask_patch_size": int(config.raw["input"]["mask_patch_size"]),
+            "mask_ratio": float(config.raw["input"]["mask_ratio"]),
+            "encoder_token_visible_if_any_point_visible": True,
+            "classification_padding": padding_policy,
+            "classification_uses_valid_mask": padding_policy == "ignore",
+            "padding_label_is_not_used_as_normal": padding_policy == "ignore",
         },
     }

@@ -1,0 +1,858 @@
+--- before/configs/p0_mask_x.json
++++ after/configs/p0_mask_x.json
+@@ -22,12 +22,13 @@
+   },
+   "loss": {
+     "reconstruction_weight": 1,
+-    "classification_weight": 1
++    "classification_weight": 1,
++    "classification_padding": "ignore"
+   },
+   "optimization": {
+     "batch_size": 16,
+     "learning_rate": 0.0005,
+-    "weight_decay": 0.00001,
++    "weight_decay": 1e-05,
+     "epochs": 50,
+     "early_stopping_patience": 7,
+     "num_workers": 0,
+--- before/configs/p0_mask_x_padding_official.json
++++ after/configs/p0_mask_x_padding_official.json
+@@ -0,0 +1,56 @@
++{
++  "schema_version": 1,
++  "data": {
++    "path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
++    "manifest_path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
++  },
++  "split": {
++    "train_ratio": 0.95,
++    "seed": 42
++  },
++  "model": {
++    "d_model": 512,
++    "d_proj": 256,
++    "patch_size": 16,
++    "num_layers": 8,
++    "num_heads": 8,
++    "d_ff_dropout": 0.1,
++    "use_rope": true,
++    "num_features": 1,
++    "activation": "gelu",
++    "dropout": 0.1
++  },
++  "loss": {
++    "reconstruction_weight": 1,
++    "classification_weight": 1,
++    "classification_padding": "official"
++  },
++  "optimization": {
++    "batch_size": 16,
++    "learning_rate": 0.0005,
++    "weight_decay": 1e-05,
++    "epochs": 50,
++    "early_stopping_patience": 7,
++    "num_workers": 0,
++    "log_freq": 100
++  },
++  "runtime": {
++    "seed": 72,
++    "device": "cuda",
++    "parallel": "none",
++    "gpu_ids": null,
++    "mixed_precision": false
++  },
++  "evaluation": {
++    "validation_mask_seed": 20261109,
++    "threshold_source": "validation_only"
++  },
++  "experiment_id": "p0_mask_x",
++  "input": {
++    "input_mode": "masked_x",
++    "target": "x",
++    "mask_ratio": 0.15,
++    "mask_unit": "patch",
++    "mask_patch_size": 16
++  }
++}
+--- before/configs/p1_full_x.json
++++ after/configs/p1_full_x.json
+@@ -22,12 +22,13 @@
+   },
+   "loss": {
+     "reconstruction_weight": 1,
+-    "classification_weight": 1
++    "classification_weight": 1,
++    "classification_padding": "ignore"
+   },
+   "optimization": {
+     "batch_size": 16,
+     "learning_rate": 0.0005,
+-    "weight_decay": 0.00001,
++    "weight_decay": 1e-05,
+     "epochs": 50,
+     "early_stopping_patience": 7,
+     "num_workers": 0,
+--- before/configs/p1_full_x_padding_official.json
++++ after/configs/p1_full_x_padding_official.json
+@@ -0,0 +1,56 @@
++{
++  "schema_version": 1,
++  "data": {
++    "path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
++    "manifest_path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
++  },
++  "split": {
++    "train_ratio": 0.95,
++    "seed": 42
++  },
++  "model": {
++    "d_model": 512,
++    "d_proj": 256,
++    "patch_size": 16,
++    "num_layers": 8,
++    "num_heads": 8,
++    "d_ff_dropout": 0.1,
++    "use_rope": true,
++    "num_features": 1,
++    "activation": "gelu",
++    "dropout": 0.1
++  },
++  "loss": {
++    "reconstruction_weight": 1,
++    "classification_weight": 1,
++    "classification_padding": "official"
++  },
++  "optimization": {
++    "batch_size": 16,
++    "learning_rate": 0.0005,
++    "weight_decay": 1e-05,
++    "epochs": 50,
++    "early_stopping_patience": 7,
++    "num_workers": 0,
++    "log_freq": 100
++  },
++  "runtime": {
++    "seed": 72,
++    "device": "cuda",
++    "parallel": "none",
++    "gpu_ids": null,
++    "mixed_precision": false
++  },
++  "evaluation": {
++    "validation_mask_seed": 20261109,
++    "threshold_source": "validation_only"
++  },
++  "experiment_id": "p1_full_x",
++  "input": {
++    "input_mode": "full_x",
++    "target": "x",
++    "mask_ratio": 0.15,
++    "mask_unit": "patch",
++    "mask_patch_size": 16
++  }
++}
+--- before/configs/p2_full_x0.json
++++ after/configs/p2_full_x0.json
+@@ -22,12 +22,13 @@
+   },
+   "loss": {
+     "reconstruction_weight": 1,
+-    "classification_weight": 1
++    "classification_weight": 1,
++    "classification_padding": "ignore"
+   },
+   "optimization": {
+     "batch_size": 16,
+     "learning_rate": 0.0005,
+-    "weight_decay": 0.00001,
++    "weight_decay": 1e-05,
+     "epochs": 50,
+     "early_stopping_patience": 7,
+     "num_workers": 0,
+--- before/configs/p2_full_x0_padding_official.json
++++ after/configs/p2_full_x0_padding_official.json
+@@ -0,0 +1,56 @@
++{
++  "schema_version": 1,
++  "data": {
++    "path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
++    "manifest_path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
++  },
++  "split": {
++    "train_ratio": 0.95,
++    "seed": 42
++  },
++  "model": {
++    "d_model": 512,
++    "d_proj": 256,
++    "patch_size": 16,
++    "num_layers": 8,
++    "num_heads": 8,
++    "d_ff_dropout": 0.1,
++    "use_rope": true,
++    "num_features": 1,
++    "activation": "gelu",
++    "dropout": 0.1
++  },
++  "loss": {
++    "reconstruction_weight": 1,
++    "classification_weight": 1,
++    "classification_padding": "official"
++  },
++  "optimization": {
++    "batch_size": 16,
++    "learning_rate": 0.0005,
++    "weight_decay": 1e-05,
++    "epochs": 50,
++    "early_stopping_patience": 7,
++    "num_workers": 0,
++    "log_freq": 100
++  },
++  "runtime": {
++    "seed": 72,
++    "device": "cuda",
++    "parallel": "none",
++    "gpu_ids": null,
++    "mixed_precision": false
++  },
++  "evaluation": {
++    "validation_mask_seed": 20261109,
++    "threshold_source": "validation_only"
++  },
++  "experiment_id": "p2_full_x0",
++  "input": {
++    "input_mode": "full_x",
++    "target": "x0",
++    "mask_ratio": 0.15,
++    "mask_unit": "patch",
++    "mask_patch_size": 16
++  }
++}
+--- before/EXPERIMENT_SPEC.md
++++ after/EXPERIMENT_SPEC.md
+@@ -156,3 +156,14 @@
+ 8. 训练和评估完成后，再由 `report` 生成比较结果。
+ 
+ 本规范本身不授权启动训练、生成数据、修改官方权重或替换既有产物。
++
++
++## 7. padding 单因素对照约束（2026-11-10）
++
++`loss.classification_padding` 只允许 `ignore` / `official`；缺省为ignore并写入实际配置。每个P组提供一对仅该项不同的配置，正式运行应明确模式，使用独立run-id。其余模型、数据划分/顺序、种子、标准化、mask、优化器、batch、并行设备、预算和选择协议保持一致。
++
++official仅复现官方异常分类损失中padding被二值化为正常点的行为，不改变注意力或重构padding策略。各模式训练和验证目标相匹配，同时验证/eval必须额外报告valid_classification与valid_total，以及目标损失点数、有效标签点数和padding点数。所有检测指标始终排除padding。
++
++两模式统一按valid_total早停与选best；它保留原权重/重构项、有效点分类CE和既有batch均值汇总方式。ignore模式与修改前的total相同。checkpoint保留完整模式配置和验证结果，训练结果注明selection_metric。模式不同的目标loss绝对大小不能直接作性能比较；用共同有效点指标或固定epoch检查点评估。
++
++该对照必须在v9内部进行，历史400k不能作为隔离padding效应的唯一对照。新增测试和证据位于tests/test_padding_contract.py与audits/padding_20261110/；不自动启动正式训练。
+--- before/IMPLEMENTATION_DIFF.md
++++ after/IMPLEMENTATION_DIFF.md
+@@ -21,7 +21,7 @@
+ - P1：完整 `X` 输入，在相同遮挡采样位置重构 `X`。
+ - P2：完整 `X` 输入，在相同遮挡采样位置重构配对正常值 `X^0`。
+ 
+-三组共用相同模型和损失权重。P0/P1/P2 分类损失均仅使用有效标签位置；这一点修正了原版先把 padding 标签二值化、再尝试过滤的实现问题，因此 P0 不是字节级复制。
++三组共用相同模型和损失权重。默认 loss.classification_padding=ignore，仅使用有效标签位置；可选 official 复现原版先二值化再过滤而将 padding 当正常点的分类损失。即使使用 official，P0 仍有下述数据重排、随机源等差异，不能视为官方完整复制。
+ 
+ patch 设置一致也不代表训练轨迹一致：v9 训练 DataLoader 为 `shuffle=False`，原版使用每轮重排的 DistributedSampler；v9 独立种子采样并固定验证 M，原版使用全局随机源。上述差异本次只核实披露，不混入 patch 修正；不能将历史两次训练的 loss 差异归因于遮挡长度。
+ 
+@@ -44,3 +44,14 @@
+ - 标准化和采样在分卡前执行，loss 在汇总后执行。没有各卡独立标准化、各卡均值等权平均或按 GPU 数量增加总 batch。P0/P1/P2 的输入、mask、目标、模型和学习率保持原协议。
+ - 多卡 dropout 随机流及浮点归约顺序可能不同，不承诺单卡和多卡训练逐位一致。DataParallel 主卡负责汇总，速度和显存收益需实测；本次不提供 DDP / 多机模式，也不增加 resume。
+ - `tests/test_parallel_contract.py`：合成变长 batch 的汇总 loss/梯度、检查点与训练流程回归；双 GPU 测试在可见卡数不足时显式 skip。
++
++
++## 2026-11-10 可选 padding 分类监督
++
++- `src/losses.py`：增加 `classification_padding=ignore/official`，只切换分类点选择和原版标签转换顺序；重构计算保持不变。无 padding 的整数标签输入下两模式 loss/梯度一致。
++- `src/config.py`：校验枚举，旧配置缺省 ignore；加载时将默认值写入生效配置，随快照和检查点保存。
++- `configs/`：原三份配置显式 ignore，新增同名后缀 `_padding_official.json` 三份配置；每对只有该字段不同。
++- `src/train.py`：训练和 smoke 传递模式，日志记录损失点数/有效点/padding点；两模式统一用 valid_total 早停和选best。ignore 的选择指标保持原值。
++- `src/evaluate.py`：训练目标 loss 按模式计算，额外提供统一有效点CE和总损失、分母计数；检测指标一直排除padding。没有将补齐点加入F1/accuracy。
++- `tests/test_padding_contract.py`：原版CE/梯度复现、过滤梯度、无padding等价、空集合、旧配置、严格校验、配对单变量差异、初始化/输入/mask/重构不变、两模式验证/训练/检查点及共同早停测试。既有并行测试扩展到两模式，配置列表测试纳入六份配置。
++- `run_experiment.py` 及模型、数据、采样、并行模块保持不变。original_400k、根training.py、现有run/权重不修改，不启动正式训练。比较要求和命令见README。
+--- before/README.md
++++ after/README.md
+@@ -63,7 +63,7 @@
+ 
+ 训练、验证、独立 eval 与 smoke 均复用同一封装。只由一个进程记录日志、早停和保存权重；检查点不带 `module.` 前缀，可通过 `--mode eval --checkpoint /绝对路径/best.pth` 在单卡/多卡加载。当前入口仍不支持恢复训练，本次没有增加 resume。
+ 
+-新增模块 `src/parallel.py` 负责配置校验、设备选择、封装与解封装。模型结构及 `sampling.py`、`data.py`、`losses.py`、`evaluate.py` 的算法未改；不会出现原始 spawn 路径重新导入默认 mask 大小的问题，采样仍明确读取 `input.mask_patch_size=16`。
++新增模块 `src/parallel.py` 负责配置校验、设备选择、封装与解封装。上述多卡改动没有修改模型结构及 `sampling.py`、`data.py`、`losses.py`、`evaluate.py` 的算法；不会出现原始 spawn 路径重新导入默认 mask 大小的问题，采样仍明确读取 `input.mask_patch_size=16`。
+ 
+ ## 检查命令
+ 
+@@ -71,3 +71,55 @@
+ /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
+   /diskA/YYD/TimeRCD/experiments/ablation_v9/tests/run_checks.py
+ ```
++
++
++## 分类损失的 padding 配对消融（2026-11-10）
++
++在同一 P 组内仅改变 `loss.classification_padding`，检验补齐位置参与分类监督的影响：
++
++```json
++"loss": {
++  "reconstruction_weight": 1,
++  "classification_weight": 1,
++  "classification_padding": "ignore"
++}
++```
++
++- `ignore`：先按 `valid & (labels >= 0)` 筛选，再二值化；padding 不参与 CE，分母是有效标签点数。默认及旧配置缺省行为保持这一模式。
++- `official`：严格复现官方分类损失先 `(labels > 0.5).long()`、再 `labels != -1` 的顺序。padding=-1 变成正常标签0，全部 B×T 点参与 CE。只复现该损失行为，不代表完整复刻官方训练流程。
++- 此开关不改变实际 padding、注意力 mask、重构 mask/目标、数据顺序、标准化、采样、模型初始化、优化器或并行方式。
++
++| 组别 | 排除 padding | 复现官方分类损失 |
++|---|---|---|
++| P0 | `configs/p0_mask_x.json` | `configs/p0_mask_x_padding_official.json` |
++| P1 | `configs/p1_full_x.json` | `configs/p1_full_x_padding_official.json` |
++| P2 | `configs/p2_full_x0.json` | `configs/p2_full_x0_padding_official.json` |
++
++每对配置仅该字段不同。统一入口和 GPU 参数继续通用。例如同一 GPU、同一 seed、同一总 batch 下的 P0 对照（由用户启动）：
++
++```bash
++CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
++  /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
++  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x.json \
++  --run-id p0_mask_x_padignore_seed072_v1 --mode train
++
++CUDA_VISIBLE_DEVICES=1 /home/omnisky/anaconda3/envs/time-rcd/bin/python3 \
++  /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py \
++  --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p0_mask_x_padding_official.json \
++  --run-id p0_mask_x_padofficial_seed072_v1 --mode train
++```
++
++P1/P2 对应更换表中两份配置和 run-id。先后执行同一设备上的两次训练；如用多卡，各对照保持相同的 `--parallel`、`--gpu-ids` 和总 batch。训练前可用新 run-id 和 `--mode smoke` 检查。
++
++训练日志记录所选模式和每个已记录 batch 的分类损失点数、有效点数、padding 点数；配置快照、checkpoint.config、smoke 和训练结果也记录模式。
++
++验证/eval 同时报告：
++
++- `classification` / `total`：当前模式对应的分类/总目标损失，两种模式分母不同，不能据其绝对大小判断哪种训练更好。
++- `valid_classification` / `valid_total`：统一排除 padding 的分类/总损失；总损失保留配置的原权重和原重构项，按现有 batch 均值方式汇总。
++- `classification_loss_points`：实际参与所选模式 CE 的点数；`classification_points`：检测指标的有效标签点数；`padding_points`：补齐点数。
++- accuracy、precision、recall、F1 始终只计算有效标签点。
++
++**两种模式的早停和 best 检查点都使用 `valid_total`**，从而保持选择标准一致；ignore 模式下它与原来的 `total` 完全相同。日志中的 `validation_loss`、训练结果的 `best_validation_loss` 均指此选择指标，结果另记 `selection_metric=valid_total`。若比较固定训练预算，可对同一 epoch 的检查点用相同 eval 协议评估，避免把不同最佳轮次误作相同步数。
++
++对照结果应来自本目录内的配对运行；历史 original_400k 还存在重排、随机源等差异，只作为原流程参考。当前没有因本次修改启动正式训练，亦没有 padding 对性能影响的结论。验证证据见 `audits/padding_20261110/`。
+--- before/src/config.py
++++ after/src/config.py
+@@ -6,6 +6,7 @@
+ from typing import Any
+ 
+ from .parallel import validate_parallel_config
++from .losses import validate_classification_padding
+ 
+ 
+ VARIANTS = {"p0_mask_x", "p1_full_x", "p2_full_x0"}
+@@ -46,6 +47,7 @@
+     with config_path.open("r", encoding="utf-8") as handle:
+         raw = json.load(handle)
+     validate_config(raw)
++    raw["loss"].setdefault("classification_padding", "ignore")
+     return ExperimentConfig(raw=raw, path=config_path)
+ 
+ 
+@@ -87,6 +89,7 @@
+         raise ValueError("model.patch_size must be positive")
+     if float(raw["loss"]["reconstruction_weight"]) < 0 or float(raw["loss"]["classification_weight"]) < 0:
+         raise ValueError("loss weights must be non-negative")
++    validate_classification_padding(raw["loss"].get("classification_padding", "ignore"))
+     if float(raw["loss"]["reconstruction_weight"]) + float(raw["loss"]["classification_weight"]) <= 0:
+         raise ValueError("at least one loss weight must be positive")
+     if int(raw["optimization"]["batch_size"]) <= 0 or int(raw["optimization"]["epochs"]) <= 0:
+--- before/src/evaluate.py
++++ after/src/evaluate.py
+@@ -4,7 +4,7 @@
+ from torch.utils.data import DataLoader
+ 
+ from .data import PairedTimeSeriesDataset, collate_samples
+-from .losses import compute_losses
++from .losses import classification_ce, compute_losses
+ from .sampling import apply_input_mask, sample_patch_mask
+ 
+ 
+@@ -26,6 +26,8 @@
+         "total": 0.0,
+         "reconstruction": 0.0,
+         "classification": 0.0,
++        "valid_classification": 0.0,
++        "valid_total": 0.0,
+         "selected_normal_reconstruction": 0.0,
+         "selected_anomalous_reconstruction": 0.0,
+         "full_normal_reconstruction": 0.0,
+@@ -40,6 +42,8 @@
+         "full_normal_points": 0,
+         "full_anomalous_points": 0,
+         "classification_points": 0,
++        "classification_loss_points": 0,
++        "padding_points": 0,
+         "classification_correct": 0,
+         "true_positive": 0,
+         "false_positive": 0,
+@@ -61,10 +65,24 @@
+                 float(config["loss"]["reconstruction_weight"]),
+                 float(config["loss"]["classification_weight"]),
+                 mask.to(device),
++                classification_padding=config["loss"].get("classification_padding", "ignore"),
+             )
+             sums["total"] += float(losses["total"])
+             sums["reconstruction"] += float(losses["reconstruction"])
+             sums["classification"] += float(losses["classification"])
++            if config["loss"].get("classification_padding", "ignore") == "ignore":
++                valid_classification = losses["classification"]
++            else:
++                valid_classification, _ = classification_ce(
++                    output["logits"], batch_device["y"], batch_device["valid"]
++                )
++            sums["valid_classification"] += float(valid_classification)
++            sums["valid_total"] += float(
++                float(config["loss"]["reconstruction_weight"]) * losses["reconstruction"]
++                + float(config["loss"]["classification_weight"]) * valid_classification
++            )
++            counts["classification_loss_points"] += losses["classification_count"]
++            counts["padding_points"] += int((~batch_device["valid"]).sum())
+ 
+             target = (
+                 batch_device["x0"]
+@@ -125,6 +143,9 @@
+         "total": sums["total"] / max(1, counts["batches"]),
+         "reconstruction": sums["reconstruction"] / max(1, counts["batches"]),
+         "classification": sums["classification"] / max(1, counts["batches"]),
++        "valid_classification": sums["valid_classification"] / max(1, counts["batches"]),
++        "valid_total": sums["valid_total"] / max(1, counts["batches"]),
++        "classification_padding": config["loss"].get("classification_padding", "ignore"),
+         "selected_normal_reconstruction": mean(
+             "selected_normal_reconstruction", "selected_normal_points"
+         ),
+--- before/src/losses.py
++++ after/src/losses.py
+@@ -2,6 +2,14 @@
+ 
+ import torch
+ import torch.nn.functional as F
++
++
++CLASSIFICATION_PADDING_POLICIES = ("ignore", "official")
++
++
++def validate_classification_padding(policy: str) -> None:
++    if policy not in CLASSIFICATION_PADDING_POLICIES:
++        raise ValueError("loss.classification_padding must be 'ignore' or 'official'")
+ 
+ 
+ def masked_mse(prediction: torch.Tensor, target: torch.Tensor, mask: torch.Tensor) -> tuple[torch.Tensor, int]:
+@@ -13,20 +21,28 @@
+     return (values.square().mean()), count
+ 
+ 
+-def classification_ce(logits: torch.Tensor, labels: torch.Tensor, valid: torch.Tensor) -> tuple[torch.Tensor, int]:
++def classification_ce(logits: torch.Tensor, labels: torch.Tensor, valid: torch.Tensor,
++                      padding_policy: str = "ignore") -> tuple[torch.Tensor, int]:
++    validate_classification_padding(padding_policy)
+     if logits.ndim != 3 or labels.ndim != 2 or valid.shape != labels.shape:
+         raise ValueError("classification shapes must be logits=(B,T,2), labels=(B,T), valid=(B,T)")
+-    active = valid & (labels >= 0)
++    if padding_policy == "official":
++        # Match the official order: binarization destroys the padding sentinel -1.
++        clean_labels = (labels > 0.5).long()
++        active = clean_labels != -1
++    else:
++        active = valid & (labels >= 0)
++        clean_labels = (labels > 0).long()
+     count = int(active.sum().item())
+     if count == 0:
+         return logits.sum() * 0.0, 0
+-    clean_labels = (labels > 0).long()
+     return F.cross_entropy(logits[active], clean_labels[active]), count
+ 
+ 
+-def compute_losses(output, batch, target: str, reconstruction_weight: float, classification_weight: float, reconstruction_mask: torch.Tensor):
++def compute_losses(output, batch, target: str, reconstruction_weight: float, classification_weight: float,
++                   reconstruction_mask: torch.Tensor, classification_padding: str = "ignore"):
+     reconstruction_target = batch["x0"] if target == "x0" else batch["x"]
+     recon_loss, recon_count = masked_mse(output["reconstruction"], reconstruction_target, reconstruction_mask)
+-    cls_loss, cls_count = classification_ce(output["logits"], batch["y"], batch["valid"])
++    cls_loss, cls_count = classification_ce(output["logits"], batch["y"], batch["valid"], classification_padding)
+     total = reconstruction_weight * recon_loss + classification_weight * cls_loss
+     return {"total": total, "reconstruction": recon_loss, "classification": cls_loss, "reconstruction_count": recon_count, "classification_count": cls_count}
+--- before/src/train.py
++++ after/src/train.py
+@@ -67,6 +67,7 @@
+         float(config["loss"]["reconstruction_weight"]),
+         float(config["loss"]["classification_weight"]),
+         mask.to(device),
++        classification_padding=config["loss"].get("classification_padding", "ignore"),
+     )
+     losses["total"].backward()
+     return {
+@@ -76,6 +77,7 @@
+             for key, value in losses.items()
+         },
+         "mask_count": int(mask.sum().item()),
++        "classification_padding": config["loss"].get("classification_padding", "ignore"),
+         "encoder_patch_size": unwrap_model(model).encoder.patch_size,
+         **parallel_record(model, config),
+         "mask_patch_size": int(config["input"]["mask_patch_size"]),
+@@ -109,6 +111,8 @@
+     log_freq = int(config["optimization"]["log_freq"])
+     patch_log = (
+         f"Parallel settings: {parallel_record(model, config)}\n"
++        f"Loss settings: classification_padding={config['loss'].get('classification_padding', 'ignore')}, "
++        f"checkpoint_selection=valid_total\n"
+         f"Patch settings: encoder_patch_size={unwrap_model(model).encoder.patch_size}, "
+         f"mask_patch_size={int(config['input']['mask_patch_size'])}, "
+         f"mask_ratio={float(config['input']['mask_ratio'])}, "
+@@ -142,6 +146,7 @@
+                 float(config["loss"]["reconstruction_weight"]),
+                 float(config["loss"]["classification_weight"]),
+                 mask.to(device),
++                classification_padding=config["loss"].get("classification_padding", "ignore"),
+             )
+             losses["total"].backward()
+             optimizer.step()
+@@ -160,6 +165,9 @@
+                     f"  Total Loss: {batch_total:.4f}\n"
+                     f"  Recon Loss: {batch_reconstruction:.4f}\n"
+                     f"  Anomaly Loss: {batch_classification:.4f}\n"
++                    f"  Classification points: loss={losses['classification_count']}, "
++                    f"valid={int((batch['valid'] & (batch['y'] >= 0)).sum())}, "
++                    f"padding={int((~batch['valid']).sum())}\n"
+                 )
+                 print(batch_log, end="", flush=True)
+                 with log_path.open("a", encoding="utf-8") as handle:
+@@ -169,7 +177,7 @@
+         average_reconstruction = total_reconstruction / max(1, batches)
+         average_classification = total_classification / max(1, batches)
+         validation = evaluate_model(model, config, config["data"]["path"], test_indices)
+-        validation_loss = float(validation["total"])
++        validation_loss = float(validation["valid_total"])
+         epoch_log = (
+             f"epoch={epoch} train_loss={average_total:.8f} "
+             f"validation_loss={validation_loss:.8f}\n"
+@@ -177,7 +185,8 @@
+             f"  Average Total Loss: {average_total:.4f}\n"
+             f"  Average Recon Loss: {average_reconstruction:.4f}\n"
+             f"  Average Anomaly Loss: {average_classification:.4f}\n"
+-            f"  Validation Total Loss: {validation_loss:.4f}\n"
++            f"  Validation Objective Loss: {float(validation['total']):.4f}\n"
++            f"  Validation Valid Total Loss (selection): {validation_loss:.4f}\n"
+         )
+         print(epoch_log, end="", flush=True)
+         with log_path.open("a", encoding="utf-8") as handle:
+@@ -201,4 +210,6 @@
+             if stale >= int(config["optimization"]["early_stopping_patience"]):
+                 break
+ 
+-    return {"status": "completed", "best_epoch": best_epoch, "best_validation_loss": best_loss}
++    return {"status": "completed", "best_epoch": best_epoch, "best_validation_loss": best_loss,
++            "selection_metric": "valid_total",
++            "classification_padding": config["loss"].get("classification_padding", "ignore")}
+--- before/tests/test_config_contract.py
++++ after/tests/test_config_contract.py
+@@ -8,7 +8,8 @@
+ 
+ def test_all_variant_configs_match_single_gpu_training_patch_sizes():
+     configs = sorted((ROOT / "configs").glob("*.json"))
+-    assert {path.stem for path in configs} == {"p0_mask_x", "p1_full_x", "p2_full_x0"}
++    variants = {"p0_mask_x", "p1_full_x", "p2_full_x0"}
++    assert {path.stem for path in configs} == variants | {f"{name}_padding_official" for name in variants}
+     for path in configs:
+         config = load_config(path)
+         assert config.raw["model"]["num_features"] == 1
+--- before/tests/test_padding_contract.py
++++ after/tests/test_padding_contract.py
+@@ -0,0 +1,222 @@
++"""Padding ablation checks using synthetic data only."""
++import copy
++import json
++import pickle
++from pathlib import Path
++
++import pytest
++import torch
++import torch.nn.functional as F
++
++from src.config import load_config, validate_config
++from src.losses import classification_ce, compute_losses
++from src.models import build_model
++from src.train import make_batch_inputs, set_seed, train_model
++from src.evaluate import evaluate_model
++import src.train as training
++
++ROOT = Path(__file__).resolve().parents[1]
++VARIANTS = ('p0_mask_x', 'p1_full_x', 'p2_full_x0')
++POLICIES = ('ignore', 'official')
++
++
++@pytest.fixture(autouse=True)
++def few_threads():
++    previous = torch.get_num_threads()
++    torch.set_num_threads(2)
++    yield
++    torch.set_num_threads(previous)
++
++
++def config_for(variant='p0_mask_x', policy='ignore'):
++    config = load_config(ROOT / 'configs' / f'{variant}.json').raw
++    config['loss']['classification_padding'] = policy
++    config['runtime'].update(device='cpu', parallel='none', gpu_ids=None)
++    config['model'].update(d_model=32, d_proj=8, num_layers=1, num_heads=4,
++                           dropout=0.0, d_ff_dropout=0.0)
++    config['optimization'].update(batch_size=3, epochs=1, log_freq=1)
++    return config
++
++
++def synthetic_data(tmp_path):
++    rows = []
++    for length in (129, 157, 145, 193, 171, 163):
++        x = torch.linspace(-1, 1, length).unsqueeze(-1)
++        rows.append(dict(time_series=x, normal_time_series=x * 0.9,
++                         labels=(torch.arange(length) % 3 == 0).long()))
++    path = tmp_path / 'synthetic.pkl'
++    with path.open('wb') as handle:
++        pickle.dump(rows, handle)
++    return path
++
++
++def tensors():
++    logits = torch.tensor([[[2., -1.], [-2., 1.], [-1., 3.], [3., -2.]]], requires_grad=True)
++    return logits, torch.tensor([[0, 2, -1, -1]]), torch.tensor([[True, True, False, False]])
++
++
++def test_official_matches_original_loss_and_gradient():
++    logits, labels, valid = tensors()
++    expected_logits = logits.detach().clone().requires_grad_()
++    # Literal official sequence, including threshold and filtering order.
++    flat_labels = (labels.view(-1) > 0.5).long()
++    active = flat_labels != -1
++    expected = F.cross_entropy(expected_logits.view(-1, 2)[active], flat_labels[active])
++    actual, count = classification_ce(logits, labels, valid, 'official')
++    assert count == labels.numel()
++    torch.testing.assert_close(actual, expected)
++    actual.backward()
++    expected.backward()
++    torch.testing.assert_close(logits.grad, expected_logits.grad)
++    assert logits.grad[~valid].abs().sum() > 0
++
++
++def test_ignore_removes_padding_values_and_gradients():
++    logits, labels, valid = tensors()
++    loss, count = classification_ce(logits, labels, valid, 'ignore')
++    loss.backward()
++    assert count == 2
++    assert torch.count_nonzero(logits.grad[~valid]) == 0
++    changed = logits.detach().clone()
++    changed[~valid] = torch.tensor([-20., 20.])
++    torch.testing.assert_close(classification_ce(changed, labels, valid)[0], loss)
++    assert not torch.isclose(classification_ce(changed, labels, valid, 'official')[0],
++                             classification_ce(logits, labels, valid, 'official')[0])
++
++
++def test_without_padding_modes_are_identical():
++    a, labels, valid = tensors()
++    a = a[:, :2].detach().clone().requires_grad_()
++    b = a.detach().clone().requires_grad_()
++    first, n = classification_ce(a, labels[:, :2], valid[:, :2], 'ignore')
++    second, m = classification_ce(b, labels[:, :2], valid[:, :2], 'official')
++    first.backward()
++    second.backward()
++    assert n == m == 2
++    torch.testing.assert_close(first, second)
++    torch.testing.assert_close(a.grad, b.grad)
++
++
++def test_all_padding_and_empty_tensors_are_finite():
++    logits = torch.zeros(1, 3, 2, requires_grad=True)
++    labels = torch.full((1, 3), -1)
++    valid = torch.zeros(1, 3, dtype=torch.bool)
++    ignored, n = classification_ce(logits, labels, valid)
++    official, m = classification_ce(logits, labels, valid, 'official')
++    assert n == 0 and m == 3
++    assert ignored.item() == 0
++    torch.testing.assert_close(official, torch.tensor(2.).log())
++    ignored.backward()
++    for policy in POLICIES:
++        loss, count = classification_ce(logits[:, :0], labels[:, :0], valid[:, :0], policy)
++        assert count == 0 and loss.item() == 0
++
++
++@pytest.mark.parametrize('variant', VARIANTS)
++def test_pair_configs_only_differ_in_padding(variant):
++    first = load_config(ROOT / 'configs' / f'{variant}.json').raw
++    second = load_config(ROOT / 'configs' / f'{variant}_padding_official.json').raw
++    assert first['loss']['classification_padding'] == 'ignore'
++    assert second['loss'].pop('classification_padding') == 'official'
++    first['loss'].pop('classification_padding')
++    assert first == second
++
++
++@pytest.mark.parametrize('policy', [None, '', 'offical', False, [], {}])
++def test_invalid_policy_fails_before_execution(policy):
++    config = config_for()
++    config['loss']['classification_padding'] = policy
++    with pytest.raises(ValueError, match='classification_padding'):
++        validate_config(config)
++    logits, labels, valid = tensors()
++    with pytest.raises(ValueError, match='classification_padding'):
++        classification_ce(logits, labels, valid, policy)
++
++
++def test_old_config_materializes_ignore_default(tmp_path):
++    config = config_for()
++    config['loss'].pop('classification_padding')
++    path = tmp_path / 'old.json'
++    path.write_text(json.dumps(config), encoding='utf-8')
++    assert load_config(path).raw['loss']['classification_padding'] == 'ignore'
++
++
++@pytest.mark.parametrize('variant', VARIANTS)
++def test_switch_leaves_initialization_inputs_masks_and_reconstruction_unchanged(variant):
++    config = config_for(variant)
++    other = copy.deepcopy(config)
++    other['loss']['classification_padding'] = 'official'
++    set_seed(72)
++    first = build_model(config)
++    set_seed(72)
++    second = build_model(other)
++    for a, b in zip(first.parameters(), second.parameters()):
++        torch.testing.assert_close(a, b, rtol=0, atol=0)
++    from src.data import Sample, collate_samples
++    batch = collate_samples([Sample(torch.arange(n).float().unsqueeze(-1),
++                                   torch.zeros(n, 1), torch.zeros(n, dtype=torch.long), None)
++                             for n in (129, 157, 145)])
++    inputs = make_batch_inputs(batch, config, torch.Generator().manual_seed(72))
++    other_inputs = make_batch_inputs(batch, other, torch.Generator().manual_seed(72))
++    for a, b in zip(inputs, other_inputs):
++        torch.testing.assert_close(a, b, rtol=0, atol=0)
++    output = first(*inputs[:2])
++    a = compute_losses(output, batch, config['input']['target'], 1, 1, inputs[2], 'ignore')
++    b = compute_losses(output, batch, config['input']['target'], 1, 1, inputs[2], 'official')
++    torch.testing.assert_close(a['reconstruction'], b['reconstruction'], rtol=0, atol=0)
++    assert a['classification_count'] == 129 + 157 + 145
++    assert b['classification_count'] == 3 * 157
++
++
++@pytest.mark.parametrize('variant', VARIANTS)
++def test_eval_reports_common_valid_metrics_for_same_weights(tmp_path, variant):
++    config = config_for(variant)
++    path = synthetic_data(tmp_path)
++    set_seed(72)
++    model = build_model(config)
++    a = evaluate_model(model, config, str(path), [0, 1, 2])
++    config['loss']['classification_padding'] = 'official'
++    b = evaluate_model(model, config, str(path), [0, 1, 2])
++    assert a['padding_points'] == b['padding_points'] > 0
++    assert a['classification_loss_points'] == a['classification_points']
++    assert b['classification_loss_points'] == b['classification_points'] + b['padding_points']
++    for key in ('valid_classification', 'valid_total', 'classification_f1', 'classification_accuracy',
++                'classification_precision', 'classification_recall', 'reconstruction'):
++        assert a[key] == b[key]
++    assert a['total'] == a['valid_total']
++
++
++@pytest.mark.parametrize('variant', VARIANTS)
++@pytest.mark.parametrize('policy', POLICIES)
++def test_training_evaluation_and_checkpoint_preserve_policy(tmp_path, variant, policy):
++    config = config_for(variant, policy)
++    config['data']['path'] = str(synthetic_data(tmp_path))
++    config['split']['train_ratio'] = 0.67
++    set_seed(72)
++    result = train_model(build_model(config), config, tmp_path)
++    payload = torch.load(tmp_path / 'checkpoints/best.pth', weights_only=False)
++    assert payload['config']['loss']['classification_padding'] == policy
++    assert payload['validation']['classification_padding'] == policy
++    assert result['best_validation_loss'] == payload['validation']['valid_total']
++    assert result['selection_metric'] == 'valid_total'
++    log = (tmp_path / 'train.log').read_text()
++    assert f'classification_padding={policy}' in log
++    assert 'Classification points: loss=' in log
++
++
++@pytest.mark.parametrize('policy', POLICIES)
++def test_best_checkpoint_and_early_stopping_use_common_metric(tmp_path, monkeypatch, policy):
++    config = config_for(policy=policy)
++    config['data']['path'] = str(synthetic_data(tmp_path))
++    config['optimization'].update(epochs=5, early_stopping_patience=1)
++    sequence = iter([{'total': .01, 'valid_total': .9},
++                     {'total': .2, 'valid_total': .3},
++                     {'total': .4, 'valid_total': .6}])
++    monkeypatch.setattr(training, 'evaluate_model', lambda *args: next(sequence))
++    set_seed(72)
++    result = train_model(build_model(config), config, tmp_path)
++    assert result['best_epoch'] == 1
++    assert result['best_validation_loss'] == .3
++    assert len(list((tmp_path / 'checkpoints').glob('epoch_*.pth'))) == 3
++    payload = torch.load(tmp_path / 'checkpoints/best.pth', weights_only=False)
++    assert payload['epoch'] == 1
+--- before/tests/test_parallel_contract.py
++++ after/tests/test_parallel_contract.py
+@@ -95,7 +95,8 @@
+ 
+ 
+ @pytest.mark.parametrize("variant", VARIANTS)
+-def test_global_loss_and_gradients_after_uneven_split(variant):
++@pytest.mark.parametrize("policy", ["ignore", "official"])
++def test_global_loss_and_gradients_after_uneven_split(variant, policy):
+     config = config_for(variant)
+     set_seed(72)
+     single = build_model(config).eval()
+@@ -108,8 +109,8 @@
+     gathered = {key: torch.cat([part[key] for part in pieces], dim=0) for key in expected}
+     for key in expected:
+         torch.testing.assert_close(gathered[key], expected[key], atol=2e-6, rtol=2e-5)
+-    reference_loss = compute_losses(expected, batch, config["input"]["target"], 1, 1, selected)
+-    gathered_loss = compute_losses(gathered, batch, config["input"]["target"], 1, 1, selected)
++    reference_loss = compute_losses(expected, batch, config["input"]["target"], 1, 1, selected, policy)
++    gathered_loss = compute_losses(gathered, batch, config["input"]["target"], 1, 1, selected, policy)
+     reference_loss["total"].backward()
+     gathered_loss["total"].backward()
+     torch.testing.assert_close(reference_loss["total"], gathered_loss["total"])
+@@ -146,8 +147,10 @@
+     assert "Parallel settings:" in (tmp_path / "train.log").read_text()
+ 
+ 
+-def test_entry_smoke_records_effective_config_and_status(tmp_path, monkeypatch):
+-    config = config_for()
++@pytest.mark.parametrize("policy", ["ignore", "official"])
++def test_entry_smoke_records_effective_config_and_status(tmp_path, monkeypatch, policy):
++    config = config_for()
++    config["loss"]["classification_padding"] = policy
+     data_path = tmp_path / "not_loaded.pkl"
+     data_path.write_bytes(b"not a pickle; smoke must not load data")
+     manifest_path = tmp_path / "manifest.json"
+@@ -164,14 +167,18 @@
+     assert json.loads((run / "status.json").read_text())["status"] == "completed"
+     assert json.loads((run / "config.json").read_text())["runtime"]["parallel"] == "none"
+     assert json.loads((run / "smoke.json").read_text())["global_batch_size"] == 16
++    assert json.loads((run / "config.json").read_text())["loss"]["classification_padding"] == policy
++    assert json.loads((run / "smoke.json").read_text())["classification_padding"] == policy
+     with pytest.raises(FileExistsError):
+         entry.run_one(args)
+ 
+ 
+ @pytest.mark.skipif(torch.cuda.device_count() < 2, reason="requires two visible CUDA GPUs")
+ @pytest.mark.parametrize("variant", VARIANTS)
+-def test_actual_two_gpu_forward_gradients_and_tail(variant):
++@pytest.mark.parametrize("policy", ["ignore", "official"])
++def test_actual_two_gpu_forward_gradients_and_tail(variant, policy):
+     config = config_for(variant)
++    config["loss"]["classification_padding"] = policy
+     set_seed(72)
+     reference = build_model(config).to("cuda:0").eval()
+     config["runtime"].update(device="cuda", parallel="data_parallel", gpu_ids=[0, 1])
+@@ -183,8 +190,8 @@
+     a, b = reference(x, visible), parallel(x, visible)
+     for key in a:
+         torch.testing.assert_close(a[key], b[key], atol=2e-5, rtol=2e-4)
+-    loss_a = compute_losses(a, device_batch, config["input"]["target"], 1, 1, selected)
+-    loss_b = compute_losses(b, device_batch, config["input"]["target"], 1, 1, selected)
++    loss_a = compute_losses(a, device_batch, config["input"]["target"], 1, 1, selected, policy)
++    loss_b = compute_losses(b, device_batch, config["input"]["target"], 1, 1, selected, policy)
+     loss_a["total"].backward()
+     loss_b["total"].backward()
+     for first, second in zip(reference.parameters(), unwrap_model(parallel).parameters()):

@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-10",
+  "status": "completed",
+  "scope": "Directory and path changes only; no training or evaluation launched",
+  "root": "/diskA/YYD/TimeRCD/experiments",
+  "compatibility_links": [
+    {
+      "legacy": "train_400k.py",
+      "canonical": "original_400k/src/train_400k.py"
+    },
+    {
+      "legacy": "generate_400k.py",
+      "canonical": "original_400k/src/generate_400k.py"
+    },
+    {
+      "legacy": "compare_400k.py",
+      "canonical": "original_400k/src/compare_400k.py"
+    },
+    {
+      "legacy": "dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
+      "canonical": "original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl"
+    },
+    {
+      "legacy": "dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json",
+      "canonical": "original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
+    },
+    {
+      "legacy": "runs",
+      "canonical": "original_400k/runs"
+    },
+    {
+      "legacy": "EXPERIMENT_SPEC.md",
+      "canonical": "ablation_v9/EXPERIMENT_SPEC.md"
+    }
+  ],
+  "original_file_identity": {
+    "dataset": {
+      "inode": 184157506,
+      "bytes": 38865368343,
+      "sha256_declared": "00a22b916b60a91f5561292142e7c02a3ebe9df5df528173df7c68217432b2a8"
+    },
+    "manifest": {
+      "inode": 184157507,
+      "bytes": 902
+    },
+    "runs_directory": {
+      "inode": 184164387
+    },
+    "run_directory": {
+      "inode": 184164388
+    },
+    "latest_checkpoint": {
+      "inode": 184157513,
+      "bytes": 444828039
+    }
+  },
+  "historical_snapshots": "Existing run configs, data manifest and v9 audit sources retain their original paths and content; compatibility links resolve them.",
+  "active_run": "time_rcd_400k_20261108",
+  "active_process_uses_legacy_paths": true,
+  "validation": {
+    "data_and_run_identity": "dataset, manifest, runs directory, run directory and latest checkpoint retained recorded inodes and sizes",
+    "active_training_log": "observed epoch 10 batch 5800 before runs move and batch 6000 after move",
+    "original_script_function_bodies": "AST equality passed for all three scripts",
+    "v9_configuration": "only data path and manifest path changed; all numerical settings retained",
+    "local_tests": "20 passed; Windows CPU only",
+    "new_entry": "help, all three mode dispatches and invalid argument rejection checked without executing workflows",
+    "remote_python": "not run: SSH MCP command whitelist limitation",
+    "data_sha256": "existing declared hash retained; dataset not rehashed during directory move"
+  }
+}
