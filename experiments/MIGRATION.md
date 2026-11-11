@@ -14,52 +14,26 @@ Git代码仓库不包含训练数据、官方权重和完整检查点，须通�
 |---|---|---|
 | 400k数据及同名manifest | experiments/original_400k/data/ | 两路线只读共用；约39GB，避免重复复制 |
 | 原流程续训检查点 | experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/ | 保留latest/best及其原始日志、配置 |
-| v9历史检查点与日志 | experiments/ablation_v9/runs/ | eval可加载完整模型，当前入口不支持resume |
+| v9现有检查点与日志 | experiments/ablation_v9/runs/ | 只迁移实际存在的run；旧P0目录本次未找到，不能假设可恢复；eval可加载完整模型，无resume |
 | 官方单变量/多变量权重 | best_model/ | 官方推理或原流程对比 |
 | 原流程外部检测数据 | datasets/TSB-AD-U/ | 仅compare需要，smoke不需要 |
 
 历史符号链接和历史JSON中的位置只是原环境记录。新机器使用上表真实目录；不要依赖旧链接，也不要为迁移修改历史配置快照或重生成一份不同的400k数据。manifest中的旧位置字段不影响数据内容身份，应结合文件大小和已有校验值核对。大型文件校验按实际需要单独执行。
 
-## v9本机配置
+## v9配置与路径
 
-仓库中的六份JSON保留既有实验设置与数据定位。下面从它们生成六份本机副本，**只替换两个数据定位字段**，不覆盖原文件，不改变实验超参。配置放在已被Git忽略的`outputs/`中；运行时入口会另存实际配置快照。
+直接使用`experiments/ablation_v9/configs/`中的六份JSON，不生成本机副本。源配置的数据和manifest字段使用仓库相对路径，数据准备在上表目录即可跨机器使用。
 
-先把数据和manifest放到上表目录，再运行以下Linux shell示例。若修改存放位置，仅调整`data_dir`，并对六组保持一致：
+配置读取器将相对数据路径解释为**进程工作目录**下的位置，而非配置文件所在目录，所有命令必须从仓库根目录执行。数据确需另存时，对相关组统一修改`data.path`和`data.manifest_path`，保留实验超参一致；优先沿用约定目录。
 
-```bash
-python - <<'PY'
-import json
-from pathlib import Path
-
-source_dir = Path("experiments/ablation_v9/configs")
-output_dir = Path("outputs/portable_configs")
-data_dir = Path("experiments/original_400k/data")
-stem = "dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set"
-data_path = data_dir / (stem + ".pkl")
-manifest_path = data_dir / (stem + ".manifest.json")
-assert data_path.is_file() and manifest_path.is_file(), "先准备数据与manifest"
-sources = sorted(source_dir.glob("*.json"))
-assert len(sources) == 6, "应为P0/P1/P2各两份padding配置"
-output_dir.mkdir(parents=True, exist_ok=True)
-for source in sources:
-    config = json.loads(source.read_text(encoding="utf-8"))
-    config["data"]["path"] = data_path.as_posix()
-    config["data"]["manifest_path"] = manifest_path.as_posix()
-    target = output_dir / source.name
-    if target.exists():
-        raise FileExistsError(f"已有本机配置，先核对：{target}")
-    target.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(target)
-PY
-```
-
-当前配置读取器将相对数据路径解释为**进程工作目录**下的位置，不是配置文件所在目录，因此上述配置和后续命令均从仓库根目录使用。无需改变配置加载或训练代码。
+每次运行会在独立run下保存实际配置快照。当前源配置的修订不会改写已有run，旧快照中的历史位置保留原文。
 
 ## 先检查，再运行
 
-无需真实训练数据的合成回归：
+先安装项目与合成检查依赖，再运行无需真实训练数据的回归：
 
 ```bash
+python -m pip install . pytest
 python experiments/ablation_v9/tests/run_checks.py
 python experiments/original_400k/run_experiment.py --help
 python experiments/ablation_v9/run_experiment.py --help
@@ -69,11 +43,11 @@ python experiments/ablation_v9/run_experiment.py --help
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config outputs/portable_configs/p0_mask_x.json \
+  --config experiments/ablation_v9/configs/p0_mask_x.json \
   --run-id p0_portable_seed072_smoke --mode smoke
 ```
 
-确认检查通过后，由操作者按v9 README选择正式命令、独立run-id与相应本机配置。双卡仍通过同一入口增加`--parallel data_parallel --gpu-ids 0 1`，同时设置`CUDA_VISIBLE_DEVICES=0,1`；batch_size是总batch。更换设备不保证dropout、浮点计算与训练轨迹逐位相同；对照组应固定设备、软件、并行方式和预算。
+确认检查通过后，由操作者按v9 README选择正式命令、独立run-id与相应源配置。双卡仍通过同一入口增加`--parallel data_parallel --gpu-ids 0 1`，同时设置`CUDA_VISIBLE_DEVICES=0,1`；batch_size是总batch。更换设备不保证dropout、浮点计算与训练轨迹逐位相同；对照组应固定设备、软件、并行方式和预算。
 
 ## 原流程恢复
 
@@ -87,4 +61,10 @@ python experiments/original_400k/run_experiment.py --mode train
 
 ## 发布与历史证据
 
-共享文档使用相对路径；机器连接、解释器安装位置等由各自环境管理。原始日志、JSON、diff和XML是历史证据，可能带有当时的环境元数据，不能通过改写它们伪造为另一台机器的结果。本次仅整理文档，未改写这些原始产物或六份源配置。文档版审计报告及归档说明已做路径整理，旧文档摘要对应旧版本。
+共享文档使用相对路径；机器连接、解释器安装位置等由各自环境管理。原始日志、JSON、diff和XML是历史证据，可能带有当时的环境元数据，不能通过改写它们伪造为另一台机器的结果。原始产物保持原文；当前六份源配置的数据字段已改为仓库相对位置，其他设置保持不变。文档版审计报告及归档说明已做路径整理，旧文档摘要对应旧版本。
+
+## 当前配置能力与资产核查
+
+源JSON总batch32、length_bucket50；单卡README例子显式覆盖batch16，双卡保持32。迁移不自动调整batch/采样器，不将不同设置混成配对结果。mixed_precision字段目前不启用AMP；threshold_source不执行阈值拟合。bench会读完整数据并进行优化器更新，不能代替smoke。短程测速摘要、旧run缺失和最新训练启动事实见根实验记录第12节。
+
+原流程compare额外依赖pandas、scipy、statsmodels、scikit-learn、matplotlib、seaborn和tqdm；仅pip install .不足以覆盖这些实验依赖。生成器依赖见dataset_gen/requirements.txt。原流程CLI自定义--resume要求本机规范化后的检查点位置；默认latest命令无需额外路径。不要把历史源脚本的路径限制迁移到v9的相对配置用法。

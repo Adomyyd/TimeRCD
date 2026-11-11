@@ -4,15 +4,15 @@ Time-RCD is a zero-shot foundation model for time series anomaly detection. Give
 
 ## 1. Installation
 
-Python 3.10 is recommended:
+Python 3.10 is recommended. After obtaining this repository, run the following
+from its root directory (cloning the upstream repository alone does not include
+this project's experiment changes):
 
 ```bash
 conda create -n Time-RCD python=3.10
 conda activate Time-RCD
 
-git clone https://github.com/thu-sail-lab/Time-RCD.git
-cd Time-RCD
-pip install .
+python -m pip install .
 ```
 
 If you are in mainland China, set the Hugging Face mirror before the first automatic checkpoint download:
@@ -89,8 +89,8 @@ scores = detector.predict(data)
 
 ## 5. Local checkpoints and offline inference
 
-Checkpoints live in `<repo>/best_model/` by default, so nothing is written to the
-Hugging Face cache. `from_project()` resolves that directory for you:
+`from_pretrained()` uses the Hugging Face cache (or its `cache_dir` argument).
+To look for weights in the local project first, use `from_project()`:
 
 ```python
 from time_rcd import TimeRCDDetector
@@ -100,11 +100,11 @@ scores = detector.predict(data)
 ```
 
 Lookup order: `weights_dir=` argument, then `TIMERCD_WEIGHTS_DIR`, then
-`<repo>/best_model`. Both `<dir>/pretrain_checkpoint_best_*.pth` and
+the `best_model/` directory next to the installed `time_rcd` package. In a source checkout this is `<repo>/best_model`; after a wheel install it may differ. Both `<dir>/pretrain_checkpoint_best_*.pth` and
 `<dir>/best_model/pretrain_checkpoint_best_*.pth` layouts are accepted.
 
 ```bash
-export TIMERCD_WEIGHTS_DIR=weights   # keep weights outside the repo
+export TIMERCD_WEIGHTS_DIR=weights   # relative to the current working directory
 ```
 
 If a file is missing, `from_project()` falls back to the Hub download. Pass
@@ -148,7 +148,8 @@ detector = TimeRCDDetector.from_pretrained(
 - `win_size`: Sliding window length. Default is `5000`. Shorter sequences use the full sequence length.
 - `batch_size`: Inference batch size. Defaults to `64` (uni) or `1` (multi). Reduce it if you run out of GPU memory.
 - `device`: When omitted, CUDA is used if available; otherwise CPU.
-- `return_logits=True`: Return raw anomaly logits in addition to probability scores.
+- `predict(data, return_logits=True)`: Return `(scores, logits)`, where logits are the anomaly-minus-normal logit differences. This is a `predict` argument, not a constructor or `from_pretrained` argument.
+- Windows are consecutive, non-overlapping chunks. Each input series is normalized once; the final chunk repeats its last value for padding, uses a validity mask, and the returned scores are cropped to the original length.
 
 The same detector can be reused on sequences of different lengths. A short sequence does not change the window setting for later predictions.
 

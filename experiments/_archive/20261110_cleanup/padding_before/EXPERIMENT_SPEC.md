@@ -158,3 +158,5 @@ python experiments/ablation_v9/run_experiment.py \
 8. 训练和评估完成后，再由 `report` 生成比较结果。
 
 本规范本身不授权启动训练、生成数据、修改官方权重或替换既有产物。
+
+> 当前性说明（2026-11-11）：本文是指定日期的历史记录，不随当前实现改写。旧入口、配置生成步骤、batch16/固定顺序及当时的run保留说明不作当前事实；当前使用两路线README，代码差异见ablation_v9/IMPLEMENTATION_DIFF.md（仓库位置：experiments/ablation_v9/IMPLEMENTATION_DIFF.md），最新资产存在性与执行状态见根实验记录第12节。

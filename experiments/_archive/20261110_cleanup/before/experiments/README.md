@@ -32,3 +32,5 @@ experiments/
 原来散落在 experiments 根目录的脚本、数据、runs 和规范路径现为兼容符号链接，用于当前运行和历史快照；它们不是独立代码副本。迁移详情见 `experiments/original_400k/migrations/layout_20261110.json`。
 
 开展工作前阅读 `AGENTS.md`、`研究问题和思路.md`、`方法设计.md` 和 `实验记录.md`。目录整理不改变实验协议，也不授权自动重启训练、生成数据或测评。
+
+> 当前性说明（2026-11-11）：本文是指定日期的历史记录，不随当前实现改写。旧入口、配置生成步骤、batch16/固定顺序及当时的run保留说明不作当前事实；当前使用两路线README，代码差异见ablation_v9/IMPLEMENTATION_DIFF.md（仓库位置：experiments/ablation_v9/IMPLEMENTATION_DIFF.md），最新资产存在性与执行状态见根实验记录第12节。

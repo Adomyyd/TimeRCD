@@ -33,3 +33,5 @@ python experiments/ablation_v9/tests/run_checks.py --junitxml experiments/ablati
 ## 执行格式更正
 
 此前某次远程命令格式与连接工具规则不匹配，不能概括为无法运行Python；后续已在项目环境成功完成测试，未修改连接配置。当前可复核命令见上文，本机连接细节不作为跨机器要求。
+
+> 当前性说明（2026-11-11）：本文保留该次核查的历史事实，旧batch、顺序、配置准备及资产路径不能直接作为当前协议。当前代码语义见experiments/ablation_v9/RUNTIME_NOTES.md；旧P0和测速run缺失、当前训练启动及文档纠正见根实验记录第12节。原始JSON/diff/XML未改写。

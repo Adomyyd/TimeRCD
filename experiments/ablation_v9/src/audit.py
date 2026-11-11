@@ -42,6 +42,8 @@ def run_audit(config: ExperimentConfig) -> dict:
             "encoder_patch_size": model.encoder.patch_size,
             "mask_patch_size": int(config.raw["input"]["mask_patch_size"]),
             "mask_ratio": float(config.raw["input"]["mask_ratio"]),
+            "batch_sampler": str(config.raw["optimization"].get("batch_sampler", "sequential")),
+            "batch_size": int(config.raw["optimization"]["batch_size"]),
             "encoder_token_visible_if_any_point_visible": True,
             "classification_padding": padding_policy,
             "classification_uses_valid_mask": padding_policy == "ignore",

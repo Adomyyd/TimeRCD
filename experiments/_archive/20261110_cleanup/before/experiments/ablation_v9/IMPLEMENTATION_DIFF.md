@@ -57,3 +57,5 @@ patch 设置一致也不代表训练轨迹一致：v9 训练 DataLoader 为 `shu
 - `src/evaluate.py`：训练目标 loss 按模式计算，额外提供统一有效点CE和总损失、分母计数；检测指标一直排除padding。没有将补齐点加入F1/accuracy。
 - `tests/test_padding_contract.py`：原版CE/梯度复现、过滤梯度、无padding等价、空集合、旧配置、严格校验、配对单变量差异、初始化/输入/mask/重构不变、两模式验证/训练/检查点及共同早停测试。既有并行测试扩展到两模式，配置列表测试纳入六份配置。
 - `run_experiment.py` 及模型、数据、采样、并行模块保持不变。original_400k、根training.py、现有run/权重不修改，不启动正式训练。比较要求和命令见README。
+
+> 当前性说明（2026-11-11）：本文是指定日期的历史记录，不随当前实现改写。旧入口、配置生成步骤、batch16/固定顺序及当时的run保留说明不作当前事实；当前使用两路线README，代码差异见ablation_v9/IMPLEMENTATION_DIFF.md（仓库位置：experiments/ablation_v9/IMPLEMENTATION_DIFF.md），最新资产存在性与执行状态见根实验记录第12节。

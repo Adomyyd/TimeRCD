@@ -1,189 +1,70 @@
-# Time Series Anomaly Detection Dataset Generator
+# 合成时序数据生成器
 
-A synthetic dataset generator for time series anomaly detection tasks, supporting both univariate and multivariate time series with configurable anomaly patterns.
+生成单变量或多变量序列，返回观测序列、配对正常序列、时间异常标签和属性。支持属性集合及metric配置两种方式；现有400k实验使用属性集合。
 
-## Features
-
-- **Univariate & Multivariate Support**: Generate single or multi-dimensional time series data
-- **Flexible Anomaly Injection**: Control the ratio of anomalous samples in your dataset
-- **Customizable Sequence Length**: Fixed or randomly distributed sequence lengths
-- **Rich Metadata**: Each sample includes detailed attributes about the time series and anomalies
-- **Two Generation Modes**: 
-  - Attribute-based generation (recommended)
-  - Metric-based generation using synthetic.json
-
-## Installation
-
-### Requirements
+所有命令从仓库根目录执行。安装生成器依赖：
 
 ```bash
-numpy
-tqdm
-networkx  # for multivariate generation
+python -m pip install -r dataset_gen/requirements.txt
 ```
 
-### Setup
+## 生成实验使用的400k数据
+
+使用统一实验入口；目标已存在时拒绝覆盖，输出约39GB，不需要为已有实验重新生成：
 
 ```bash
-pip install numpy tqdm networkx
+python experiments/original_400k/run_experiment.py --mode generate
 ```
 
-## Quick Start
+数据和manifest写到`experiments/original_400k/data/`。具体用法见[原流程实验](../experiments/original_400k/README.md)。
 
-### Basic Usage
+## 在Python中生成小数据
+
+下面代码从仓库根目录运行。生成器内部使用平级模块导入，并读取相对于工作目录的metric配置，因此先设置模块位置与工作目录。
 
 ```python
-from src.generate_dataset import generate_dataset
+from pathlib import Path
+import os
 import pickle
+import sys
 
-# Generate 100 univariate samples with anomalies
+repo = Path.cwd()
+generator_dir = repo / "dataset_gen"
+sys.path.insert(0, str(generator_dir / "src"))
+os.chdir(generator_dir)
+from generate_dataset import generate_dataset
+
 dataset = generate_dataset(
-    num_samples=100,
+    num_samples=10,
     seq_len=1000,
     anomaly_sample_ratio=1.0,
-    is_multivariate=False
-)
-
-# Save the dataset
-with open('dataset.pkl', 'wb') as f:
-    pickle.dump(dataset, f)
-```
-
-### Multivariate Time Series
-
-```python
-# Generate multivariate time series with 5 features
-dataset = generate_dataset(
-    num_samples=100,
-    seq_len=2500,
-    anomaly_sample_ratio=1.0,
-    is_multivariate=True,
-    num_features=5,
-    use_attribute_set=True  # Recommended
-)
-```
-
-## Parameters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `num_samples` | int | 1000 | Number of samples to generate |
-| `seq_len` | int, optional | None | Length of each time series. If None, randomly generated (100-10000) |
-| `anomaly_sample_ratio` | float | 0.5 | Ratio of samples containing anomalies (0.0-1.0) |
-| `is_multivariate` | bool | False | Whether to generate multivariate time series |
-| `num_features` | int, optional | None | Number of features for multivariate data |
-| `activate_function` | bool | False | Apply activation functions in multivariate generation |
-| `metrics` | list, optional | None | Specific metrics for anomaly generation |
-| `use_attribute_set` | bool | False | Use ALL_ATTRIBUTE_SET for generation (recommended) |
-
-## Output Format
-
-Each sample in the dataset is a dictionary containing:
-
-```python
-{
-    'normal_time_series': np.ndarray,  # Time series without anomalies
-    'time_series': np.ndarray,         # Time series with anomalies injected
-    'labels': np.ndarray,              # Binary labels (1 = anomaly, 0 = normal)
-    'attribute': dict                  # Metadata about the time series
-}
-```
-
-### Univariate Attribute Structure
-
-```python
-{
-    'metric': str,           # Metric type
-    'anomalies': list,       # List of anomaly descriptions
-    'pattern': str,          # Base pattern type
-    # ... other attributes
-}
-```
-
-### Multivariate Attribute Structure
-
-```python
-{
-    'attribute_list': list,  # Attributes for each feature
-    'num_features': int,     # Number of features
-    'is_endogenous': list,   # Which features have endogenous anomalies
-    'dag': str              # Directed Acyclic Graph structure
-}
-```
-
-## Examples
-
-### Example 1: Anomaly-Only Dataset
-
-```python
-# Generate dataset with only anomalous samples
-dataset = generate_dataset(
-    num_samples=500,
-    seq_len=1000,
-    anomaly_sample_ratio=1.0,  # 100% anomalies
     is_multivariate=False,
-    use_attribute_set=True
+    use_attribute_set=True,
+    num_workers=1,
 )
+output = repo / "experiments" / "original_400k" / "data" / "example_10.pkl"
+output.parent.mkdir(parents=True, exist_ok=True)
+with output.open("xb") as stream:
+    pickle.dump(dataset, stream)
+os.chdir(repo)
 ```
 
-### Example 2: Mixed Dataset
+多变量时将`is_multivariate=True, num_features=5`传给同一函数。多进程调用应放在脚本的`if __name__ == "__main__":`中。
 
-```python
-# Generate dataset with 50% anomalous and 50% normal samples
-dataset = generate_dataset(
-    num_samples=1000,
-    anomaly_sample_ratio=0.5,
-    is_multivariate=False
-)
-```
+| 参数 | 默认值 | 含义 |
+|---|---|---|
+| num_samples | 1000 | 样本数 |
+| seq_len | None | 随机长度1000–10000；指定整数时固定长度 |
+| anomaly_sample_ratio | 0.5 | 样本保留异常的概率；不代表异常时间点比例 |
+| is_multivariate | False | 是否生成多变量数据 |
+| num_features | None | 多变量通道数；None时随机2–50，单变量不靠此参数切换模式 |
+| activate_function | False | 多变量依赖中的激活函数开关 |
+| metrics | None | metric候选，仅非属性集合路径有效 |
+| use_attribute_set | False | True使用ALL_ATTRIBUTE_SET；False使用metric配置 |
+| num_workers | 80 | 工作进程数；1为单进程，None按CPU核数 |
 
-### Example 3: Variable-Length Sequences
+每个样本包含`normal_time_series`、`time_series`、`labels`、`attribute`。配对序列共享生成过程及数值变换，不自动等于独立因果反事实；异常样本比例1.0在单变量路径按异常属性非空重试，不表示所有时间点异常，多变量路径不提供相同的强制重试保证。
 
-```python
-# Generate samples with random sequence lengths (100-10000)
-dataset = generate_dataset(
-    num_samples=200,
-    seq_len=None,  # Random length
-    anomaly_sample_ratio=0.8
-)
-```
+源码位于`dataset_gen/src/`，metric配置在`dataset_gen/config/synthetic.json`。底层`generate_dataset.py`的直接执行段仍有历史机器绑定输出设置，不作为当前使用入口。
 
-## Running from Command Line
-
-You can modify the configuration at the bottom of `generate_dataset.py` and run:
-
-```bash
-cd src
-python generate_dataset.py
-```
-
-This will generate a dataset with the configured parameters and save it to `data_generate/samples/`.
-
-## Project Structure
-
-```
-TSAD_dataset_gen/
-├── src/
-│   ├── generate_dataset.py      # Main dataset generation script
-│   ├── ts_generator.py           # Univariate time series generator
-│   └── ts_multi_generator.py    # Multivariate time series generator
-├── data_generate/
-│   └── samples/                  # Output directory for datasets
-└── README.md
-```
-
-## Notes
-
-- **Recommended Mode**: Use `use_attribute_set=True` for more flexible generation without JSON constraints
-- **Memory Usage**: Large datasets with long sequences can consume significant memory
-- **Generation Time**: Multivariate generation with many features may take longer
-- **Anomaly Guarantee**: When `anomaly_sample_ratio=1.0`, the generator ensures all samples contain at least one anomaly
-
-## Acknowledgements
-
-This project references and adapts parts of the code from [ChatTS](https://github.com/NetManAIOps/ChatTS).
-
-## License
-
-This project is provided as-is for research and educational purposes.
-
+生成器参考并改编自[ChatTS](https://github.com/NetManAIOps/ChatTS)。

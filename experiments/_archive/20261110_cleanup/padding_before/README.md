@@ -73,3 +73,5 @@ P1/P2 分别替换配置为 `p1_full_x.json` / `p2_full_x0.json`，并使用新�
 python \
   experiments/ablation_v9/tests/run_checks.py
 ```
+
+> 当前性说明（2026-11-11）：本文是指定日期的历史记录，不随当前实现改写。旧入口、配置生成步骤、batch16/固定顺序及当时的run保留说明不作当前事实；当前使用两路线README，代码差异见ablation_v9/IMPLEMENTATION_DIFF.md（仓库位置：experiments/ablation_v9/IMPLEMENTATION_DIFF.md），最新资产存在性与执行状态见根实验记录第12节。

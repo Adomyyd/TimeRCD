@@ -9,3 +9,11 @@ patch_20261110/sources中的官方/历史源码被tests/test_patch_parity.py按A
 padding_20261110/REPORT.md历史所指before/已移至`experiments/_archive/20261110_cleanup/padding_before/`，归档代码保持原哈希；文档展示内容已做迁移整理，旧文档哈希对应整理前版本，报告/diff/manifest/XML保留原位。原400k迁移备份也位于同次归档original_400k_migrations。原始结果文件保留；报告中的路径表示已更新，统一按该映射查找。
 
 早期patch报告对远程Python执行能力的概括已更正；后续远端套件已通过。当前从仓库根目录使用项目环境的`python`运行`experiments/ablation_v9/tests/run_checks.py`。
+
+## 2026-11-11索引补充
+
+- bucket_review_20261111/REPORT.md：分桶覆盖、配对与bench计时问题审查；当时的文档待办已由后续文档整理处理，算法问题仍未修复。
+- bench_20261111/bench_summary.json：他次短程测速摘要，原四个run目录已移除；不视为完整轮次测量或通用设备结论。
+- docs_review_20261111/REPORT.md：当前代码与全文档核对、失效资产及能力边界、文档检查结果。
+
+旧patch/parallel/padding报告里的batch16、三配置、固定顺序及“未测默认规模”均是当时事实；当前为六配置、源batch32、length_bucket，可选batch覆盖，执行状态见根实验记录。旧P0目录本次未找到，审计不保证其检查点仍可用。

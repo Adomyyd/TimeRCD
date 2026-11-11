@@ -1,0 +1,187 @@
+[
+  {
+    "path": "AGENTS.md",
+    "before_sha256": "e87c0894548a06e4419cf55a964f2f68a75ac17cce38d9792cadcdb719187ed2",
+    "after_sha256": "7316acf534bec7867773c8c23340f481dd3912f2b8924509e4e1e4fea9216f80"
+  },
+  {
+    "path": "Tutorial.md",
+    "before_sha256": "a7c748ddfa37bc02f1d63069a79b8c02ede6e74475799f412a421f1b01bf995e",
+    "after_sha256": "f75c434106acd544ab66463b420b6e43a4dc03a5b459e9521c7ebbf0dcf639a2"
+  },
+  {
+    "path": "实验记录.md",
+    "before_sha256": "02d895d05b9cec289be7234c45d54aaf71c35ff6b129d7d969c93f29f5e4c21d",
+    "after_sha256": "e177ef21769fe3f6794e457b850739ba863a95fcc8bfb6d9e98f26f6c7addce2"
+  },
+  {
+    "path": "方法设计.md",
+    "before_sha256": "17d2e599993fb82d9fd1de9fdee3c712dc4a013bce27d7ef50865f54b2ec8a40",
+    "after_sha256": "5e2712a2f0f3166463acf62a6c241cda592ae023b26df2ee4b2eab4596e7d602"
+  },
+  {
+    "path": "研究问题和思路.md",
+    "before_sha256": "6ffe61f17b1ed09ef4847ef14a993b4a7a5bc2133cb40888e32b6a222445cb3e",
+    "after_sha256": "8815efadd198f9e61c21ffcb8804453fff5c5ccde1e7f65cf3b8881382201fa2"
+  },
+  {
+    "path": "dataset_gen/README.md",
+    "before_sha256": "9850e0814b8928084f6cc9d4e63b565d7785ab7c8573803bfce2be4d849b33ca",
+    "after_sha256": "da97a8cf7793da37563a062fad8e4e9637a87b9df927c55468acc2c169443ccc"
+  },
+  {
+    "path": "experiments/MIGRATION.md",
+    "before_sha256": "1f980e1fc62bb9e2a7d51757245bed8974095c158a496c5b7c3a1eb5ac886353",
+    "after_sha256": "28339eeab89bf474b3cb8bdd87b9df9ce424dd555c7154b94c51bf79c25d3b79"
+  },
+  {
+    "path": "experiments/README.md",
+    "before_sha256": "6d624427fb96d78b7b644160311e7cc3314952453a7efa169f15555bf7610dcd",
+    "after_sha256": "3e50c0dde4f899114f9d29c1cb2fc79fe5ca2d40f622eea05ce2254d8a5742b9"
+  },
+  {
+    "path": "experiments/ablation_v9/EXPERIMENT_SPEC.md",
+    "before_sha256": "2dc3880b79c25e6f800e0e94b78c1fd4ce86cc416354419e28166c639bf66c57",
+    "after_sha256": "c79422e76c21923954194eca90449c61904c26250908e8cb3ebc875ffc23838c"
+  },
+  {
+    "path": "experiments/ablation_v9/IMPLEMENTATION_DIFF.md",
+    "before_sha256": "6e8dfb7b776db7a00a7dda9302d73bbbd715da66c6a200bc7c9c9426521bffd9",
+    "after_sha256": "b1e1e88cf7cf69e37bf64fea96a75b582b23fbde117c6fdbacc672aae02daf60"
+  },
+  {
+    "path": "experiments/ablation_v9/README.md",
+    "before_sha256": "bd812b646737a4d241767ae348284930f438972a00e0758d110894b41d66acb3",
+    "after_sha256": "474917576d850d03cfd850faf1ef8b0c42aeb5851f1d668137009b871d3e89cc"
+  },
+  {
+    "path": "experiments/ablation_v9/RUNTIME_NOTES.md",
+    "before_sha256": "84cf102dfdb55b0a4cb33e74e631ba4936c629a6bdaeb3ec6ab79c08b94ad0eb",
+    "after_sha256": "0d7d13684a9c6c06aa649c38e65bec6e0c5b3b18076d4ba2bba68cabbfcb7bc6"
+  },
+  {
+    "path": "experiments/original_400k/EXPERIMENT_NOTES.md",
+    "before_sha256": "174c2aba1eca96252f038cfe69c81a183c33d61d90f20dc1cf42fb867deb1c63",
+    "after_sha256": "ad433b904f3ffe2f927beefeff9529074585eaa57f51eb619f1688e872e1ca77"
+  },
+  {
+    "path": "experiments/original_400k/README.md",
+    "before_sha256": "ca4529c1b1ee5f80328d76cdc50ec3160c2285644b6224313aebae701692e633",
+    "after_sha256": "03b40d4f039041f3eee677a032fab682c4338d3fc5aed0a89911306d4b45561b"
+  },
+  {
+    "path": "experiments/_archive/README.md",
+    "before_sha256": "793484d064f0753bbf799228ff0e6648587dfeed3b0ad15dc15dbd0d42452c10",
+    "after_sha256": "e7755088a8435ab94e768d12af847f1dc8911c1e5252e643c3f51f63e8243f16"
+  },
+  {
+    "path": "experiments/ablation_v9/audits/README.md",
+    "before_sha256": "d569d1ee56b339c1200dd0cd06a25ffef468de23b407597e748c7a0e4ccf084e",
+    "after_sha256": "ebc6da01705d499e07c91f7b4aedc69dd540b04f9420b85800d645c775d3e3c0"
+  },
+  {
+    "path": "experiments/ablation_v9/audits/bucket_review_20261111/REPORT.md",
+    "before_sha256": "935b3a9e982def17ac3ab244923fc9e0a9e095ab843586ed99c99caae262f69c",
+    "after_sha256": "f5b3ddaa497acd702d191a3daf09c6f2fefe373803a7ef5a7ddde957c717c4c7"
+  },
+  {
+    "path": "experiments/ablation_v9/audits/docs_review_20261111/REPORT.md",
+    "before_sha256": null,
+    "after_sha256": "eca3248c8cd9cd88fd1f8948e1ab56c4d79ce5ae010e76b33338b6ebd75bef7a"
+  },
+  {
+    "path": "experiments/ablation_v9/audits/padding_20261110/REPORT.md",
+    "before_sha256": "414e0683c87fe04da77d78dd68458b5883b60ed66ea7122a3a939da895ac6010",
+    "after_sha256": "07f21d7c1f47a5280ee74b87e8884705fe45548f043b5afb98ab7f5b7e205bf2"
+  },
+  {
+    "path": "experiments/ablation_v9/audits/parallel_20261110/REPORT.md",
+    "before_sha256": "ce930389f38a5dfa08898cf1baa4a5b2d2d4482528733aad7c73b3a91fdc5d94",
+    "after_sha256": "69515a73cb0ee702497585080e96584e1b84557a7137b38d5579693bef097f08"
+  },
+  {
+    "path": "experiments/ablation_v9/audits/patch_20261110/REPORT.md",
+    "before_sha256": "d6e49cb667870ebf36cc40d1ca11d48def54bb68624217ddce08e33b624d674e",
+    "after_sha256": "08142c4db5ddd7d818a376103dd25d0288652f1b16f39ca65f17ff5595d98d4d"
+  },
+  {
+    "path": "experiments/original_400k/audits/stop_20261110/REPORT.md",
+    "before_sha256": "9f24a8bca6821d699333045981a4cd5b24380e407111bb272a321033ef42a492",
+    "after_sha256": "2926b3589fc8a66d21fb38ba678e2f2152b234d2150e7ea7377bb42cd79c0465"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/README.md",
+    "before_sha256": "68f45af1e02e1a5cbbad528a94104f35d0f8a62eb469ab94e5025a740bc3272c",
+    "after_sha256": "3acea1b50a2d06196f68c7deaf8f92dd94036de3712af52c7d61985e980bb86a"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/REPORT.md",
+    "before_sha256": "e9cbf6832244e657223df00b6dcf317904d62ae55e8ec6acd48563e92a234995",
+    "after_sha256": "459162e5e088173e30d2fba74889d7349d82b0846ab39f4268cc44af1dc5ad99"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/AGENTS.md",
+    "before_sha256": "61b509c42a0dad302da35c5f45662621fcbb3c72d8cfb1f37d01a9cec2dc2d71",
+    "after_sha256": "58f0bbe7f86ed5010316a6c1ffc5e920a6a7a3b59c00653f87565bb6cc9c3496"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/README.md",
+    "before_sha256": "d4250ed1a05dcd3b5c54522c328b454e0b934a4736878b7c900eeed21683114f",
+    "after_sha256": "dd03c8bfbc38dd73b257a6a5717bdc4824bf16a2a7addd18b7839635f3afe94c"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/实验记录.md",
+    "before_sha256": "5fc83d3f7857c7f01d4526571204d5deb716214e745ece17ae8faa81e0d5ef3a",
+    "after_sha256": "e50f497d5228670e4b62b9350633523d545a4bb26128972602704d60de6b4e32"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/方法设计.md",
+    "before_sha256": "4d7dfbebfe937e50d7aebdf1540b62c0b65f006a9d56547257698efad41541e5",
+    "after_sha256": "fcd928864553ee67ac66fd885434107e8dcffc84044304bbc68b2481f014f169"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/研究问题和思路.md",
+    "before_sha256": "e4c043761f392a0877aa2d52949d9d54921026c326c8941560972c7a0049a804",
+    "after_sha256": "e0967864111b90d539ae1ee2ba8a2d576e069479a170658e08b22f84f079d083"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/padding_before/EXPERIMENT_SPEC.md",
+    "before_sha256": "4ed627ebfd1e85414e1a469e2fceab9c895445e33c73aea07df7b3cfd9623595",
+    "after_sha256": "350f816ce4c885f3a3d1e1d5f0b59d0a070a2ec5ae3a448e4660a69922859824"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/padding_before/IMPLEMENTATION_DIFF.md",
+    "before_sha256": "2bd9254cc6cd3b663b861d76d0835e858d3f18d63e11f6359fb76e570f4db7b9",
+    "after_sha256": "b4b30fbc23985e31a36c8d9d1796ebed765c68c7f92bb485f3fe6e767080bb9d"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/padding_before/README.md",
+    "before_sha256": "44dc69cb194b0381a4a7b8771c012b832668c17b6a6a0308ae52b3deaaf4df08",
+    "after_sha256": "75c513fb81bafab57a11cdef877b8ff2eefdaf45664a3e7b0402af72767dd0bb"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/experiments/README.md",
+    "before_sha256": "e273e7173495af2311565e8af6a3cbe409187a53104a342e4b97067650ab4746",
+    "after_sha256": "315894a84361e37913ab2dcda67ce6a4ecc9465a5da434f7e6ec7bb9ad2096eb"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/experiments/ablation_v9/EXPERIMENT_SPEC.md",
+    "before_sha256": "09d631c1384991c9a38b85ac2388e44965697e005fe8f079b83625fa5ea40494",
+    "after_sha256": "e0ef49b5cf3fc5375e073068108b042fd742b75a19678978a42c218544f71add"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/experiments/ablation_v9/IMPLEMENTATION_DIFF.md",
+    "before_sha256": "262e108639ab7c55ee0278e6f1c7d29e2c2496b81c66a94abc42cd87b90da0cc",
+    "after_sha256": "a4cbd638caefc02759a9f7fbb3a211d5a9cf9ea31481bc4613cb5af81e1ee9c9"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/experiments/ablation_v9/README.md",
+    "before_sha256": "be867fbae1f505392c6a8ca1471165cb765441957940b927e9a4b62175738d66",
+    "after_sha256": "1a4ec25e5d5735560ab6b66e4c2835f3baeba6c8e2a58a757276c5ad0291bd14"
+  },
+  {
+    "path": "experiments/_archive/20261110_cleanup/before/experiments/original_400k/README.md",
+    "before_sha256": "1fa28cdbce4c287a4051fb83fdfdd3efccd52cca8a0c4460f08a07e36614209e",
+    "after_sha256": "486fb28679bb8672164120e3c42bd27c2c459a92590b203b23e15f8d750c8fd8"
+  }
+]

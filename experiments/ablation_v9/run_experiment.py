@@ -27,14 +27,18 @@ from src.evaluate import evaluate_model
 from src.models import build_model
 from src.parallel import prepare_model, unwrap_model
 from src.reporting import write_report
-from src.train import _device, run_smoke, set_seed, train_model
+from src.train import _device, benchmark, run_smoke, set_seed, train_model
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run TimeRCD v9 ablation experiments")
     parser.add_argument("--config", required=True, help="Path to a JSON experiment config")
     parser.add_argument("--run-id", required=True, help="Unique output directory name")
-    parser.add_argument("--mode", choices=["audit", "smoke", "train", "eval", "report", "all"], required=True)
+    parser.add_argument("--mode", choices=["audit", "smoke", "bench", "train", "eval", "report", "all"], required=True)
+    parser.add_argument("--max-batches", type=int, default=300,
+                        help="Batch limit for --mode bench (default 300)")
+    parser.add_argument("--batch-size", type=int, default=None,
+                        help="Override optimization.batch_size before the config snapshot")
     parser.add_argument("--checkpoint", help="Checkpoint path for eval mode")
     parser.add_argument("--parallel", choices=["none", "data_parallel"], default=None,
                         help="Override runtime.parallel; default uses JSON config")
@@ -131,6 +135,9 @@ def apply_runtime_overrides(config: ExperimentConfig, args: argparse.Namespace) 
             config.raw["runtime"]["gpu_ids"] = None
     if args.gpu_ids is not None:
         config.raw["runtime"]["gpu_ids"] = args.gpu_ids
+    batch_size = getattr(args, "batch_size", None)
+    if batch_size is not None:
+        config.raw["optimization"]["batch_size"] = int(batch_size)
     validate_config(config.raw)
 
 
@@ -159,6 +166,15 @@ def run_one(args: argparse.Namespace) -> None:
             model = load_model(config)
             smoke = run_smoke(model, config.raw)
             write_json(run_dir / "smoke.json", smoke)
+            status["status"] = "completed"
+            status["completed_utc"] = utc_now()
+            write_json(run_dir / "status.json", status)
+            append_registry(args.run_id, config, run_dir, "completed", args.mode)
+            return
+
+        if args.mode == "bench":
+            model = load_model(config)
+            benchmark(model, config.raw, run_dir, args.max_batches)
             status["status"] = "completed"
             status["completed_utc"] = utc_now()
             write_json(run_dir / "status.json", status)
@@ -200,12 +216,13 @@ def run_one(args: argparse.Namespace) -> None:
         status["completed_utc"] = utc_now()
         write_json(run_dir / "status.json", status)
         append_registry(args.run_id, config, run_dir, "completed", args.mode)
-    except Exception as exc:
-        status["status"] = "failed"
+    except BaseException as exc:
+        final_status = "aborted" if isinstance(exc, KeyboardInterrupt) else "failed"
+        status["status"] = final_status
         status["error"] = repr(exc)
         status["completed_utc"] = utc_now()
         write_json(run_dir / "status.json", status)
-        append_registry(args.run_id, config, run_dir, "failed", args.mode)
+        append_registry(args.run_id, config, run_dir, final_status, args.mode)
         raise
 
 

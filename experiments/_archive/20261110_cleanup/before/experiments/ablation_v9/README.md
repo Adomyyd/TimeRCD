@@ -125,3 +125,5 @@ P1/P2 对应更换表中两份配置和 run-id。先后执行同一设备上的�
 **两种模式的早停和 best 检查点都使用 `valid_total`**，从而保持选择标准一致；ignore 模式下它与原来的 `total` 完全相同。日志中的 `validation_loss`、训练结果的 `best_validation_loss` 均指此选择指标，结果另记 `selection_metric=valid_total`。若比较固定训练预算，可对同一 epoch 的检查点用相同 eval 协议评估，避免把不同最佳轮次误作相同步数。
 
 对照结果应来自本目录内的配对运行；历史 original_400k 还存在重排、随机源等差异，只作为原流程参考。当前没有因本次修改启动正式训练，亦没有 padding 对性能影响的结论。验证证据见 `audits/padding_20261110/`。
+
+> 当前性说明（2026-11-11）：本文是指定日期的历史记录，不随当前实现改写。旧入口、配置生成步骤、batch16/固定顺序及当时的run保留说明不作当前事实；当前使用两路线README，代码差异见ablation_v9/IMPLEMENTATION_DIFF.md（仓库位置：experiments/ablation_v9/IMPLEMENTATION_DIFF.md），最新资产存在性与执行状态见根实验记录第12节。

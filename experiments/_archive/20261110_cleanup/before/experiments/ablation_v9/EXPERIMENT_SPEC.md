@@ -169,3 +169,5 @@ official仅复现官方异常分类损失中padding被二值化为正常点的�
 两模式统一按valid_total早停与选best；它保留原权重/重构项、有效点分类CE和既有batch均值汇总方式。ignore模式与修改前的total相同。checkpoint保留完整模式配置和验证结果，训练结果注明selection_metric。模式不同的目标loss绝对大小不能直接作性能比较；用共同有效点指标或固定epoch检查点评估。
 
 该对照必须在v9内部进行，历史400k不能作为隔离padding效应的唯一对照。新增测试和证据位于tests/test_padding_contract.py与audits/padding_20261110/；不自动启动正式训练。
+
+> 当前性说明（2026-11-11）：本文是指定日期的历史记录，不随当前实现改写。旧入口、配置生成步骤、batch16/固定顺序及当时的run保留说明不作当前事实；当前使用两路线README，代码差异见ablation_v9/IMPLEMENTATION_DIFF.md（仓库位置：experiments/ablation_v9/IMPLEMENTATION_DIFF.md），最新资产存在性与执行状态见根实验记录第12节。

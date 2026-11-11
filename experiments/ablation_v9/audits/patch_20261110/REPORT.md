@@ -70,3 +70,5 @@ config.ts_config.patch_size = 16
 ```bash
 python experiments/ablation_v9/tests/run_checks.py
 ```
+
+> 当前性说明（2026-11-11）：本文保留该次核查的历史事实，旧batch、顺序、配置准备及资产路径不能直接作为当前协议。当前代码语义见experiments/ablation_v9/RUNTIME_NOTES.md；旧P0和测速run缺失、当前训练启动及文档纠正见根实验记录第12节。原始JSON/diff/XML未改写。

@@ -31,9 +31,11 @@ python experiments/ablation_v9/tests/run_checks.py --junitxml experiments/ablati
 
 run_experiment.py、src/{models,data,sampling,parallel,audit,reporting}.py与实施前快照哈希相同。部署前检查相关远程文件未发生并发修改；部署后16文件逐字节回读一致。
 
-- before/：本次实施前相关文件快照（保留此前已有改动）。
+- 实施前快照：原before/现位于experiments/_archive/20261110_cleanup/padding_before/（保留此前已有改动），本审计目录不再有before/。
 - changes.diff：相对于上述快照的本次独立diff。
 - source_manifest.json：16文件修改前/后SHA256。
 - pytest_local.xml / pytest_remote.xml：测试证据。
 
 本地首次全套收集因尚未同步历史patch审计源码而失败，补齐只读依赖后继续；一次新增严格相等检查发现Python浮点求和与张量求和约6e-8差异，已改为沿用张量算术，保证ignore下valid_total与原total相同。最终测试如上，未放宽该相等断言。
+
+> 当前性说明（2026-11-11）：本文保留该次核查的历史事实，旧batch、顺序、配置准备及资产路径不能直接作为当前协议。当前代码语义见experiments/ablation_v9/RUNTIME_NOTES.md；旧P0和测速run缺失、当前训练启动及文档纠正见根实验记录第12节。原始JSON/diff/XML未改写。

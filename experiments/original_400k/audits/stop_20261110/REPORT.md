@@ -15,4 +15,6 @@
 
 进一步根因定位需要逐batch异常监测，并在触发时保存epoch/batch/样本索引、归一化统计、输入目标与预测幅值、分项loss和梯度范数；本次仅核查日志，未增加诊断代码、加载大数据或重跑。
 
-证据：stop_and_log_evidence.json保存进程身份、信号、停止后状态、检查点目录状态和两份日志解析；resume_console.log:1952、train.log:12080为epoch11汇总。stop_and_inspect.py是本次PID限定停止/日志审计脚本，不是训练入口。
+证据：stop_and_log_evidence.json保存进程身份、信号、停止后状态、检查点目录状态和两份日志解析；resume_console.log:1952、train.log:12080为epoch11汇总。stop_and_inspect.py是本次PID限定停止/日志审计脚本，现位于experiments/_archive/20261110_cleanup/one_off_scripts/stop_and_inspect.py，不在本审计目录，也不是训练入口。
+
+> 当前性说明（2026-11-11）：本文保留该次核查的历史事实，旧batch、顺序、配置准备及资产路径不能直接作为当前协议。当前代码语义见experiments/ablation_v9/RUNTIME_NOTES.md；旧P0和测速run缺失、当前训练启动及文档纠正见根实验记录第12节。原始JSON/diff/XML未改写。

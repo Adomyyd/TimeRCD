@@ -39,3 +39,5 @@
 ## 追溯
 
 before/保存修改前12个既有文档/代码文件；changes.diff为16项部署文件的完整差异，source_manifest.json记录修改前后SHA256。plan.json、result.json、removed_caches.json、verification.json保存目录操作与保护校验。operations/下为本次维护脚本，不是训练入口。原迁移记录和旧文档仅作历史证据，不应当作当前执行规范。
+
+> 当前性说明（2026-11-11）：本文是指定日期的历史记录，不随当前实现改写。旧入口、配置生成步骤、batch16/固定顺序及当时的run保留说明不作当前事实；当前使用两路线README，代码差异见ablation_v9/IMPLEMENTATION_DIFF.md（仓库位置：experiments/ablation_v9/IMPLEMENTATION_DIFF.md），最新资产存在性与执行状态见根实验记录第12节。

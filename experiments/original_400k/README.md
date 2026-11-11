@@ -15,6 +15,7 @@ python experiments/original_400k/run_experiment.py --help
 仅在没有已有数据、确实需要生成新数据时执行；将生成约39GB文件，目标已存在时会拒绝覆盖：
 
 ```bash
+python -m pip install -r dataset_gen/requirements.txt
 python experiments/original_400k/run_experiment.py --mode generate
 ```
 
@@ -35,6 +36,7 @@ python experiments/original_400k/run_experiment.py --mode train
 准备训练所得best检查点、`best_model/pretrain_checkpoint_best_uni.pth`，以及`datasets/TSB-AD-U/`中的外部评测数据后运行：
 
 ```bash
+python -m pip install pandas scipy statsmodels scikit-learn matplotlib seaborn tqdm
 python experiments/original_400k/run_experiment.py --mode compare
 ```
 

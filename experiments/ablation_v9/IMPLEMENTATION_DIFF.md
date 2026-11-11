@@ -1,6 +1,6 @@
 # v9相对原始TimeRCD的实现差异
 
-更新时间：2026-11-10。用于核实当前代码，不将历史补丁按时间堆叠成互相冲突的协议。原始根training.py未因v9改写；400k原流程继续调用它。模型、训练设置和监督需分别核对，P0不是官方全流程复制。
+更新时间：2026-11-11。用于核实当前代码，不将历史补丁按时间堆叠成互相冲突的协议。原始根training.py未因v9改写；400k原流程继续调用它。模型、训练设置和监督需分别核对，P0不是官方全流程复制。
 
 ## 1. 结构与输入/目标
 
@@ -34,7 +34,9 @@ src/losses.py的classification_padding默认ignore：先用valid及labels>=0筛�
 
 | 项目 | 原400k流程 | v9 |
 |---|---|---|
-| 训练顺序 | DistributedSampler每轮shuffle | DataLoader shuffle=False |
+| 训练顺序 | DistributedSampler每轮shuffle | 默认length_bucket按长度分池，每轮重排池及池内；可选sequential固定split后顺序 |
+| 总batch | 16 | 源配置32；CLI --batch-size可覆盖 |
+| 验证分批 | 原验证loader | 固定split后顺序、不分桶；使用同一总batch配置 |
 | 标准化 | batch观测X统计，配对共用 | 保持全batch观测统计、配对共用 |
 | 采样RNG | 原全局随机源 | 训练按seed/epoch/batch显式生成器 |
 | 验证M | 随全局随机流变化 | evaluation.validation_mask_seed固定 |
@@ -42,18 +44,26 @@ src/losses.py的classification_padding默认ignore：先用valid及labels>=0筛�
 | 最佳选择 | 原目标验证loss | 共同valid_total |
 | eval | 原比较脚本可做外部TSB-AD | 当前仅合成语料随机验证侧、分区域误差/复制基线与点级指标 |
 
+分桶由src/data.py的LengthBucketBatchSampler及src/train.py的_build_train_loader实现；池大小为batch_size×bucket_multiplier，当前32×50=1600，每轮覆盖一次并保留尾批。380000条训练数据对应11875步。批组成会改变全batch标准化、损失加权和SGD顺序；训练padding减少也改变padding实验的效应范围。
+
 因此历史400k与P0的loss差异不能只归因于padding或mask大小。不同目标的总loss也不能直接说明P2优于P1。分组split、外部VUS、密度分层、合法上下文干预与多种子统计尚未在v9完整实现/执行。
 
 ## 5. 可选并行、日志与运行管理
 
-src/parallel.py实现单进程DataParallel，入口支持--parallel/--gpu-ids；原400k走根training.py的DDP路径（当前单进程world_size1）。v9只切batch维，全batch预处理/采样，汇总预测后计算loss，总batch和优化器步数不随卡数增加。首逻辑GPU为主卡。无DDP/FSDP/多机实现；默认规模双卡吞吐/显存未测，单多卡不承诺逐位一致。
+src/parallel.py实现单进程DataParallel，入口支持--parallel/--gpu-ids；原400k走根training.py的DDP路径（当前单进程world_size1）。v9只切batch维，全batch预处理/采样，汇总预测后计算loss，总batch和优化器步数不随卡数增加。首逻辑GPU为主卡。无DDP/FSDP/多机实现；已有默认规模短程测速汇总，未完成整轮吞吐验证；见audits/bench_20261111/bench_summary.json及RUNTIME_NOTES中的限制，单多卡不承诺逐位一致。
 
 v9检查点保存未封装完整state_dict、优化器、epoch、验证和config；支持单多卡eval加载，但当前没有训练resume接口。400k入口支持本run模型/优化器恢复，也不是完整RNG/早停恢复。
 
-v9统一入口负责audit/smoke/train/eval/report/all与独立run登记；all实际为audit→smoke→train→best eval，不自动report。默认每100batch输出分项loss和分类点数，epoch记录分项/验证。尚未加入逐batch尖峰触发保存，不能承诺周期日志捕获所有异常。
+v9统一入口负责audit/smoke/bench/train/eval/report/all与独立run登记；all实际为audit→smoke→train→best eval，不自动report。默认每100batch输出分项loss和分类点数，epoch记录分项/验证。尚未加入逐batch尖峰触发保存，不能承诺周期日志捕获所有异常。
 
 ## 6. 核实位置与整理边界
 
 src/{models,sampling,losses,train,evaluate,parallel,audit,config}.py分别承担上述职责；README给出可执行命令，EXPERIMENT_SPEC约束工程行为。audits/patch_20261110、parallel_20261110、padding_20261110保留来源、差异、哈希与XML证据。
 
-本次整理只修正audit元数据及其断言、同步文档、归档旧备份并移除冗余入口/缓存，不改变模型/损失/训练/评价数值逻辑或六份配置。原migrations、padding的before备份和一次性停止脚本移入`experiments/_archive/20261110_cleanup/`；run、registry、数据、权重保留原位。
+2026-11-10整理只修正audit元数据及其断言、归档旧备份并移除冗余入口/缓存。当时未改变训练数值逻辑；之后用户新增分桶、测速和总batch32，当前以本文件及源代码为准。2026-11-11本次只更新文档，不修改代码、配置或原始产物。原migrations、padding的before备份和一次性停止脚本移入`experiments/_archive/20261110_cleanup/`；run、registry、数据、权重保留原位。
+
+## 7. 配置字段与未实现能力
+
+入口另支持--batch-size（在实际config快照前覆盖总batch）和bench专用--max-batches（默认300）。bench读取完整训练数据并执行反向及优化器更新，不验证、不保存训练检查点，也不是smoke；实现限制见RUNTIME_NOTES。
+
+runtime.mixed_precision虽存在于JSON，v9未读取该字段，也没有autocast/GradScaler，不能靠设为true启用AMP。evaluation.threshold_source只是协议记录，当前eval使用logits argmax，没有验证集阈值搜索。schema_version只要求字段存在，未校验具体版本。src/config.py中的MODES未含bench且未被入口使用，实际模式以run_experiment.py的argparse choices为准。当前没有预训练权重初始化、训练resume、B/Z或P3–P5入口；方案中的这些部分仍是后续计划。

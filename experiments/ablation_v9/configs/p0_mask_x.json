@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "data": {
-    "path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
-    "manifest_path": "/diskA/YYD/TimeRCD/experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
+    "path": "experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.pkl",
+    "manifest_path": "experiments/original_400k/data/dataset_400000_samples_Nonelen_1.0ratio_univariate_attr_set.manifest.json"
   },
   "split": {
     "train_ratio": 0.95,
@@ -26,7 +26,9 @@
     "classification_padding": "ignore"
   },
   "optimization": {
-    "batch_size": 16,
+    "batch_size": 32,
+    "batch_sampler": "length_bucket",
+    "bucket_multiplier": 50,
     "learning_rate": 0.0005,
     "weight_decay": 1e-05,
     "epochs": 50,

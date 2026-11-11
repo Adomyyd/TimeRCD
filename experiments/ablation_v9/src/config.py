@@ -11,6 +11,7 @@ from .losses import validate_classification_padding
 
 VARIANTS = {"p0_mask_x", "p1_full_x", "p2_full_x0"}
 MODES = {"audit", "smoke", "train", "eval", "report", "all"}
+BATCH_SAMPLERS = {"sequential", "length_bucket"}
 
 
 @dataclass(frozen=True)
@@ -96,6 +97,11 @@ def validate_config(raw: dict[str, Any]) -> None:
         raise ValueError("batch_size and epochs must be positive")
     if int(raw["optimization"]["log_freq"]) <= 0:
         raise ValueError("optimization.log_freq must be positive")
+    batch_sampler = str(raw["optimization"].get("batch_sampler", "sequential"))
+    if batch_sampler not in BATCH_SAMPLERS:
+        raise ValueError("optimization.batch_sampler must be 'sequential' or 'length_bucket'")
+    if int(raw["optimization"].get("bucket_multiplier", 50)) <= 0:
+        raise ValueError("optimization.bucket_multiplier must be positive")
     if not raw["data"]["path"] or not raw["data"]["manifest_path"]:
         raise ValueError("data paths must be provided")
     validate_parallel_config(raw)

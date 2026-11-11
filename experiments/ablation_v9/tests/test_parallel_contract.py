@@ -166,7 +166,7 @@ def test_entry_smoke_records_effective_config_and_status(tmp_path, monkeypatch, 
     run = tmp_path / "runs/test_smoke"
     assert json.loads((run / "status.json").read_text())["status"] == "completed"
     assert json.loads((run / "config.json").read_text())["runtime"]["parallel"] == "none"
-    assert json.loads((run / "smoke.json").read_text())["global_batch_size"] == 16
+    assert json.loads((run / "smoke.json").read_text())["global_batch_size"] == config["optimization"]["batch_size"]
     assert json.loads((run / "config.json").read_text())["loss"]["classification_padding"] == policy
     assert json.loads((run / "smoke.json").read_text())["classification_padding"] == policy
     checks = json.loads((run / "audit.json").read_text())["protocol_checks"]
