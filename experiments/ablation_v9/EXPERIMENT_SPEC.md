@@ -1,6 +1,6 @@
 # v9消融工程规范
 
-更新时间：2026-11-11。本文面向Agent，约束当前实现与后续实验；用户命令见README，完整运行语义见RUNTIME_NOTES.md，研究假设及推进条件见根方法设计.md。不将计划功能写成已实现能力。
+更新时间：2026-11-12。本文面向Agent，约束当前实现与后续实验；用户命令见README，完整运行语义见RUNTIME_NOTES.md，研究假设及推进条件见根方法设计.md。不将计划功能写成已实现能力。
 
 ## 1. 目录与职责
 
@@ -8,7 +8,7 @@
 
 | 位置 | 职责 |
 |---|---|
-| configs/ | 六份P0/P1/P2 × ignore/official JSON，实验协议与数值参数 |
+| configs/ | 六份P0/P1/P2 × ignore/official训练JSON，另有eval_official.json统一检测评测协议 |
 | src/config.py | 读取配置，校验当前schema/变体/关键数值/并行/padding；缺省padding为ignore并写入生效配置 |
 | src/data.py | 读取配对数据、随机划分、长度缓存/分桶采样器、全batch标准化与补齐 |
 | src/sampling.py | 依据有效长度生成M，应用输入置零 |
@@ -16,14 +16,15 @@
 | src/losses.py | 重构位置、分类padding策略及明确分母；空集合返回可反传0 |
 | src/parallel.py | 设备校验、DataParallel封装/解封装、并行信息 |
 | src/train.py | 构造训练loader、合成smoke、训练/短程bench、日志、优化器、早停与检查点 |
-| src/evaluate.py | 固定验证M、当前分区域误差及点级检测指标 |
+| src/evaluate.py | 训练时固定验证M、区域误差及点级指标；不因完整eval改变 |
+| src/benchmark_eval.py | 合成留出/官方TSB-AD-U统一检测推理、官方指标、清单及汇总 |
 | src/audit.py | 文件/manifest/协议核查与参数量；记录实际padding策略 |
 | src/reporting.py | 只读取eval.json生成列表，不重新训练或评价 |
 | tests/ | 小规模合成行为与回归检查；run_checks.py为测试入口 |
-| audits/ | 不可混作运行代码的来源、差异和验证证据；patch sources被测试读取 |
+| audits/ | 不可混作运行代码的来源、差异和验证证据；patch/eval sources被测试读取 |
 | registry/、runs/ | 执行登记与独立产物，保留既有内容 |
 
-维护归档统一放`experiments/_archive/`；当前另存在用户新增的`.backup_bucket_20261110/`，本次仅核对，不将其当入口或擅自移动。数据/manifest/runs旧资产链接保持可达；不再提供experiments根目录旧脚本/规范入口。
+维护归档统一放`experiments/_archive/`；历史备份`.backup_bucket_20261110/`与`.backup_spike_20261111/`已于2026-11-12经用户确认清理（共11文件），不再是可用目录；范围与证据见audits/eval_20261112/CODE_REVIEW.md和cleanup_execution.json。数据/manifest/runs旧资产链接保持可达；不再提供experiments根目录旧脚本/规范入口。
 
 ## 2. 配置与单因素约束
 
@@ -56,7 +57,7 @@ ignore：先按valid及非负标签过滤，再二值化；official：先按官�
 
 从仓库根目录执行，激活项目环境后使用`python`和相对脚本/配置路径；用户数据准备与执行命令在本目录README；Agent迁移核查见`experiments/MIGRATION.md`。入口模式的实际行为见RUNTIME_NOTES.md：all当前为audit→smoke→train→eval，不自动report；v9当前无resume。不要直接运行src/train.py或另建未登记训练入口。
 
-run-id必须唯一，已有目录拒绝覆盖。CLI并行与batch覆盖在快照前完成。各run共有config、command、environment、status及registry事件；audit成功后写data_manifest/audit。smoke/train/all写smoke.json；train/all写train.log、逐epoch与best检查点、metrics/train.json；bench只写metrics/bench.json；eval/all写metrics/eval.json；report写metrics/report.json。产物按模式生成，不能承诺每个run都有日志或检查点。保存未封装完整state_dict及优化器/epoch/验证/config，单多卡可加载。run失败不伪报完成，历史快照原文不改写。
+run-id必须唯一，已有目录拒绝覆盖。CLI并行与batch覆盖在快照前完成。各run共有config、command、environment、status及registry事件；audit成功后写data_manifest/audit。smoke/train/all写smoke.json；train/all写train.log、逐epoch与best检查点、metrics/train.json；bench只写metrics/bench.json；eval/all写eval.log、eval_config.json、evaluation_manifest.json、逐序列/组/域CSV及metrics/eval.json，可选scores/；report写metrics/report.json。产物按模式生成，不能承诺每个run都有日志或检查点。保存未封装完整state_dict及优化器/epoch/验证/config，单多卡可加载。run失败不伪报完成，历史快照原文不改写。
 
 新正式训练应先完成相应接口检查，登记初始化、预算、种子、数据版本、评价/停止条件和产物位置。用户未要求时，不自动生成数据、恢复训练或耗时测评；只读审计和合成小测试明确标注范围。
 
@@ -64,9 +65,9 @@ run-id必须唯一，已有目录拒绝覆盖。CLI并行与batch覆盖在快照
 
 当前测试覆盖分桶完整覆盖/尾批/局部索引与bench接口、配置、输入/遮挡、官方采样一致性、padding的CE/梯度、六组合合成微型训练/验证、共同选择标准、检查点、入口快照、真实双GPU小模型/尾批次等。生产算法修改只补必要检查；不为目录或文案修改制造镜像测试。
 
-当前evaluate仅提供现有随机验证侧的区域重构/复制基线与点级分类指标；VUS、外部测试适配、密度分层、上下文干预、背景分组审计与多种子统计是后续要求。已有默认规模短程测速摘要，不能视为完整训练/验证/存盘的整轮测量；其计时边界及外推限制见RUNTIME_NOTES。不能以合成测试宣称训练提速或方法收益。
+evaluate.py保留训练验证的区域误差/复制基线与点级指标；eval/all已由benchmark_eval.py提供合成留出与官方单变量TSB-AD-U/VUS。密度分层、上下文干预、背景分组审计与多种子统计仍是后续要求。已有默认规模短程测速摘要，不能视为完整训练/验证/存盘的整轮测量；其计时边界及外推限制见RUNTIME_NOTES。不能以合成测试宣称训练提速或方法收益。
 
-正式研究评价还需按方法设计.md报告异常区域正常参考恢复、共同检测指标、误报、局部密度/事件长度/频率分层、合法上下文干预及容量匹配。阈值只由训练/验证确定，未获重复证据不推进方法主张。
+正式研究评价还需按方法设计.md报告异常区域正常参考恢复、共同检测指标、误报、局部密度/事件长度/频率分层、合法上下文干预及容量匹配。部署阈值只由训练/验证确定；官方复现型F1保留oracle阈值搜索，须独立标注，不能冒充部署指标。未获重复证据不推进方法主张。
 
 ## 6. 当前能力边界
 

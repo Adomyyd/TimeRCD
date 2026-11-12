@@ -42,7 +42,7 @@ scores = detector.predict(data)
 | 用途 | 使用说明 |
 |---|---|
 | 原流程400k数据生成、断点恢复、检测对比 | [original_400k](experiments/original_400k/README.md) |
-| P0/P1/P2、padding对照、单卡或多卡训练 | [ablation_v9](experiments/ablation_v9/README.md) |
+| P0/P1/P2、padding对照、单卡或多卡训练、合成与真实数据统一评测 | [ablation_v9](experiments/ablation_v9/README.md) |
 | 实验入口与快速检查 | [experiments](experiments/README.md) |
 
 详细推理参数见[Tutorial](Tutorial.md)，数据生成器用法见[dataset_gen](dataset_gen/README.md)。

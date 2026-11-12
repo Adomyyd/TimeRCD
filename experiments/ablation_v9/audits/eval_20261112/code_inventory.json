@@ -1,0 +1,2105 @@
+[
+  {
+    "path": ".backup_bucket_20261110/audit.py",
+    "bytes": 2210,
+    "sha256": "3821257330b4e36b8e8a316377d74178c10507df719adfbb375b59fd81176fd0",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "run_audit",
+        "line": 8,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/audit.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": ".backup_bucket_20261110/config.py",
+    "bytes": 4067,
+    "sha256": "8e3588a24a0fe3f5bde20242b413b1ec75f771f3ef61507e17eb29fffe35ddbf",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "ExperimentConfig",
+        "line": 17,
+        "active_mentions": {
+          "run_experiment.py": 6,
+          "src/audit.py": 2,
+          "src/config.py": 4
+        }
+      },
+      {
+        "name": "load_config",
+        "line": 45,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/config.py": 1,
+          "tests/test_bench_contract.py": 2,
+          "tests/test_benchmark_eval.py": 6,
+          "tests/test_config_contract.py": 2,
+          "tests/test_padding_contract.py": 5,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 3
+        }
+      },
+      {
+        "name": "validate_config",
+        "line": 54,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/config.py": 2,
+          "tests/test_padding_contract.py": 2,
+          "tests/test_parallel_contract.py": 3
+        }
+      },
+      {
+        "name": "config_to_json",
+        "line": 104,
+        "active_mentions": {
+          "src/config.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": ".backup_bucket_20261110/data.py",
+    "bytes": 4247,
+    "sha256": "3b8e78a7d50b145c2bd15a41c5560ef97d8f9bcb4fa3833b17036e729919511d",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "Sample",
+        "line": 19,
+        "active_mentions": {
+          "src/data.py": 4,
+          "tests/test_padding_contract.py": 2,
+          "tests/test_parallel_contract.py": 2
+        }
+      },
+      {
+        "name": "load_data",
+        "line": 26,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "src/data.py": 4
+        }
+      },
+      {
+        "name": "PairedTimeSeriesDataset",
+        "line": 34,
+        "active_mentions": {
+          "src/data.py": 1,
+          "src/evaluate.py": 2,
+          "src/train.py": 2
+        }
+      },
+      {
+        "name": "collate_samples",
+        "line": 60,
+        "active_mentions": {
+          "src/data.py": 2,
+          "src/evaluate.py": 2,
+          "src/train.py": 2,
+          "tests/test_padding_contract.py": 2,
+          "tests/test_parallel_contract.py": 2
+        }
+      },
+      {
+        "name": "load_indices",
+        "line": 93,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "src/data.py": 1,
+          "src/train.py": 3,
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "file_manifest",
+        "line": 101,
+        "active_mentions": {
+          "src/audit.py": 2,
+          "src/data.py": 1
+        }
+      },
+      {
+        "name": "sha256",
+        "line": 119,
+        "active_mentions": {
+          "src/benchmark_eval.py": 6,
+          "src/data.py": 3
+        }
+      }
+    ]
+  },
+  {
+    "path": ".backup_bucket_20261110/train.py",
+    "bytes": 9153,
+    "sha256": "edc0596e114fbd950e95d6756bde4c3cd8d4daae08698212d0417c4dcbd38310",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "set_seed",
+        "line": 17,
+        "active_mentions": {
+          "run_experiment.py": 3,
+          "src/train.py": 3,
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 6,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "_device",
+        "line": 27,
+        "active_mentions": {
+          "src/train.py": 3
+        }
+      },
+      {
+        "name": "make_batch_inputs",
+        "line": 31,
+        "active_mentions": {
+          "src/train.py": 4,
+          "tests/test_padding_contract.py": 3,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "run_smoke",
+        "line": 47,
+        "active_mentions": {
+          "run_experiment.py": 3,
+          "src/train.py": 1,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "train_model",
+        "line": 88,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/train.py": 1,
+          "tests/test_padding_contract.py": 3,
+          "tests/test_parallel_contract.py": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "audits/eval_20261112/sources/upstream_HP_list.py",
+    "bytes": 8506,
+    "sha256": "d08c97eb67e67c3370e00acb27fbbd7819c689f7948b5ff3e1022c724d43c66f",
+    "unused_import_candidates": [],
+    "definitions": []
+  },
+  {
+    "path": "audits/eval_20261112/sources/upstream_evaluation_basic_metrics.py",
+    "bytes": 112473,
+    "sha256": "68200449af2082f647a61a68c9417cdc587815ddfa7a1ee81cadc0faba035439",
+    "unused_import_candidates": [
+      {
+        "symbol": "partial",
+        "line": 11
+      }
+    ],
+    "definitions": [
+      {
+        "name": "generate_curve",
+        "line": 14,
+        "active_mentions": {}
+      },
+      {
+        "name": "inverse_proportional_cardinality_fn",
+        "line": 30,
+        "active_mentions": {}
+      },
+      {
+        "name": "constant_bias_fn",
+        "line": 52,
+        "active_mentions": {}
+      },
+      {
+        "name": "improved_cardinality_fn",
+        "line": 72,
+        "active_mentions": {}
+      },
+      {
+        "name": "basic_metricor",
+        "line": 88,
+        "active_mentions": {}
+      }
+    ]
+  },
+  {
+    "path": "audits/eval_20261112/sources/upstream_evaluation_metrics.py",
+    "bytes": 14251,
+    "sha256": "2ecb21799d5e3531bd90af7e38ff1b7f5822721cf0a2212578f28bbfd3f4aa1a",
+    "unused_import_candidates": [
+      {
+        "symbol": "sys",
+        "line": 1
+      },
+      {
+        "symbol": "torch",
+        "line": 11
+      },
+      {
+        "symbol": "as_completed",
+        "line": 12
+      },
+      {
+        "symbol": "partial",
+        "line": 13
+      },
+      {
+        "symbol": "tqdm",
+        "line": 14
+      }
+    ],
+    "definitions": [
+      {
+        "name": "_compute_auc_roc",
+        "line": 19,
+        "active_mentions": {}
+      },
+      {
+        "name": "_compute_auc_pr",
+        "line": 26,
+        "active_mentions": {}
+      },
+      {
+        "name": "_compute_vus",
+        "line": 33,
+        "active_mentions": {}
+      },
+      {
+        "name": "_compute_pointf1",
+        "line": 40,
+        "active_mentions": {}
+      },
+      {
+        "name": "_compute_pointf1pa",
+        "line": 55,
+        "active_mentions": {}
+      },
+      {
+        "name": "_compute_affiliation",
+        "line": 67,
+        "active_mentions": {}
+      },
+      {
+        "name": "_compute_t_score",
+        "line": 74,
+        "active_mentions": {}
+      },
+      {
+        "name": "_compute_f1_t",
+        "line": 81,
+        "active_mentions": {}
+      },
+      {
+        "name": "_run_task",
+        "line": 97,
+        "active_mentions": {}
+      },
+      {
+        "name": "get_metrics_optimized",
+        "line": 101,
+        "active_mentions": {
+          "run_experiment.py": 1,
+          "src/benchmark_eval.py": 2,
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "get_metrics",
+        "line": 257,
+        "active_mentions": {
+          "run_experiment.py": 1,
+          "src/benchmark_eval.py": 2
+        }
+      },
+      {
+        "name": "get_metrics_pred",
+        "line": 323,
+        "active_mentions": {}
+      },
+      {
+        "name": "find_length_rank",
+        "line": 356,
+        "active_mentions": {
+          "run_experiment.py": 1,
+          "src/benchmark_eval.py": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "audits/eval_20261112/sources/upstream_main.py",
+    "bytes": 16030,
+    "sha256": "6a74ce860fa364f3adb2d52c1bab81084f13d6787d2faa4e90d5e08c5dd9a16e",
+    "unused_import_candidates": [
+      {
+        "symbol": "MinMaxScaler",
+        "line": 13
+      }
+    ],
+    "definitions": [
+      {
+        "name": "parse_window_sizes",
+        "line": 36,
+        "active_mentions": {}
+      },
+      {
+        "name": "build_window_test_configs",
+        "line": 57,
+        "active_mentions": {}
+      },
+      {
+        "name": "build_window_suffix",
+        "line": 80,
+        "active_mentions": {}
+      },
+      {
+        "name": "build_metric_preview",
+        "line": 86,
+        "active_mentions": {}
+      },
+      {
+        "name": "get_result",
+        "line": 110,
+        "active_mentions": {}
+      }
+    ]
+  },
+  {
+    "path": "audits/eval_20261112/sources/upstream_models_TimeRCD.py",
+    "bytes": 25743,
+    "sha256": "a5a2bbd7790c346157a427dc836454a47568c10baaa1feb5d2cc4ffcfbc1f627",
+    "unused_import_candidates": [
+      {
+        "symbol": "sns",
+        "line": 8
+      },
+      {
+        "symbol": "create_random_mask",
+        "line": 17
+      },
+      {
+        "symbol": "default_config",
+        "line": 18
+      }
+    ],
+    "definitions": [
+      {
+        "name": "TimeRCDPretrainTester",
+        "line": 21,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "Dataset_UCR",
+        "line": 537,
+        "active_mentions": {}
+      }
+    ]
+  },
+  {
+    "path": "audits/eval_20261112/sources/upstream_utils_dataset.py",
+    "bytes": 12040,
+    "sha256": "19ce39599c9f2ee2684fb57a6af115992d7f29deaa7b4f7aa3b89c14e9a0f34a",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "TimeRCDDataset",
+        "line": 6,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "tests/test_benchmark_eval.py": 3
+        }
+      },
+      {
+        "name": "ReconstructDataset",
+        "line": 81,
+        "active_mentions": {}
+      },
+      {
+        "name": "ForecastDataset",
+        "line": 117,
+        "active_mentions": {}
+      },
+      {
+        "name": "TSDataset",
+        "line": 205,
+        "active_mentions": {}
+      },
+      {
+        "name": "ReconstructDataset_Moment",
+        "line": 228,
+        "active_mentions": {}
+      },
+      {
+        "name": "TACLipDataset",
+        "line": 263,
+        "active_mentions": {}
+      }
+    ]
+  },
+  {
+    "path": "audits/eval_20261112/sources/upstream_utils_slidingWindows.py",
+    "bytes": 2476,
+    "sha256": "07d85ee90eac21c3a4b0642ed45b0245f0325639b087213842752c2337af0563",
+    "unused_import_candidates": [
+      {
+        "symbol": "plot_acf",
+        "line": 4
+      }
+    ],
+    "definitions": [
+      {
+        "name": "find_length_rank",
+        "line": 8,
+        "active_mentions": {
+          "run_experiment.py": 1,
+          "src/benchmark_eval.py": 2
+        }
+      },
+      {
+        "name": "find_length",
+        "line": 57,
+        "active_mentions": {}
+      }
+    ]
+  },
+  {
+    "path": "audits/patch_20261110/sources/local_training.py",
+    "bytes": 37097,
+    "sha256": "2b10b05c2811b5dc07f655c26d380e018cb254497707025be3ec586fa1107f56",
+    "unused_import_candidates": [
+      {
+        "symbol": "Union",
+        "line": 14
+      },
+      {
+        "symbol": "json",
+        "line": 16
+      },
+      {
+        "symbol": "Union",
+        "line": 23
+      },
+      {
+        "symbol": "Path",
+        "line": 24
+      },
+      {
+        "symbol": "sys",
+        "line": 27
+      }
+    ],
+    "definitions": [
+      {
+        "name": "PretrainBatch",
+        "line": 35,
+        "active_mentions": {}
+      },
+      {
+        "name": "ChatTSAnomalyPretrainDataset",
+        "line": 42,
+        "active_mentions": {}
+      },
+      {
+        "name": "TimeSeriesPretrainModel",
+        "line": 79,
+        "active_mentions": {}
+      },
+      {
+        "name": "create_random_mask",
+        "line": 188,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "collate_fn",
+        "line": 227,
+        "active_mentions": {
+          "src/evaluate.py": 1,
+          "src/train.py": 1
+        }
+      },
+      {
+        "name": "set_seed",
+        "line": 282,
+        "active_mentions": {
+          "run_experiment.py": 3,
+          "src/train.py": 3,
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 6,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "setup_distributed",
+        "line": 293,
+        "active_mentions": {}
+      },
+      {
+        "name": "cleanup_distributed",
+        "line": 315,
+        "active_mentions": {}
+      },
+      {
+        "name": "evaluate_epoch",
+        "line": 321,
+        "active_mentions": {}
+      },
+      {
+        "name": "train_epoch",
+        "line": 371,
+        "active_mentions": {}
+      },
+      {
+        "name": "save_checkpoint",
+        "line": 451,
+        "active_mentions": {}
+      },
+      {
+        "name": "train_multiple_datasets",
+        "line": 511,
+        "active_mentions": {}
+      },
+      {
+        "name": "train_worker",
+        "line": 592,
+        "active_mentions": {}
+      },
+      {
+        "name": "main",
+        "line": 775,
+        "active_mentions": {
+          "src/benchmark_eval.py": 3,
+          "tests/run_checks.py": 1,
+          "tests/test_patch_parity.py": 3
+        }
+      }
+    ]
+  },
+  {
+    "path": "audits/patch_20261110/sources/time_rcd_config.py",
+    "bytes": 2199,
+    "sha256": "ebfeac0a971dc784d47d9c01a0622ebadaf46f9e41588f37f610d746dce8c967",
+    "unused_import_candidates": [
+      {
+        "symbol": "Optional",
+        "line": 2
+      }
+    ],
+    "definitions": [
+      {
+        "name": "TimeSeriesConfig",
+        "line": 6,
+        "active_mentions": {}
+      },
+      {
+        "name": "TimeRCDConfig",
+        "line": 33,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 3
+        }
+      }
+    ]
+  },
+  {
+    "path": "audits/patch_20261110/sources/train_400k.py",
+    "bytes": 4242,
+    "sha256": "2e402934e8d183a762de3665c6a96f830e692e710f00eed6bb653bd06787c3f7",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "Tee",
+        "line": 23,
+        "active_mentions": {}
+      },
+      {
+        "name": "main",
+        "line": 37,
+        "active_mentions": {
+          "src/benchmark_eval.py": 3,
+          "tests/run_checks.py": 1,
+          "tests/test_patch_parity.py": 3
+        }
+      }
+    ]
+  },
+  {
+    "path": "audits/patch_20261110/sources/upstream_encoder.py",
+    "bytes": 15464,
+    "sha256": "04f07035dc99940db923c3524a479056b601d192ab937cdc6ca00499962f4c4c",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "RMSNorm",
+        "line": 9,
+        "active_mentions": {}
+      },
+      {
+        "name": "RotaryEmbedding",
+        "line": 24,
+        "active_mentions": {}
+      },
+      {
+        "name": "BinaryAttentionBias",
+        "line": 38,
+        "active_mentions": {}
+      },
+      {
+        "name": "MultiheadAttentionWithRoPE",
+        "line": 58,
+        "active_mentions": {}
+      },
+      {
+        "name": "LlamaMLP",
+        "line": 167,
+        "active_mentions": {}
+      },
+      {
+        "name": "TransformerEncoderLayerWithRoPE",
+        "line": 182,
+        "active_mentions": {}
+      },
+      {
+        "name": "CustomTransformerEncoder",
+        "line": 208,
+        "active_mentions": {}
+      },
+      {
+        "name": "TimeSeriesEncoder",
+        "line": 231,
+        "active_mentions": {
+          "src/models.py": 2,
+          "tests/test_patch_parity.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "audits/patch_20261110/sources/upstream_main_library.py",
+    "bytes": 10081,
+    "sha256": "f05b70d9daaf2f5d4e2867cb2d6daa0b235d5d3941bbc0862eff71614b349028",
+    "unused_import_candidates": [
+      {
+        "symbol": "datetime",
+        "line": 1
+      },
+      {
+        "symbol": "itertools",
+        "line": 2
+      },
+      {
+        "symbol": "os",
+        "line": 3
+      },
+      {
+        "symbol": "optim",
+        "line": 6
+      },
+      {
+        "symbol": "DataLoader",
+        "line": 7
+      },
+      {
+        "symbol": "DistributedSampler",
+        "line": 7
+      },
+      {
+        "symbol": "dist",
+        "line": 9
+      },
+      {
+        "symbol": "mp",
+        "line": 10
+      },
+      {
+        "symbol": "DDP",
+        "line": 11
+      },
+      {
+        "symbol": "random",
+        "line": 12
+      },
+      {
+        "symbol": "np",
+        "line": 13
+      },
+      {
+        "symbol": "List",
+        "line": 14
+      },
+      {
+        "symbol": "Dict",
+        "line": 14
+      },
+      {
+        "symbol": "Any",
+        "line": 14
+      },
+      {
+        "symbol": "Union",
+        "line": 14
+      },
+      {
+        "symbol": "ChatTSTimeRCDPretrainDataset",
+        "line": 17
+      }
+    ],
+    "definitions": [
+      {
+        "name": "PretrainBatch",
+        "line": 26,
+        "active_mentions": {}
+      },
+      {
+        "name": "TimeSeriesPretrainModel",
+        "line": 34,
+        "active_mentions": {}
+      },
+      {
+        "name": "create_random_mask",
+        "line": 129,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "collate_fn",
+        "line": 166,
+        "active_mentions": {
+          "src/evaluate.py": 1,
+          "src/train.py": 1
+        }
+      },
+      {
+        "name": "test_collate_fn",
+        "line": 220,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "audits/patch_20261110/sources/upstream_training.py",
+    "bytes": 37168,
+    "sha256": "311bfc8eece430c99a8fc4fac0bcc24b877ec9193f8d3292214611887a238b23",
+    "unused_import_candidates": [
+      {
+        "symbol": "Union",
+        "line": 14
+      },
+      {
+        "symbol": "json",
+        "line": 16
+      },
+      {
+        "symbol": "Union",
+        "line": 23
+      },
+      {
+        "symbol": "Path",
+        "line": 24
+      },
+      {
+        "symbol": "sys",
+        "line": 27
+      }
+    ],
+    "definitions": [
+      {
+        "name": "PretrainBatch",
+        "line": 35,
+        "active_mentions": {}
+      },
+      {
+        "name": "ChatTSAnomalyPretrainDataset",
+        "line": 42,
+        "active_mentions": {}
+      },
+      {
+        "name": "TimeSeriesPretrainModel",
+        "line": 79,
+        "active_mentions": {}
+      },
+      {
+        "name": "create_random_mask",
+        "line": 188,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "collate_fn",
+        "line": 227,
+        "active_mentions": {
+          "src/evaluate.py": 1,
+          "src/train.py": 1
+        }
+      },
+      {
+        "name": "set_seed",
+        "line": 282,
+        "active_mentions": {
+          "run_experiment.py": 3,
+          "src/train.py": 3,
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 6,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "setup_distributed",
+        "line": 293,
+        "active_mentions": {}
+      },
+      {
+        "name": "cleanup_distributed",
+        "line": 315,
+        "active_mentions": {}
+      },
+      {
+        "name": "evaluate_epoch",
+        "line": 321,
+        "active_mentions": {}
+      },
+      {
+        "name": "train_epoch",
+        "line": 371,
+        "active_mentions": {}
+      },
+      {
+        "name": "save_checkpoint",
+        "line": 451,
+        "active_mentions": {}
+      },
+      {
+        "name": "train_multiple_datasets",
+        "line": 511,
+        "active_mentions": {}
+      },
+      {
+        "name": "train_worker",
+        "line": 592,
+        "active_mentions": {}
+      },
+      {
+        "name": "main",
+        "line": 775,
+        "active_mentions": {
+          "src/benchmark_eval.py": 3,
+          "tests/run_checks.py": 1,
+          "tests/test_patch_parity.py": 3
+        }
+      }
+    ]
+  },
+  {
+    "path": "run_experiment.py",
+    "bytes": 10847,
+    "sha256": "b3ce85fbe104b4b692eb70c1eb5d92b8ea62a40e993b8fa57cf14ae43f2b9506",
+    "unused_import_candidates": [
+      {
+        "symbol": "get_metrics",
+        "line": 197
+      },
+      {
+        "symbol": "get_metrics_optimized",
+        "line": 197
+      },
+      {
+        "symbol": "find_length_rank",
+        "line": 198
+      }
+    ],
+    "definitions": [
+      {
+        "name": "parse_args",
+        "line": 31,
+        "active_mentions": {
+          "run_experiment.py": 3
+        }
+      },
+      {
+        "name": "utc_now",
+        "line": 60,
+        "active_mentions": {
+          "run_experiment.py": 9
+        }
+      },
+      {
+        "name": "write_json",
+        "line": 64,
+        "active_mentions": {
+          "run_experiment.py": 15,
+          "src/benchmark_eval.py": 5
+        }
+      },
+      {
+        "name": "git_revision",
+        "line": 69,
+        "active_mentions": {
+          "run_experiment.py": 3
+        }
+      },
+      {
+        "name": "environment_record",
+        "line": 80,
+        "active_mentions": {
+          "run_experiment.py": 2
+        }
+      },
+      {
+        "name": "append_registry",
+        "line": 101,
+        "active_mentions": {
+          "run_experiment.py": 7
+        }
+      },
+      {
+        "name": "create_run_dir",
+        "line": 116,
+        "active_mentions": {
+          "run_experiment.py": 2
+        }
+      },
+      {
+        "name": "save_run_metadata",
+        "line": 126,
+        "active_mentions": {
+          "run_experiment.py": 2
+        }
+      },
+      {
+        "name": "load_model",
+        "line": 135,
+        "active_mentions": {
+          "run_experiment.py": 5
+        }
+      },
+      {
+        "name": "apply_runtime_overrides",
+        "line": 141,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "tests/test_parallel_contract.py": 3
+        }
+      },
+      {
+        "name": "run_one",
+        "line": 154,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "tests/test_benchmark_eval.py": 1,
+          "tests/test_parallel_contract.py": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/__init__.py",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "unused_import_candidates": [],
+    "definitions": []
+  },
+  {
+    "path": "src/audit.py",
+    "bytes": 2380,
+    "sha256": "d86fdea9b3faacb77ea15f299df0a226dbc0f8954619ff95ca579e8428237ac0",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "run_audit",
+        "line": 8,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/audit.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/benchmark_eval.py",
+    "bytes": 17862,
+    "sha256": "3e128c4403f7764caccfab9e45023c6974d274b289f4dd2f6fe5f8483345d725",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "write_json",
+        "line": 34,
+        "active_mentions": {
+          "run_experiment.py": 15,
+          "src/benchmark_eval.py": 5
+        }
+      },
+      {
+        "name": "load_protocol",
+        "line": 39,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/benchmark_eval.py": 1,
+          "tests/test_benchmark_eval.py": 2
+        }
+      },
+      {
+        "name": "real_targets",
+        "line": 61,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/benchmark_eval.py": 2,
+          "tests/test_benchmark_eval.py": 5
+        }
+      },
+      {
+        "name": "read_real_series",
+        "line": 82,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "DetectionHead",
+        "line": 95,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2
+        }
+      },
+      {
+        "name": "detection_model",
+        "line": 106,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "score_series",
+        "line": 113,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "official_metrics",
+        "line": 139,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "tests/test_benchmark_eval.py": 4
+        }
+      },
+      {
+        "name": "verify_checkpoint_config",
+        "line": 165,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/benchmark_eval.py": 1,
+          "tests/test_benchmark_eval.py": 2
+        }
+      },
+      {
+        "name": "summarize",
+        "line": 176,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "evaluate_benchmarks",
+        "line": 196,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/benchmark_eval.py": 1,
+          "tests/test_benchmark_eval.py": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/config.py",
+    "bytes": 4478,
+    "sha256": "3c3702d2f87bb8b6251cdf125677770f69cb56e96176cac3fe946a2eff8dcb7c",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "ExperimentConfig",
+        "line": 18,
+        "active_mentions": {
+          "run_experiment.py": 6,
+          "src/audit.py": 2,
+          "src/config.py": 4
+        }
+      },
+      {
+        "name": "load_config",
+        "line": 46,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/config.py": 1,
+          "tests/test_bench_contract.py": 2,
+          "tests/test_benchmark_eval.py": 6,
+          "tests/test_config_contract.py": 2,
+          "tests/test_padding_contract.py": 5,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 3
+        }
+      },
+      {
+        "name": "validate_config",
+        "line": 55,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/config.py": 2,
+          "tests/test_padding_contract.py": 2,
+          "tests/test_parallel_contract.py": 3
+        }
+      },
+      {
+        "name": "config_to_json",
+        "line": 110,
+        "active_mentions": {
+          "src/config.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/data.py",
+    "bytes": 7144,
+    "sha256": "ab155e5d4b4b11e363ea5e080789105a93227a893a04b15a06163b27c38a6f41",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "Sample",
+        "line": 21,
+        "active_mentions": {
+          "src/data.py": 4,
+          "tests/test_padding_contract.py": 2,
+          "tests/test_parallel_contract.py": 2
+        }
+      },
+      {
+        "name": "load_data",
+        "line": 28,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "src/data.py": 4
+        }
+      },
+      {
+        "name": "sample_lengths",
+        "line": 36,
+        "active_mentions": {
+          "src/data.py": 1,
+          "src/train.py": 2
+        }
+      },
+      {
+        "name": "PairedTimeSeriesDataset",
+        "line": 44,
+        "active_mentions": {
+          "src/data.py": 1,
+          "src/evaluate.py": 2,
+          "src/train.py": 2
+        }
+      },
+      {
+        "name": "collate_samples",
+        "line": 70,
+        "active_mentions": {
+          "src/data.py": 2,
+          "src/evaluate.py": 2,
+          "src/train.py": 2,
+          "tests/test_padding_contract.py": 2,
+          "tests/test_parallel_contract.py": 2
+        }
+      },
+      {
+        "name": "load_indices",
+        "line": 103,
+        "active_mentions": {
+          "src/benchmark_eval.py": 2,
+          "src/data.py": 1,
+          "src/train.py": 3,
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "LengthBucketBatchSampler",
+        "line": 111,
+        "active_mentions": {
+          "src/data.py": 1,
+          "src/train.py": 2,
+          "tests/test_bucket_sampler.py": 7
+        }
+      },
+      {
+        "name": "file_manifest",
+        "line": 173,
+        "active_mentions": {
+          "src/audit.py": 2,
+          "src/data.py": 1
+        }
+      },
+      {
+        "name": "sha256",
+        "line": 191,
+        "active_mentions": {
+          "src/benchmark_eval.py": 6,
+          "src/data.py": 3
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/evaluate.py",
+    "bytes": 8150,
+    "sha256": "eb71210613880f420292f9b28b65421605d1c6fce639650cc0d8118d6b5c2343",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "evaluate_model",
+        "line": 11,
+        "active_mentions": {
+          "src/evaluate.py": 1,
+          "src/train.py": 2,
+          "tests/test_padding_contract.py": 4
+        }
+      },
+      {
+        "name": "_make_eval_inputs",
+        "line": 168,
+        "active_mentions": {
+          "src/evaluate.py": 2,
+          "tests/test_patch_parity.py": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/losses.py",
+    "bytes": 2264,
+    "sha256": "7db92a4c3190fc000e7fec7c6fb0639df5a1d99b1fb19dd2f51246e09972af4a",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "validate_classification_padding",
+        "line": 10,
+        "active_mentions": {
+          "src/config.py": 2,
+          "src/losses.py": 2
+        }
+      },
+      {
+        "name": "masked_mse",
+        "line": 15,
+        "active_mentions": {
+          "src/losses.py": 2,
+          "tests/test_loss_contract.py": 2
+        }
+      },
+      {
+        "name": "classification_ce",
+        "line": 24,
+        "active_mentions": {
+          "src/evaluate.py": 2,
+          "src/losses.py": 2,
+          "tests/test_loss_contract.py": 2,
+          "tests/test_padding_contract.py": 12
+        }
+      },
+      {
+        "name": "compute_losses",
+        "line": 42,
+        "active_mentions": {
+          "src/evaluate.py": 2,
+          "src/losses.py": 1,
+          "src/train.py": 4,
+          "tests/test_padding_contract.py": 3,
+          "tests/test_parallel_contract.py": 5
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/models.py",
+    "bytes": 2171,
+    "sha256": "5344a86c919b388d9c757daabf7b008d85bce90d93082e893b79e895ea78ca4a",
+    "unused_import_candidates": [
+      {
+        "symbol": "Optional",
+        "line": 3
+      }
+    ],
+    "definitions": [
+      {
+        "name": "AblationPretrainModel",
+        "line": 11,
+        "active_mentions": {
+          "src/models.py": 2
+        }
+      },
+      {
+        "name": "build_model",
+        "line": 58,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/audit.py": 2,
+          "src/models.py": 1,
+          "tests/test_bench_contract.py": 2,
+          "tests/test_benchmark_eval.py": 3,
+          "tests/test_padding_contract.py": 6,
+          "tests/test_parallel_contract.py": 5,
+          "tests/test_patch_parity.py": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/parallel.py",
+    "bytes": 2955,
+    "sha256": "e0ac55c40ac47b674100c2c0d3d0944a2ccb831ac148abd58caa8407aa616997",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "validate_parallel_config",
+        "line": 7,
+        "active_mentions": {
+          "src/config.py": 2,
+          "src/parallel.py": 2
+        }
+      },
+      {
+        "name": "resolve_device",
+        "line": 30,
+        "active_mentions": {
+          "src/parallel.py": 2,
+          "src/train.py": 2,
+          "tests/test_parallel_contract.py": 4
+        }
+      },
+      {
+        "name": "prepare_model",
+        "line": 48,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/parallel.py": 1,
+          "tests/test_parallel_contract.py": 3
+        }
+      },
+      {
+        "name": "unwrap_model",
+        "line": 57,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/benchmark_eval.py": 2,
+          "src/parallel.py": 1,
+          "src/train.py": 4,
+          "tests/test_parallel_contract.py": 6
+        }
+      },
+      {
+        "name": "parallel_record",
+        "line": 61,
+        "active_mentions": {
+          "src/parallel.py": 1,
+          "src/train.py": 3
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/reporting.py",
+    "bytes": 455,
+    "sha256": "70b5af635ceb5b625e2451c4a566434ab8d79b2130a508c7e2da069e82c89086",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "write_report",
+        "line": 7,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/reporting.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/sampling.py",
+    "bytes": 1272,
+    "sha256": "439993e7b25cc05233228a8a7581080dff21dff7320d7f49523ed71606c271dc",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "sample_patch_mask",
+        "line": 6,
+        "active_mentions": {
+          "src/evaluate.py": 2,
+          "src/sampling.py": 1,
+          "src/train.py": 2,
+          "tests/test_patch_parity.py": 2,
+          "tests/test_sampling_contract.py": 3
+        }
+      },
+      {
+        "name": "apply_input_mask",
+        "line": 32,
+        "active_mentions": {
+          "src/evaluate.py": 2,
+          "src/sampling.py": 1,
+          "src/train.py": 2,
+          "tests/test_patch_parity.py": 2,
+          "tests/test_sampling_contract.py": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "src/train.py",
+    "bytes": 16756,
+    "sha256": "900c2ef372e53501494d9eaf557b9c08a7af8a9a28e108e9fbea12727fe7c552",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "set_seed",
+        "line": 26,
+        "active_mentions": {
+          "run_experiment.py": 3,
+          "src/train.py": 3,
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 6,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "_device",
+        "line": 36,
+        "active_mentions": {
+          "src/train.py": 3
+        }
+      },
+      {
+        "name": "make_batch_inputs",
+        "line": 40,
+        "active_mentions": {
+          "src/train.py": 4,
+          "tests/test_padding_contract.py": 3,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "run_smoke",
+        "line": 56,
+        "active_mentions": {
+          "run_experiment.py": 3,
+          "src/train.py": 1,
+          "tests/test_parallel_contract.py": 3,
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "_build_train_loader",
+        "line": 97,
+        "active_mentions": {
+          "src/train.py": 3
+        }
+      },
+      {
+        "name": "train_model",
+        "line": 128,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/train.py": 1,
+          "tests/test_padding_contract.py": 3,
+          "tests/test_parallel_contract.py": 2
+        }
+      },
+      {
+        "name": "_sync_devices",
+        "line": 286,
+        "active_mentions": {
+          "src/train.py": 3
+        }
+      },
+      {
+        "name": "benchmark",
+        "line": 292,
+        "active_mentions": {
+          "run_experiment.py": 2,
+          "src/benchmark_eval.py": 3,
+          "src/train.py": 2,
+          "tests/test_bench_contract.py": 3
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/conftest.py",
+    "bytes": 201,
+    "sha256": "6b0f1c1bd3dbe96460fcb75a3db1705a0cd6482ac8e3e3e321be3fd739f790c0",
+    "unused_import_candidates": [],
+    "definitions": []
+  },
+  {
+    "path": "tests/run_checks.py",
+    "bytes": 246,
+    "sha256": "cbc7eec7890fdd5c0fa107272d5d76ae29c7d25dce54186365b479215131b0bd",
+    "unused_import_candidates": [],
+    "definitions": []
+  },
+  {
+    "path": "tests/test_bench_contract.py",
+    "bytes": 1822,
+    "sha256": "fb267642c81a0457b75d8f9f84ef427806d478e8e541fdacd3d6ee4a7009fe94",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "config_for",
+        "line": 15,
+        "active_mentions": {
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 7,
+          "tests/test_parallel_contract.py": 7
+        }
+      },
+      {
+        "name": "synthetic_data",
+        "line": 24,
+        "active_mentions": {
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 4
+        }
+      },
+      {
+        "name": "test_benchmark_reports_throughput_and_respects_batch_limit",
+        "line": 36,
+        "active_mentions": {
+          "tests/test_bench_contract.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/test_benchmark_eval.py",
+    "bytes": 12288,
+    "sha256": "da379ad51fa6a9d1da9311196beac7ce231ae8b60c608ed58b0c3ea06ff28f55",
+    "unused_import_candidates": [
+      {
+        "symbol": "evaluation",
+        "line": 106
+      },
+      {
+        "symbol": "evaluation",
+        "line": 107
+      }
+    ],
+    "definitions": [
+      {
+        "name": "protocol",
+        "line": 27,
+        "active_mentions": {
+          "run_experiment.py": 7,
+          "src/benchmark_eval.py": 32,
+          "tests/test_benchmark_eval.py": 15
+        }
+      },
+      {
+        "name": "model",
+        "line": 34,
+        "active_mentions": {
+          "run_experiment.py": 13,
+          "src/audit.py": 3,
+          "src/benchmark_eval.py": 8,
+          "src/config.py": 4,
+          "src/evaluate.py": 4,
+          "src/models.py": 12,
+          "src/parallel.py": 13,
+          "src/train.py": 19,
+          "tests/test_bench_contract.py": 1,
+          "tests/test_benchmark_eval.py": 12,
+          "tests/test_config_contract.py": 2,
+          "tests/test_padding_contract.py": 4,
+          "tests/test_parallel_contract.py": 5,
+          "tests/test_patch_parity.py": 6
+        }
+      },
+      {
+        "name": "source_function",
+        "line": 42,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 3
+        }
+      },
+      {
+        "name": "test_scores_match_official_zero_shot",
+        "line": 51,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "test_official_main_selection_and_hyperparameters",
+        "line": 76,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "test_csv_dropna_then_filename_boundary",
+        "line": 95,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "test_all_metrics_match_pinned_official_fast",
+        "line": 105,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "test_checkpoint_mismatch_rejected",
+        "line": 139,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "test_joint_pipeline_split_full_inputs_and_partial_status",
+        "line": 148,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "test_metrics_failure_preserves_partial_rows",
+        "line": 181,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "test_group_macro_is_not_pooled_series_macro",
+        "line": 206,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      },
+      {
+        "name": "test_unified_eval_entry_loads_checkpoint_and_runs_both_domains",
+        "line": 215,
+        "active_mentions": {
+          "tests/test_benchmark_eval.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/test_bucket_sampler.py",
+    "bytes": 2377,
+    "sha256": "940658f70972eeac5b0fe1b139c26db85560c6459da64c07612a6113ec019849",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "synthetic_lengths",
+        "line": 11,
+        "active_mentions": {
+          "tests/test_bucket_sampler.py": 5
+        }
+      },
+      {
+        "name": "padded_fraction",
+        "line": 17,
+        "active_mentions": {
+          "tests/test_bucket_sampler.py": 3
+        }
+      },
+      {
+        "name": "test_every_index_is_used_once_per_epoch",
+        "line": 23,
+        "active_mentions": {
+          "tests/test_bucket_sampler.py": 1
+        }
+      },
+      {
+        "name": "test_bucketing_keeps_step_count_and_cuts_padding",
+        "line": 34,
+        "active_mentions": {
+          "tests/test_bucket_sampler.py": 1
+        }
+      },
+      {
+        "name": "test_same_seed_and_epoch_is_reproducible",
+        "line": 43,
+        "active_mentions": {
+          "tests/test_bucket_sampler.py": 1
+        }
+      },
+      {
+        "name": "test_invalid_settings_fail_fast",
+        "line": 58,
+        "active_mentions": {
+          "tests/test_bucket_sampler.py": 1
+        }
+      },
+      {
+        "name": "test_mismatched_lengths_fail_fast",
+        "line": 64,
+        "active_mentions": {
+          "tests/test_bucket_sampler.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/test_config_contract.py",
+    "bytes": 635,
+    "sha256": "3f9aaf14af15908f22f60a1c212c7e084f685fee9acc917e7bca15474bd0cd19",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "test_all_variant_configs_match_single_gpu_training_patch_sizes",
+        "line": 9,
+        "active_mentions": {
+          "tests/test_config_contract.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/test_loss_contract.py",
+    "bytes": 623,
+    "sha256": "8abf01aca10bfb20aca762a3e50d0d328441a0d04d6e5f3f34cdb082f8c0cd5c",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "test_padding_is_excluded_from_classification",
+        "line": 6,
+        "active_mentions": {
+          "tests/test_loss_contract.py": 1
+        }
+      },
+      {
+        "name": "test_zero_reconstruction_mask_is_explicitly_zero",
+        "line": 15,
+        "active_mentions": {
+          "tests/test_loss_contract.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/test_padding_contract.py",
+    "bytes": 9709,
+    "sha256": "c614c30e3f260b5b92382b3dc78883e4f494cb5efb6e3ff1020aefcea4368bc5",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "few_threads",
+        "line": 24,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1,
+          "tests/test_parallel_contract.py": 1
+        }
+      },
+      {
+        "name": "config_for",
+        "line": 31,
+        "active_mentions": {
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 7,
+          "tests/test_parallel_contract.py": 7
+        }
+      },
+      {
+        "name": "synthetic_data",
+        "line": 41,
+        "active_mentions": {
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 4
+        }
+      },
+      {
+        "name": "tensors",
+        "line": 53,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 5
+        }
+      },
+      {
+        "name": "test_official_matches_original_loss_and_gradient",
+        "line": 58,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_ignore_removes_padding_values_and_gradients",
+        "line": 74,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_without_padding_modes_are_identical",
+        "line": 87,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_all_padding_and_empty_tensors_are_finite",
+        "line": 100,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_pair_configs_only_differ_in_padding",
+        "line": 116,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_invalid_policy_fails_before_execution",
+        "line": 126,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_old_config_materializes_ignore_default",
+        "line": 136,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_switch_leaves_initialization_inputs_masks_and_reconstruction_unchanged",
+        "line": 145,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_eval_reports_common_valid_metrics_for_same_weights",
+        "line": 172,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_training_evaluation_and_checkpoint_preserve_policy",
+        "line": 191,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      },
+      {
+        "name": "test_best_checkpoint_and_early_stopping_use_common_metric",
+        "line": 208,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/test_parallel_contract.py",
+    "bytes": 10844,
+    "sha256": "c6c3a478a5c9458a6eb9a1c7f03153348eebbd2f8a8eb9257f9d629c63c2ce7e",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "config_for",
+        "line": 24,
+        "active_mentions": {
+          "tests/test_bench_contract.py": 2,
+          "tests/test_padding_contract.py": 7,
+          "tests/test_parallel_contract.py": 7
+        }
+      },
+      {
+        "name": "few_threads",
+        "line": 33,
+        "active_mentions": {
+          "tests/test_padding_contract.py": 1,
+          "tests/test_parallel_contract.py": 1
+        }
+      },
+      {
+        "name": "batch_for_test",
+        "line": 40,
+        "active_mentions": {
+          "tests/test_parallel_contract.py": 3
+        }
+      },
+      {
+        "name": "test_invalid_settings",
+        "line": 62,
+        "active_mentions": {
+          "tests/test_parallel_contract.py": 1
+        }
+      },
+      {
+        "name": "test_old_configs_and_cli_override",
+        "line": 72,
+        "active_mentions": {
+          "tests/test_parallel_contract.py": 1
+        }
+      },
+      {
+        "name": "test_device_selection_and_unavailable_ids",
+        "line": 83,
+        "active_mentions": {
+          "tests/test_parallel_contract.py": 1
+        }
+      },
+      {
+        "name": "test_global_loss_and_gradients_after_uneven_split",
+        "line": 99,
+        "active_mentions": {
+          "tests/test_parallel_contract.py": 1
+        }
+      },
+      {
+        "name": "test_wrapped_training_saves_portable_checkpoint",
+        "line": 122,
+        "active_mentions": {
+          "tests/test_parallel_contract.py": 1
+        }
+      },
+      {
+        "name": "test_entry_smoke_records_effective_config_and_status",
+        "line": 151,
+        "active_mentions": {
+          "tests/test_parallel_contract.py": 1
+        }
+      },
+      {
+        "name": "test_actual_two_gpu_forward_gradients_and_tail",
+        "line": 183,
+        "active_mentions": {
+          "tests/test_parallel_contract.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/test_patch_parity.py",
+    "bytes": 7099,
+    "sha256": "d01bd3bc3ec6600bd784368ec3255310124173fa703541fdd6ddc16ec95fba7f",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "source_mask",
+        "line": 25,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 3
+        }
+      },
+      {
+        "name": "source_entry_patch_assignments",
+        "line": 35,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 3
+        }
+      },
+      {
+        "name": "test_entry_mutates_same_default_object",
+        "line": 48,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 1
+        }
+      },
+      {
+        "name": "test_sample_and_zero_fill_match_original",
+        "line": 61,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 1
+        }
+      },
+      {
+        "name": "test_train_and_eval_inputs_match_protocol",
+        "line": 75,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 1
+        }
+      },
+      {
+        "name": "test_encoder_keeps_partially_visible_token",
+        "line": 91,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 1
+        }
+      },
+      {
+        "name": "test_default_model_cpu_smoke",
+        "line": 114,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 1
+        }
+      },
+      {
+        "name": "spawn_probe",
+        "line": 134,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 2
+        }
+      },
+      {
+        "name": "test_spawn_has_fresh_global_default",
+        "line": 139,
+        "active_mentions": {
+          "tests/test_patch_parity.py": 1
+        }
+      }
+    ]
+  },
+  {
+    "path": "tests/test_sampling_contract.py",
+    "bytes": 1152,
+    "sha256": "95a4ea8b50b7201c29504aa7660e1b925c470edabe4f5cf2d57370baa7025db2",
+    "unused_import_candidates": [],
+    "definitions": [
+      {
+        "name": "test_mask_granularity_is_independent_of_encoder_patch_size",
+        "line": 6,
+        "active_mentions": {
+          "tests/test_sampling_contract.py": 1
+        }
+      },
+      {
+        "name": "test_input_mask_zeroes_only_selected_values",
+        "line": 27,
+        "active_mentions": {
+          "tests/test_sampling_contract.py": 1
+        }
+      }
+    ]
+  }
+]

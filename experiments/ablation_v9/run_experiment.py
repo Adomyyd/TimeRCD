@@ -22,12 +22,10 @@ import torch
 
 from src.audit import run_audit
 from src.config import ExperimentConfig, load_config, validate_config
-from src.data import load_indices
-from src.evaluate import evaluate_model
 from src.models import build_model
 from src.parallel import prepare_model, unwrap_model
 from src.reporting import write_report
-from src.train import _device, benchmark, run_smoke, set_seed, train_model
+from src.train import benchmark, run_smoke, set_seed, train_model
 
 
 def parse_args() -> argparse.Namespace:
@@ -40,11 +38,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=None,
                         help="Override optimization.batch_size before the config snapshot")
     parser.add_argument("--checkpoint", help="Checkpoint path for eval mode")
+    parser.add_argument("--eval-config", default=str(HERE / "configs" / "eval_official.json"),
+                        help="Detection evaluation protocol (synthetic held-out + official TSB-AD-U)")
+    parser.add_argument("--eval-max-synthetic", type=int, default=None,
+                        help="Optional synthetic series limit; results are marked as a subset")
+    parser.add_argument("--eval-max-real", type=int, default=None,
+                        help="Optional real series limit; results are marked as a subset")
     parser.add_argument("--parallel", choices=["none", "data_parallel"], default=None,
                         help="Override runtime.parallel; default uses JSON config")
     parser.add_argument("--gpu-ids", type=int, nargs="+", default=None,
                         help="Visible CUDA device ids for data_parallel; first id gathers outputs")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.mode == "eval" and not args.checkpoint:
+        parser.error("--mode eval requires --checkpoint; use the training run's config.json")
+    for name in ("eval_max_synthetic", "eval_max_real"):
+        if getattr(args, name) is not None and getattr(args, name) <= 0:
+            parser.error("evaluation limits must be positive")
+    return args
 
 
 def utc_now() -> str:
@@ -181,6 +191,15 @@ def run_one(args: argparse.Namespace) -> None:
             append_registry(args.run_id, config, run_dir, "completed", args.mode)
             return
 
+        if args.mode in {"eval", "all"}:
+            from src.benchmark_eval import DEFAULT_PROTOCOL, load_protocol, real_targets
+            # Check evaluation dependencies before all-mode can start training.
+            from evaluation.metrics import get_metrics, get_metrics_optimized
+            from utils.slidingWindows import find_length_rank
+            protocol = load_protocol(getattr(args, "eval_config", DEFAULT_PROTOCOL))
+            real_targets(protocol["real_data_dir"])
+            write_json(run_dir / "eval_config.json", protocol)
+
         if args.mode in {"train", "all"}:
             model = load_model(config)
             smoke = run_smoke(model, config.raw)
@@ -188,25 +207,25 @@ def run_one(args: argparse.Namespace) -> None:
             result = train_model(model, config.raw, run_dir)
             write_json(run_dir / "metrics" / "train.json", result)
 
-        if args.mode == "eval":
-            checkpoint = Path(args.checkpoint) if args.checkpoint else run_dir / "checkpoints" / "best.pth"
+        if args.mode in {"eval", "all"}:
+            from src.benchmark_eval import evaluate_benchmarks, verify_checkpoint_config
+            checkpoint = Path(args.checkpoint) if args.mode == "eval" else run_dir / "checkpoints" / "best.pth"
             if not checkpoint.is_file():
                 raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
+            if args.mode == "all":
+                del model
+            payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
+            verify_checkpoint_config(payload, config.raw)
             model = load_model(config)
-            payload = torch.load(checkpoint, map_location=_device(config.raw), weights_only=False)
             unwrap_model(model).load_state_dict(payload["model_state_dict"])
-            _, test_indices = load_indices(config.data_path, float(config.raw["split"]["train_ratio"]), int(config.raw["split"]["seed"]))
-            metrics = evaluate_model(model, config.raw, str(config.data_path), test_indices)
-            write_json(run_dir / "metrics" / "eval.json", metrics)
-
-        if args.mode == "all":
-            checkpoint = run_dir / "checkpoints" / "best.pth"
-            model = load_model(config)
-            payload = torch.load(checkpoint, map_location=_device(config.raw), weights_only=False)
-            unwrap_model(model).load_state_dict(payload["model_state_dict"])
-            _, test_indices = load_indices(config.data_path, float(config.raw["split"]["train_ratio"]), int(config.raw["split"]["seed"]))
-            metrics = evaluate_model(model, config.raw, str(config.data_path), test_indices)
-            write_json(run_dir / "metrics" / "eval.json", metrics)
+            checkpoint_epoch = int(payload["epoch"])
+            del payload
+            set_seed(protocol["seed"])
+            torch.set_num_threads(protocol["cpu_threads"])
+            evaluate_benchmarks(model, config.raw, run_dir, checkpoint, protocol,
+                                checkpoint_epoch=checkpoint_epoch,
+                                max_synthetic=getattr(args, "eval_max_synthetic", None),
+                                max_real=getattr(args, "eval_max_real", None))
 
         if args.mode == "report":
             run_dirs = sorted(path for path in (HERE / "runs").iterdir() if path.is_dir())

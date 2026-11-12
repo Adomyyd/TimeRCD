@@ -35,7 +35,7 @@
 | smoke | audit后用合成batch做前向、损失和反向 |
 | bench | audit后读取完整pickle，按训练loader做前向/反向/AdamW更新，输出metrics/bench.json；不做smoke、验证或检查点 |
 | train | audit → smoke → 训练及每轮验证/检查点 |
-| eval | audit后按给定配置加载--checkpoint，评价现有随机划分的验证侧 |
+| eval | audit后核对训练配置/--checkpoint，统一评测合成留出与官方TSB-AD-U，输出概率/logit完整指标 |
 | report | audit后汇总runs/*/metrics/eval.json；不会重新评测 |
 | all | audit → smoke → train → best检查点eval；当前没有自动调用report |
 
@@ -65,7 +65,7 @@ eval使用新的run-id，显式给出相对于仓库根目录的`--checkpoint`�
 - 分类accuracy/precision/recall/F1始终仅用有效标签点；classification_loss_points记录当前CE分母，classification_points为检测指标点数，padding_points为补齐点数。
 - 另报告M选中/全有效、正常/异常区域的重构误差，以及复制X作为正常预测的基线误差。
 
-当前eval未提供完整外部TSB-AD/VUS流程、密度分层、分组split审计、多种子统计或上下文干预。P2对X^0、P0/P1对X，各组目标total也不能直接横向判断方法优劣。正式对照需在共同检测协议、同预算/固定epoch等条件下评价。
+训练验证函数evaluate_model保留上述行为；2026-11-12起，入口eval/all另调用benchmark_eval.evaluate_benchmarks，完成合成留出集与TSB-AD-U的完整检测指标。密度分层、分组split审计、多种子统计和上下文干预仍未实现。P2对X^0、P0/P1对X，各组目标total也不能直接横向判断方法优劣。正式对照需在共同检测协议、同预算/固定epoch等条件下评价。
 
 ## 证据与状态
 
@@ -81,6 +81,26 @@ audits/bench_20261111/bench_summary.json保留他次测速汇总：单卡batch16
 
 ## 配置中尚未生效的能力
 
-runtime.mixed_precision未被v9训练/bench读取，无AMP实现；设true不会启用混合精度。evaluation.threshold_source为研究协议占位，当前点级指标直接对logits argmax，未拟合阈值。schema_version未校验具体版本号；src/config.py的未使用MODES常量漏bench，入口choices实际已支持bench。run_smoke虽含反向，不调用optimizer.step；正式train在其后重置seed/清梯度，仍从随机模型初始化训练，没有权重初始化或resume入口。
+runtime.mixed_precision未被v9训练/bench读取，无AMP实现；设true不会启用混合精度。evaluation.threshold_source为训练协议占位，训练验证点级指标仍对logits argmax；完整eval改用官方oracle阈值搜索，仍未拟合验证集部署阈值。schema_version未校验具体版本号；未使用的MODES常量已清理，入口choices支持bench。run_smoke虽含反向，不调用optimizer.step；正式train在其后重置seed/清梯度，仍从随机模型初始化训练，没有权重初始化或resume入口。
 
 status/registry在入口开始时写running；KeyboardInterrupt会标aborted，其他捕获异常标failed，但外部SIGTERM/SIGKILL可能留下running。不得将状态文件代替进程/日志核查。
+
+## 统一检测评测（2026-11-12）
+
+代码边界：evaluate.py及训练调用保持原样；benchmark_eval.py承接eval/all，统一入口不变。评测依赖见requirements-eval.txt；eval/all在训练开始前检查评测依赖与真实基准清单。eval必须提供checkpoint，且检查checkpoint保存的experiment_id/model/input/loss/split及合成数据位置与传入配置一致；建议直接使用训练run的config.json。CPU加载检查点并释放优化器payload后再推理；评测从完整权重恢复，不再随机初始化后当作待评模型。评测seed2024独立于训练seed72。
+
+对齐版本：thu-sail-lab/Time-RCD@d458549f6962029a5c5241c43a5baa1ec5eccbb2，是轻量包替换前最后包含main.py的官方版本。官方最新main已无原基准脚本，不把新轻量API当作原指标协议。main.py与本项目逐字节一致；utils/dataset.py一致；models/TimeRCD.py只调整包导入。根evaluation下两处已有F1_T串行执行/传入n_splits修正保留；同800分位点下与原并行路径做数值对照，证据见audits/eval_20261112。官方快照只作证据和测试依赖，不作为新入口。
+
+数据与推理：真实基准复用官方单变量排除表，纳入IOPS/MGAB/NAB/NEK/Power/SED/Stock/TODS/UCR/WSD/YAHOO，共700条；按组数量检查完整性。CSV先dropna再按文件名倒数第三段读取训练边界，仅测试后缀进入模型；ACF周期用完整清理后的序列计算。合成侧仅用与训练相同split的留出索引，每条完整原始X独立评测，X0不输入、不计检测分数。两侧均使用TimeRCDDataset：整个测试序列每通道numpy总体std标准化，std为0才换1e-8；窗口min(5000,T)、stride=window，末尾重复最后值且mask为false；展开并截回原长度。编码器只接有效mask，不按P0训练遮蔽；检测头只读取encoder/anomaly_head，不执行重构头。DataParallel只分窗口batch；默认推理batch64，不使用optimization.batch_size。
+
+指标：概率为softmax(mean_channel_logits)[...,1]，logit为l1-l0，分别逐序列调用官方get_metrics_optimized（默认fast，F1_T分位点800、chunk25、worker4/4）或get_metrics（default模式）。后者与fast不是可混用的同一预算。保留官方mean+3std的pred参数传法；具体阈值型函数仍搜索测试标签上的oracle阈值，不能称validation-only，也不修改训练早停。官方某些内部计算异常返回0，本入口保留该行为；返回字段缺失/非有限数则失败，不把失败自动剔除后报完整结果。PA/事件指标不是固定0.5阈值F1。VUS沿用version=opt、阈值数250；不拼接不同序列、不降采样。
+
+产物：metrics/per_series.csv逐完成行落盘，包含domain/group/series/score_kind/长度/异常点数/周期/边界及16指标；group_mean_metrics.csv按组，domain_summary.csv分列series_macro与group_macro，eval.json保存相同嵌套汇总。真实侧group_macro是先组内平均再11组等权平均，series_macro会受各组条数影响；官方main只输出逐序列CSV，额外汇总属于本项目透明展示。合成侧为序列等权均值，不是全点拼接分数。合成与真实不合并为一个总分。
+
+evaluation_manifest.json记录评测参数、checkpoint哈希/epoch、执行源码哈希、逐真实CSV哈希/清单、合成留出索引哈希、阈值/异常回退约定；eval_config.json为实际协议。scores/*.npz包含value/label/anomaly_score/logits（默认保存，可通过save_scores关闭）。eval.log先记录准备阶段，再记录序列推理/两类分数计算及完成，完整pickle准备阶段可能耗时。CPU线程数1只在本次评测进程设置，不修改其他训练进程；没有自动更改训练batch、采样器、mask或损失。
+
+--eval-max-synthetic/--eval-max-real只截取稳定顺序前N条；真实清单仍先检查完整700条，合成pickle仍全量读取。full_benchmark表示两侧均完整；改变窗口/batch/metrics_mode/F1_T参数/评测seed时official_default_parameters=false。这些标记不替代比较时的完整参数核对。逐序列处理异常时写eval_failure.json并保留已完成CSV/分数；入口捕获异常并标failed，KeyboardInterrupt标aborted。依赖/准备阶段失败可能尚无eval_failure.json；不生成成功eval.json，无自动跳过或resume。all仍会训练后跑完整eval，train不会。当前只有CPU合成与官方数值对照，不声称完整数据或GPU评测已完成。
+
+## 2026-11-12代码清理完成
+
+全量引用核查及逐文件保留理由见audits/eval_20261112/CODE_REVIEW.md，cleanup_proposal.diff对应用户确认后已应用的代码改动。已删除MODES/config_to_json/Optional及两隐藏备份目录共11文件；不生效配置字段本轮保留。执行证据见cleanup_execution.json，CPU回归87通过、6项因需GPU跳过。bench既有计时限制、schema校验边界及未实现功能不在本次评测实现中顺带修改。本次清理未操作P0 ignore进程或其产物，现存run/registry不属于清理对象。

@@ -1,0 +1,159 @@
+{
+  "status": "completed",
+  "authorized_by": "user: 按照你的建议清理",
+  "started_utc": "2026-11-12T10:10:50.029503+00:00",
+  "deleted_files": [
+    {
+      "path": ".backup_bucket_20261110/audit.py",
+      "bytes": 2210,
+      "sha256": "3821257330b4e36b8e8a316377d74178c10507df719adfbb375b59fd81176fd0"
+    },
+    {
+      "path": ".backup_bucket_20261110/config.py",
+      "bytes": 4067,
+      "sha256": "8e3588a24a0fe3f5bde20242b413b1ec75f771f3ef61507e17eb29fffe35ddbf"
+    },
+    {
+      "path": ".backup_bucket_20261110/data.py",
+      "bytes": 4247,
+      "sha256": "3b8e78a7d50b145c2bd15a41c5560ef97d8f9bcb4fa3833b17036e729919511d"
+    },
+    {
+      "path": ".backup_bucket_20261110/p0_mask_x.json",
+      "bytes": 1395,
+      "sha256": "40d0453677b078085017f610b2e7d69bfa394a8b90f358d211a094be6d6d8277"
+    },
+    {
+      "path": ".backup_bucket_20261110/p0_mask_x_padding_official.json",
+      "bytes": 1397,
+      "sha256": "d068bb4660ef8e56d93db392513efee4ea1e2b206230b4b65e2d13907868075b"
+    },
+    {
+      "path": ".backup_bucket_20261110/p1_full_x.json",
+      "bytes": 1393,
+      "sha256": "3035ac50a9ab786d3bfe4f70545e703e23fd24f89ef6842f127a348ab7d25cf2"
+    },
+    {
+      "path": ".backup_bucket_20261110/p1_full_x_padding_official.json",
+      "bytes": 1395,
+      "sha256": "bc7ed01b357796322e09bd1d6ea32cfb661f8460e43da152c9fe689c5e7a724b"
+    },
+    {
+      "path": ".backup_bucket_20261110/p2_full_x0.json",
+      "bytes": 1395,
+      "sha256": "cbd845099fe4d2c2fa5e9312786afaedfe59cc3f5f357a5467510f51fc52bbe3"
+    },
+    {
+      "path": ".backup_bucket_20261110/p2_full_x0_padding_official.json",
+      "bytes": 1397,
+      "sha256": "b7801ee58ede17eecdea76e9596e5b373cf11fd8e86e69b2322920b685e2939e"
+    },
+    {
+      "path": ".backup_bucket_20261110/train.py",
+      "bytes": 9153,
+      "sha256": "edc0596e114fbd950e95d6756bde4c3cd8d4daae08698212d0417c4dcbd38310"
+    },
+    {
+      "path": ".backup_spike_20261111/audits_README.md",
+      "bytes": 2118,
+      "sha256": "ebc6da01705d499e07c91f7b4aedc69dd540b04f9420b85800d645c775d3e3c0"
+    }
+  ],
+  "code_edits": [
+    {
+      "path": "src/config.py",
+      "before_sha256": "3c3702d2f87bb8b6251cdf125677770f69cb56e96176cac3fe946a2eff8dcb7c",
+      "proposed_after_sha256": "91e76eec8dff152fcf2aa69a33c73d1716a207639326fa3a181366a03ff7014d"
+    },
+    {
+      "path": "src/models.py",
+      "before_sha256": "5344a86c919b388d9c757daabf7b008d85bce90d93082e893b79e895ea78ca4a",
+      "proposed_after_sha256": "fe97f704e06bd1af2bfc65e3321e551b165426e74b6b02c711c6821c01966407"
+    }
+  ],
+  "protected_sha256": {
+    "experiments/ablation_v9/src/train.py": "900c2ef372e53501494d9eaf557b9c08a7af8a9a28e108e9fbea12727fe7c552",
+    "experiments/ablation_v9/src/benchmark_eval.py": "3e128c4403f7764caccfab9e45023c6974d274b289f4dd2f6fe5f8483345d725",
+    "experiments/ablation_v9/src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/ablation_v9/src/evaluate.py": "eb71210613880f420292f9b28b65421605d1c6fce639650cc0d8118d6b5c2343",
+    "experiments/ablation_v9/src/data.py": "ab155e5d4b4b11e363ea5e080789105a93227a893a04b15a06163b27c38a6f41",
+    "experiments/ablation_v9/src/audit.py": "d86fdea9b3faacb77ea15f299df0a226dbc0f8954619ff95ca579e8428237ac0",
+    "experiments/ablation_v9/src/sampling.py": "439993e7b25cc05233228a8a7581080dff21dff7320d7f49523ed71606c271dc",
+    "experiments/ablation_v9/src/reporting.py": "70b5af635ceb5b625e2451c4a566434ab8d79b2130a508c7e2da069e82c89086",
+    "experiments/ablation_v9/src/parallel.py": "e0ac55c40ac47b674100c2c0d3d0944a2ccb831ac148abd58caa8407aa616997",
+    "experiments/ablation_v9/src/losses.py": "7db92a4c3190fc000e7fec7c6fb0639df5a1d99b1fb19dd2f51246e09972af4a",
+    "experiments/ablation_v9/tests/test_sampling_contract.py": "95a4ea8b50b7201c29504aa7660e1b925c470edabe4f5cf2d57370baa7025db2",
+    "experiments/ablation_v9/tests/test_bench_contract.py": "fb267642c81a0457b75d8f9f84ef427806d478e8e541fdacd3d6ee4a7009fe94",
+    "experiments/ablation_v9/tests/test_parallel_contract.py": "c6c3a478a5c9458a6eb9a1c7f03153348eebbd2f8a8eb9257f9d629c63c2ce7e",
+    "experiments/ablation_v9/tests/conftest.py": "6b0f1c1bd3dbe96460fcb75a3db1705a0cd6482ac8e3e3e321be3fd739f790c0",
+    "experiments/ablation_v9/tests/run_checks.py": "cbc7eec7890fdd5c0fa107272d5d76ae29c7d25dce54186365b479215131b0bd",
+    "experiments/ablation_v9/tests/test_bucket_sampler.py": "940658f70972eeac5b0fe1b139c26db85560c6459da64c07612a6113ec019849",
+    "experiments/ablation_v9/tests/test_benchmark_eval.py": "da379ad51fa6a9d1da9311196beac7ce231ae8b60c608ed58b0c3ea06ff28f55",
+    "experiments/ablation_v9/tests/test_config_contract.py": "3f9aaf14af15908f22f60a1c212c7e084f685fee9acc917e7bca15474bd0cd19",
+    "experiments/ablation_v9/tests/test_loss_contract.py": "8abf01aca10bfb20aca762a3e50d0d328441a0d04d6e5f3f34cdb082f8c0cd5c",
+    "experiments/ablation_v9/tests/test_patch_parity.py": "d01bd3bc3ec6600bd784368ec3255310124173fa703541fdd6ddc16ec95fba7f",
+    "experiments/ablation_v9/tests/test_padding_contract.py": "c614c30e3f260b5b92382b3dc78883e4f494cb5efb6e3ff1020aefcea4368bc5",
+    "experiments/ablation_v9/configs/eval_official.json": "94488eb530c791ff866503bbb2fa79f038849e21e27cfcd844ab5e2bebbed6f7",
+    "experiments/ablation_v9/configs/p0_mask_x_padding_official.json": "93d9420b780ed21330e7fcccfe7a69bc5a6693fe3f2cbb23c9f5b346894f9139",
+    "experiments/ablation_v9/configs/p1_full_x.json": "9074312c1ee738b75695601b0b1a0789feddc7ab1769612413962822c6f3ba7b",
+    "experiments/ablation_v9/configs/p0_mask_x.json": "9b6af0560b512a404074c48d17b576be5310986f379fe6dce7cb36083f3cf297",
+    "experiments/ablation_v9/configs/p1_full_x_padding_official.json": "a37735270808f9ed7ba57056028ccf2ea0b17ae0454f00ce5239a142bcebb471",
+    "experiments/ablation_v9/configs/p2_full_x0_padding_official.json": "390fcb9159b31c03f033dbaa7b8796159019804715e9c77453b3280d9d8ca7a4",
+    "experiments/ablation_v9/configs/p2_full_x0.json": "3a7ab1e61495fa0e65cd72194fecd8b413ea60d25c09319c7e363ff75072c289",
+    "experiments/ablation_v9/audits/eval_20261112/sources/upstream_utils_slidingWindows.py": "07d85ee90eac21c3a4b0642ed45b0245f0325639b087213842752c2337af0563",
+    "experiments/ablation_v9/audits/eval_20261112/sources/upstream_evaluation_metrics.py": "2ecb21799d5e3531bd90af7e38ff1b7f5822721cf0a2212578f28bbfd3f4aa1a",
+    "experiments/ablation_v9/audits/eval_20261112/sources/upstream_HP_list.py": "d08c97eb67e67c3370e00acb27fbbd7819c689f7948b5ff3e1022c724d43c66f",
+    "experiments/ablation_v9/audits/eval_20261112/sources/upstream_utils_dataset.py": "19ce39599c9f2ee2684fb57a6af115992d7f29deaa7b4f7aa3b89c14e9a0f34a",
+    "experiments/ablation_v9/audits/eval_20261112/sources/upstream_main.py": "6a74ce860fa364f3adb2d52c1bab81084f13d6787d2faa4e90d5e08c5dd9a16e",
+    "experiments/ablation_v9/audits/eval_20261112/sources/upstream_evaluation_basic_metrics.py": "68200449af2082f647a61a68c9417cdc587815ddfa7a1ee81cadc0faba035439",
+    "experiments/ablation_v9/audits/eval_20261112/sources/upstream_models_TimeRCD.py": "a5a2bbd7790c346157a427dc836454a47568c10baaa1feb5d2cc4ffcfbc1f627",
+    "experiments/ablation_v9/audits/patch_20261110/sources/upstream_main_library.py": "f05b70d9daaf2f5d4e2867cb2d6daa0b235d5d3941bbc0862eff71614b349028",
+    "experiments/ablation_v9/audits/patch_20261110/sources/upstream_training.py": "311bfc8eece430c99a8fc4fac0bcc24b877ec9193f8d3292214611887a238b23",
+    "experiments/ablation_v9/audits/patch_20261110/sources/time_rcd_config.py": "ebfeac0a971dc784d47d9c01a0622ebadaf46f9e41588f37f610d746dce8c967",
+    "experiments/ablation_v9/audits/patch_20261110/sources/local_training.py": "2b10b05c2811b5dc07f655c26d380e018cb254497707025be3ec586fa1107f56",
+    "experiments/ablation_v9/audits/patch_20261110/sources/upstream_encoder.py": "04f07035dc99940db923c3524a479056b601d192ab937cdc6ca00499962f4c4c",
+    "experiments/ablation_v9/audits/patch_20261110/sources/train_400k.py": "2e402934e8d183a762de3665c6a96f830e692e710f00eed6bb653bd06787c3f7",
+    "experiments/ablation_v9/run_experiment.py": "b3ce85fbe104b4b692eb70c1eb5d92b8ea62a40e993b8fa57cf14ae43f2b9506"
+  },
+  "optional_keys_retained": [
+    "runtime.mixed_precision",
+    "evaluation.threshold_source"
+  ],
+  "touched_runs_registry_data_weights": false,
+  "git_status_before": " M AGENTS.md\n M README.md\n M experiments/MIGRATION.md\n M experiments/README.md\n M experiments/ablation_v9/EXPERIMENT_SPEC.md\n M experiments/ablation_v9/IMPLEMENTATION_DIFF.md\n M experiments/ablation_v9/README.md\n M experiments/ablation_v9/RUNTIME_NOTES.md\n M experiments/ablation_v9/audits/README.md\n M experiments/ablation_v9/registry/experiments.jsonl\n M experiments/ablation_v9/run_experiment.py\n M experiments/ablation_v9/tests/test_config_contract.py\n M experiments/original_400k/EXPERIMENT_NOTES.md\n M \"\\345\\256\\236\\351\\252\\214\\350\\256\\260\\345\\275\\225.md\"\n M \"\\346\\226\\271\\346\\263\\225\\350\\256\\276\\350\\256\\241.md\"\n M \"\\347\\240\\224\\347\\251\\266\\351\\227\\256\\351\\242\\230\\345\\222\\214\\346\\200\\235\\350\\267\\257.md\"\n?? experiments/ablation_v9/.backup_spike_20261111/\n?? experiments/ablation_v9/.tmp_cleanup_confirmed/\n?? experiments/ablation_v9/audits/eval_20261112/\n?? experiments/ablation_v9/audits/spike_20261111/\n?? experiments/ablation_v9/configs/eval_official.json\n?? experiments/ablation_v9/requirements-eval.txt\n?? experiments/ablation_v9/src/benchmark_eval.py\n?? experiments/ablation_v9/tests/test_benchmark_eval.py\n",
+  "code_cleanup_utc": "2026-11-12T10:10:50.044827+00:00",
+  "protected_hashes_unchanged": true,
+  "removed_backup_directories": [
+    ".backup_bucket_20261110",
+    ".backup_spike_20261111"
+  ],
+  "cpu_regression": {
+    "exit_code": 0,
+    "output": "cleanup_cpu_tests.txt",
+    "checked_utc": "2026-11-12T10:11:17.139240+00:00",
+    "cuda_visible_devices": "-1"
+  },
+  "completed_utc": "2026-11-12T10:12:30.393058+00:00",
+  "completed_local": "2026-11-12T18:12:30.393088+08:00",
+  "documents_updated": [
+    "AGENTS.md",
+    "experiments/MIGRATION.md",
+    "experiments/ablation_v9/EXPERIMENT_SPEC.md",
+    "experiments/ablation_v9/IMPLEMENTATION_DIFF.md",
+    "experiments/ablation_v9/RUNTIME_NOTES.md",
+    "experiments/ablation_v9/audits/README.md",
+    "experiments/original_400k/EXPERIMENT_NOTES.md",
+    "experiments/ablation_v9/audits/eval_20261112/CODE_REVIEW.md",
+    "实验记录.md"
+  ],
+  "final_checks": {
+    "python_files_parsed": 37,
+    "maintenance_markdown_files": 42,
+    "readme_bash_blocks_passed": 16,
+    "no_machine_paths_in_markdown": true,
+    "protected_42_hashes_unchanged": true,
+    "edited_source_hashes_match_reviewed_diff": true,
+    "all_11_candidates_absent": true
+  },
+  "task_temporary_directory_removed": true
+}

@@ -1,0 +1,89 @@
+{
+  "status": "executed_after_user_confirmation",
+  "scope": "experiments/ablation_v9",
+  "recommended_delete_files": [
+    {
+      "path": ".backup_bucket_20261110/audit.py",
+      "bytes": 2210,
+      "sha256": "3821257330b4e36b8e8a316377d74178c10507df719adfbb375b59fd81176fd0"
+    },
+    {
+      "path": ".backup_bucket_20261110/config.py",
+      "bytes": 4067,
+      "sha256": "8e3588a24a0fe3f5bde20242b413b1ec75f771f3ef61507e17eb29fffe35ddbf"
+    },
+    {
+      "path": ".backup_bucket_20261110/data.py",
+      "bytes": 4247,
+      "sha256": "3b8e78a7d50b145c2bd15a41c5560ef97d8f9bcb4fa3833b17036e729919511d"
+    },
+    {
+      "path": ".backup_bucket_20261110/p0_mask_x.json",
+      "bytes": 1395,
+      "sha256": "40d0453677b078085017f610b2e7d69bfa394a8b90f358d211a094be6d6d8277"
+    },
+    {
+      "path": ".backup_bucket_20261110/p0_mask_x_padding_official.json",
+      "bytes": 1397,
+      "sha256": "d068bb4660ef8e56d93db392513efee4ea1e2b206230b4b65e2d13907868075b"
+    },
+    {
+      "path": ".backup_bucket_20261110/p1_full_x.json",
+      "bytes": 1393,
+      "sha256": "3035ac50a9ab786d3bfe4f70545e703e23fd24f89ef6842f127a348ab7d25cf2"
+    },
+    {
+      "path": ".backup_bucket_20261110/p1_full_x_padding_official.json",
+      "bytes": 1395,
+      "sha256": "bc7ed01b357796322e09bd1d6ea32cfb661f8460e43da152c9fe689c5e7a724b"
+    },
+    {
+      "path": ".backup_bucket_20261110/p2_full_x0.json",
+      "bytes": 1395,
+      "sha256": "cbd845099fe4d2c2fa5e9312786afaedfe59cc3f5f357a5467510f51fc52bbe3"
+    },
+    {
+      "path": ".backup_bucket_20261110/p2_full_x0_padding_official.json",
+      "bytes": 1397,
+      "sha256": "b7801ee58ede17eecdea76e9596e5b373cf11fd8e86e69b2322920b685e2939e"
+    },
+    {
+      "path": ".backup_bucket_20261110/train.py",
+      "bytes": 9153,
+      "sha256": "edc0596e114fbd950e95d6756bde4c3cd8d4daae08698212d0417c4dcbd38310"
+    },
+    {
+      "path": ".backup_spike_20261111/audits_README.md",
+      "bytes": 2118,
+      "sha256": "ebc6da01705d499e07c91f7b4aedc69dd540b04f9420b85800d645c775d3e3c0"
+    }
+  ],
+  "recommended_code_edits": [
+    {
+      "path": "src/config.py",
+      "before_sha256": "3c3702d2f87bb8b6251cdf125677770f69cb56e96176cac3fe946a2eff8dcb7c",
+      "proposed_after_sha256": "91e76eec8dff152fcf2aa69a33c73d1716a207639326fa3a181366a03ff7014d"
+    },
+    {
+      "path": "src/models.py",
+      "before_sha256": "5344a86c919b388d9c757daabf7b008d85bce90d93082e893b79e895ea78ca4a",
+      "proposed_after_sha256": "fe97f704e06bd1af2bfc65e3321e551b165426e74b6b02c711c6821c01966407"
+    }
+  ],
+  "optional_config_keys": [
+    "runtime.mixed_precision",
+    "evaluation.threshold_source"
+  ],
+  "config_key_recommendation": "retain_this_round",
+  "protected": [
+    "runs/",
+    "registry/",
+    "audits/sources and evidence",
+    "current six training configs",
+    "training implementation",
+    "datasets and weights"
+  ],
+  "execution_record": "cleanup_execution.json",
+  "authorization": "user: 按照你的建议清理",
+  "completed_utc": "2026-11-12T10:12:30.226481+00:00"
+}

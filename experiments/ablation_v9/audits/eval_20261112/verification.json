@@ -1,0 +1,90 @@
+{
+  "protected_unchanged": {
+    "experiments/ablation_v9/src/audit.py": true,
+    "experiments/ablation_v9/src/config.py": true,
+    "experiments/ablation_v9/src/data.py": true,
+    "experiments/ablation_v9/src/evaluate.py": true,
+    "experiments/ablation_v9/src/losses.py": true,
+    "experiments/ablation_v9/src/models.py": true,
+    "experiments/ablation_v9/src/parallel.py": true,
+    "experiments/ablation_v9/src/reporting.py": true,
+    "experiments/ablation_v9/src/sampling.py": true,
+    "experiments/ablation_v9/src/train.py": true,
+    "experiments/ablation_v9/src/__init__.py": true,
+    "experiments/ablation_v9/configs/p0_mask_x.json": true,
+    "experiments/ablation_v9/configs/p0_mask_x_padding_official.json": true,
+    "experiments/ablation_v9/configs/p1_full_x.json": true,
+    "experiments/ablation_v9/configs/p1_full_x_padding_official.json": true,
+    "experiments/ablation_v9/configs/p2_full_x0.json": true,
+    "experiments/ablation_v9/configs/p2_full_x0_padding_official.json": true
+  },
+  "upstream_sha256": {
+    "latest_evaluation_basic_metrics.py": "68200449af2082f647a61a68c9417cdc587815ddfa7a1ee81cadc0faba035439",
+    "latest_evaluation_metrics.py": "2ecb21799d5e3531bd90af7e38ff1b7f5822721cf0a2212578f28bbfd3f4aa1a",
+    "latest_HP_list.py": "d08c97eb67e67c3370e00acb27fbbd7819c689f7948b5ff3e1022c724d43c66f",
+    "latest_main.py": "6a74ce860fa364f3adb2d52c1bab81084f13d6787d2faa4e90d5e08c5dd9a16e",
+    "latest_models_TimeRCD.py": "a5a2bbd7790c346157a427dc836454a47568c10baaa1feb5d2cc4ffcfbc1f627",
+    "latest_utils_dataset.py": "19ce39599c9f2ee2684fb57a6af115992d7f29deaa7b4f7aa3b89c14e9a0f34a",
+    "latest_utils_slidingWindows.py": "07d85ee90eac21c3a4b0642ed45b0245f0325639b087213842752c2337af0563"
+  },
+  "snapshot_integrity": {
+    "latest_evaluation_basic_metrics.py": true,
+    "latest_evaluation_metrics.py": true,
+    "latest_HP_list.py": true,
+    "latest_main.py": true,
+    "latest_models_TimeRCD.py": true,
+    "latest_utils_dataset.py": true,
+    "latest_utils_slidingWindows.py": true
+  },
+  "affiliation_matches_upstream": {
+    "generics.py": true,
+    "metrics.py": true,
+    "_affiliation_zone.py": true,
+    "_integral_interval.py": true,
+    "_single_ground_truth_event.py": true,
+    "__init__.py": true
+  },
+  "local_files_equal_upstream": {
+    "main.py": true,
+    "HP_list.py": true,
+    "utils/dataset.py": true,
+    "utils/slidingWindows.py": true
+  },
+  "real_count": 700,
+  "real_counts_by_group": {
+    "NAB": 28,
+    "WSD": 111,
+    "Stock": 20,
+    "MGAB": 9,
+    "SED": 3,
+    "IOPS": 17,
+    "NEK": 9,
+    "TODS": 15,
+    "Power": 1,
+    "UCR": 228,
+    "YAHOO": 259
+  },
+  "actual_checkpoint_cpu_check": {
+    "epoch": 31,
+    "state_dict_strict_load": true,
+    "parameters": 37056387,
+    "device": "cpu",
+    "inference_executed": false
+  },
+  "p0_pair_config_diff_only": "loss.classification_padding",
+  "readme_bash_blocks": 7,
+  "entry_help": true,
+  "dependencies": {
+    "torch": "2.5.1+cu121",
+    "numpy": "2.2.6",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.15.3",
+    "statsmodels": "0.15.0",
+    "tqdm": "4.68.2"
+  },
+  "gpu_access": false,
+  "full_pickle_loaded": false,
+  "benchmark_executed": false,
+  "training_started_or_modified": false
+}

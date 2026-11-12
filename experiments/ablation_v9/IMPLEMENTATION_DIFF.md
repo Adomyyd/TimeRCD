@@ -1,6 +1,6 @@
 # v9相对原始TimeRCD的实现差异
 
-更新时间：2026-11-11。用于核实当前代码，不将历史补丁按时间堆叠成互相冲突的协议。原始根training.py未因v9改写；400k原流程继续调用它。模型、训练设置和监督需分别核对，P0不是官方全流程复制。
+更新时间：2026-11-12。用于核实当前代码，不将历史补丁按时间堆叠成互相冲突的协议。原始根training.py未因v9改写；400k原流程继续调用它。模型、训练设置和监督需分别核对，P0不是官方全流程复制。
 
 ## 1. 结构与输入/目标
 
@@ -26,7 +26,7 @@
 
 src/losses.py的classification_padding默认ignore：先用valid及labels>=0筛选再二值化；official复现先(labels>0.5).long()再labels!=-1，使padding=-1成为正常0，全部B×T参与CE。三份默认配置显式ignore，三份*_padding_official.json仅该字段不同；旧配置缺省ignore会写入生效快照。
 
-开关不改模型、输入、attention、补齐、重构项、初始化或优化器。train/smoke/eval传递模式，日志、检查点、验证和结果记录模式及分母；audit协议字段随模式变化，避免official仍误报已过滤padding。
+开关不改模型、输入、attention、补齐、重构项、初始化或优化器。train/smoke/训练验证传递模式，日志、检查点、验证和结果记录模式及分母；audit协议字段随模式变化，避免official仍误报已过滤padding。
 
 两模式共同按valid_total早停/选best，保留目标loss供诊断；ignore时与原total一致。检测指标始终排除padding。该选择协议用于隔离训练padding作用，与原脚本直接按其验证目标loss选best的行为须区分。
 
@@ -42,11 +42,11 @@ src/losses.py的classification_padding默认ignore：先用valid及labels>=0筛�
 | 验证M | 随全局随机流变化 | evaluation.validation_mask_seed固定 |
 | padding CE | 官方行为 | ignore默认/official可选 |
 | 最佳选择 | 原目标验证loss | 共同valid_total |
-| eval | 原比较脚本可做外部TSB-AD | 当前仅合成语料随机验证侧、分区域误差/复制基线与点级指标 |
+| eval | 官方main逐真实CSV推理/指标 | 统一eval/all评测合成留出+同一官方单变量TSB-AD-U协议，另输出可追溯汇总；训练验证不改 |
 
 分桶由src/data.py的LengthBucketBatchSampler及src/train.py的_build_train_loader实现；池大小为batch_size×bucket_multiplier，当前32×50=1600，每轮覆盖一次并保留尾批。380000条训练数据对应11875步。批组成会改变全batch标准化、损失加权和SGD顺序；训练padding减少也改变padding实验的效应范围。
 
-因此历史400k与P0的loss差异不能只归因于padding或mask大小。不同目标的总loss也不能直接说明P2优于P1。分组split、外部VUS、密度分层、合法上下文干预与多种子统计尚未在v9完整实现/执行。
+因此历史400k与P0的loss差异不能只归因于padding或mask大小。不同目标的总loss也不能直接说明P2优于P1。外部VUS流程已实现，但本次未执行完整数据评测；分组split审计、密度分层、合法上下文干预与多种子统计仍未实现/执行。
 
 ## 5. 可选并行、日志与运行管理
 
@@ -66,4 +66,14 @@ src/{models,sampling,losses,train,evaluate,parallel,audit,config}.py分别承担
 
 入口另支持--batch-size（在实际config快照前覆盖总batch）和bench专用--max-batches（默认300）。bench读取完整训练数据并执行反向及优化器更新，不验证、不保存训练检查点，也不是smoke；实现限制见RUNTIME_NOTES。
 
-runtime.mixed_precision虽存在于JSON，v9未读取该字段，也没有autocast/GradScaler，不能靠设为true启用AMP。evaluation.threshold_source只是协议记录，当前eval使用logits argmax，没有验证集阈值搜索。schema_version只要求字段存在，未校验具体版本。src/config.py中的MODES未含bench且未被入口使用，实际模式以run_experiment.py的argparse choices为准。当前没有预训练权重初始化、训练resume、B/Z或P3–P5入口；方案中的这些部分仍是后续计划。
+runtime.mixed_precision虽存在于JSON，v9未读取该字段，也没有autocast/GradScaler，不能靠设为true启用AMP。evaluation.threshold_source只是训练协议记录，训练验证用logits argmax；完整eval改用官方oracle搜索，仍没有验证集部署阈值搜索。schema_version只要求字段存在，未校验具体版本。未使用的MODES常量已于用户确认后删除，实际模式由run_experiment.py的argparse choices定义。当前没有预训练权重初始化、训练resume、B/Z或P3–P5入口；方案中的这些部分仍是后续计划。
+
+## 8. 完整评测相对旧eval的变化（2026-11-12）
+
+新增benchmark_eval.py、eval_official.json、requirements-eval.txt及对应测试；run_experiment.py将eval/all接入统一基准，校验checkpoint与训练配置，明确eval的checkpoint参数。原evaluate_model保留作训练验证，train.py/模型/损失/采样及六训练JSON均未改。新评测完整输入，检测分数与官方一致；X0不用于推理或检测指标。根官方指标/数据处理代码未改，本次仅复用；两处历史F1_T执行修正与固定官方源码作数值对照。
+
+官方对齐版本d458549；逐字节主脚本核对、数据选择、预处理/尾窗口/概率及logit、16指标测试见audits/eval_20261112。官方main只写逐序列结果；本项目新增组均值/组等权宏平均/序列宏平均及合成侧同协议评测，是额外编排，不声称官方原脚本已经包含合成评测和这些汇总。训练seed/验证mask/选best不跟随评测seed2024改变。两侧全量评测尚未启动。
+
+## 9. 冗余代码核查（2026-11-12）
+
+已核查入口、全部src/tests与历史sources的引用。用户确认后已删除MODES、config_to_json和models.Optional，以及两隐藏备份目录共11文件。runtime.mixed_precision/evaluation.threshold_source为不生效配置记录，本轮保留。报告、已应用补丁和执行记录见audits/eval_20261112/CODE_REVIEW.md、cleanup_proposal.diff与cleanup_execution.json。evaluate.py、reporting.py、缓存、并行和审计来源均有职责，不因新eval加入而删除。

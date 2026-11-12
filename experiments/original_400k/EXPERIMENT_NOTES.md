@@ -51,3 +51,7 @@ generate、compare不会与训练自动串联，均需明确任务授权再执�
 ## 2026-11-11代码核对
 
 当前generate/train/compare及固定GPU0、batch16、默认latest恢复行为仍与上述说明一致。compare仅匹配代码列出的11组TSB-AD-U文件，逐序列错误写error并继续，汇总只用成功行；不能把退出成功等同所有文件成功，也不能把该阈值实现视为已满足v9计划的验证集阈值协议。生成器和compare所需依赖已补到README，pip install .只覆盖公开推理API的基础依赖。根实验记录中的当前P0启动不改变本路线“已停止”的历史事实。
+
+## 2026-11-12范围复核
+
+本路线generate/train/compare及上述停止状态没有因v9评测更新而改变。合成留出与官方TSB-AD-U统一eval新增于并列的ablation_v9，使用v9配置和检查点；不能将本路线compare或原流程模型直接当作v9兼容检查点。v9运行快照与已确认的代码清理事实见根实验记录第14–16节。

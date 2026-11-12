@@ -10,7 +10,6 @@ from .losses import validate_classification_padding
 
 
 VARIANTS = {"p0_mask_x", "p1_full_x", "p2_full_x0"}
-MODES = {"audit", "smoke", "train", "eval", "report", "all"}
 BATCH_SAMPLERS = {"sequential", "length_bucket"}
 
 
@@ -106,6 +105,3 @@ def validate_config(raw: dict[str, Any]) -> None:
         raise ValueError("data paths must be provided")
     validate_parallel_config(raw)
 
-
-def config_to_json(config: ExperimentConfig) -> str:
-    return json.dumps(config.raw, ensure_ascii=False, indent=2) + "\n"

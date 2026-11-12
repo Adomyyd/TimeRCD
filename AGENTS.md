@@ -19,6 +19,7 @@
 - 模型patch与遮挡块独立配置，默认16/16，比例0.15。配置类初始默认4不是当前单卡400k的运行值。
 - padding是独立消融轴：ignore过滤分类padding，official复现官方行为；同一配对除该项外保持一致。历史400k不能单独隔离padding效应。
 - DataParallel的batch_size指总batch，标准化和mask在分卡前生成、损失在汇总后计算。检查点保存完整未封装模型状态。
+- 完整检测评测由v9统一入口的eval/all执行，使用独立eval_official.json；训练验证仍在evaluate.py。官方协议固定到d458549，合成留出与单变量TSB-AD-U逐序列计算相同指标；oracle F1与部署阈值区分，限制条数明确标子集。audits/eval_20261112/sources也是数值回归依赖，不当作无用源码清理。
 - 数据生成配置维持当前决定。实验初始化、划分、种子、权重、步数、评价与停止条件必须可追溯；不把重构改善当作检测、解耦或上下文利用的证明。
 
 ## 文档与资产
@@ -33,6 +34,7 @@
 
 - `研究问题和思路.md`：问题、假设、相关工作与结论边界；`方法设计.md`：计算图、监督与对照；`实验记录.md`：当前状态、执行事实、证据与下一步。
 - 用户用法写在各路线README；v9结构规范、运行语义、原版差异分别写在EXPERIMENT_SPEC、RUNTIME_NOTES、IMPLEMENTATION_DIFF。原流程细节写在EXPERIMENT_NOTES；实验进展汇总到根实验记录，避免持续追加相互矛盾的旧说明。
+- v9冗余代码核查已完成，范围与精确补丁见`experiments/ablation_v9/audits/eval_20261112/CODE_REVIEW.md`；用户确认后已删除11个历史备份文件及MODES/config_to_json/Optional三处无用代码；两个占位配置字段保留，执行证据见同目录cleanup_execution.json。自己的任务临时文件按下述收尾规则处理。
 - 数据、权重、日志、run配置快照、registry和审计证据视为用户资产。清理前核实引用和影响；不为整理而删除、改写或移动已有run。
 - `experiments/_archive/`存放旧文档、重复备份及一次性操作脚本，不是训练入口。旧数据/manifest/runs兼容链接仍被历史快照引用，须保留。
 - `experiments/ablation_v9/audits/patch_20261110/sources/`是回归测试依赖的官方/历史源码快照，不是无用副本；不得当作当前实现执行或随意删除。

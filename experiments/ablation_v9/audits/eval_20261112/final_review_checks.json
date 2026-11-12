@@ -1,0 +1,231 @@
+{
+  "status": "passed",
+  "python_files_parsed": 41,
+  "documentation_files_checked": 43,
+  "forbidden_doc_locations": [],
+  "readme_bash_checks": [
+    {
+      "path": "README.md",
+      "block": 1,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "dataset_gen/README.md",
+      "block": 1,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "dataset_gen/README.md",
+      "block": 2,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/README.md",
+      "block": 1,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/README.md",
+      "block": 2,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/ablation_v9/README.md",
+      "block": 1,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/ablation_v9/README.md",
+      "block": 2,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/ablation_v9/README.md",
+      "block": 3,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/ablation_v9/README.md",
+      "block": 4,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/ablation_v9/README.md",
+      "block": 5,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/ablation_v9/README.md",
+      "block": 6,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/ablation_v9/README.md",
+      "block": 7,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/original_400k/README.md",
+      "block": 1,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/original_400k/README.md",
+      "block": 2,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/original_400k/README.md",
+      "block": 3,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "path": "experiments/original_400k/README.md",
+      "block": 4,
+      "passed": true,
+      "error": ""
+    }
+  ],
+  "readme_links": [
+    {
+      "from": "README.md",
+      "target": "experiments/original_400k/README.md",
+      "exists": true
+    },
+    {
+      "from": "README.md",
+      "target": "experiments/ablation_v9/README.md",
+      "exists": true
+    },
+    {
+      "from": "README.md",
+      "target": "experiments/README.md",
+      "exists": true
+    },
+    {
+      "from": "README.md",
+      "target": "Tutorial.md",
+      "exists": true
+    },
+    {
+      "from": "README.md",
+      "target": "dataset_gen/README.md",
+      "exists": true
+    },
+    {
+      "from": "README.md",
+      "target": "LICENSE",
+      "exists": true
+    },
+    {
+      "from": "dataset_gen/README.md",
+      "target": "../experiments/original_400k/README.md",
+      "exists": true
+    },
+    {
+      "from": "experiments/README.md",
+      "target": "original_400k/README.md",
+      "exists": true
+    },
+    {
+      "from": "experiments/README.md",
+      "target": "ablation_v9/README.md",
+      "exists": true
+    }
+  ],
+  "protected_training_hashes": {
+    "experiments/ablation_v9/src/audit.py": {
+      "expected": "d86fdea9b3faacb77ea15f299df0a226dbc0f8954619ff95ca579e8428237ac0",
+      "actual": "d86fdea9b3faacb77ea15f299df0a226dbc0f8954619ff95ca579e8428237ac0"
+    },
+    "experiments/ablation_v9/src/config.py": {
+      "expected": "3c3702d2f87bb8b6251cdf125677770f69cb56e96176cac3fe946a2eff8dcb7c",
+      "actual": "3c3702d2f87bb8b6251cdf125677770f69cb56e96176cac3fe946a2eff8dcb7c"
+    },
+    "experiments/ablation_v9/src/data.py": {
+      "expected": "ab155e5d4b4b11e363ea5e080789105a93227a893a04b15a06163b27c38a6f41",
+      "actual": "ab155e5d4b4b11e363ea5e080789105a93227a893a04b15a06163b27c38a6f41"
+    },
+    "experiments/ablation_v9/src/evaluate.py": {
+      "expected": "eb71210613880f420292f9b28b65421605d1c6fce639650cc0d8118d6b5c2343",
+      "actual": "eb71210613880f420292f9b28b65421605d1c6fce639650cc0d8118d6b5c2343"
+    },
+    "experiments/ablation_v9/src/losses.py": {
+      "expected": "7db92a4c3190fc000e7fec7c6fb0639df5a1d99b1fb19dd2f51246e09972af4a",
+      "actual": "7db92a4c3190fc000e7fec7c6fb0639df5a1d99b1fb19dd2f51246e09972af4a"
+    },
+    "experiments/ablation_v9/src/models.py": {
+      "expected": "5344a86c919b388d9c757daabf7b008d85bce90d93082e893b79e895ea78ca4a",
+      "actual": "5344a86c919b388d9c757daabf7b008d85bce90d93082e893b79e895ea78ca4a"
+    },
+    "experiments/ablation_v9/src/parallel.py": {
+      "expected": "e0ac55c40ac47b674100c2c0d3d0944a2ccb831ac148abd58caa8407aa616997",
+      "actual": "e0ac55c40ac47b674100c2c0d3d0944a2ccb831ac148abd58caa8407aa616997"
+    },
+    "experiments/ablation_v9/src/reporting.py": {
+      "expected": "70b5af635ceb5b625e2451c4a566434ab8d79b2130a508c7e2da069e82c89086",
+      "actual": "70b5af635ceb5b625e2451c4a566434ab8d79b2130a508c7e2da069e82c89086"
+    },
+    "experiments/ablation_v9/src/sampling.py": {
+      "expected": "439993e7b25cc05233228a8a7581080dff21dff7320d7f49523ed71606c271dc",
+      "actual": "439993e7b25cc05233228a8a7581080dff21dff7320d7f49523ed71606c271dc"
+    },
+    "experiments/ablation_v9/src/train.py": {
+      "expected": "900c2ef372e53501494d9eaf557b9c08a7af8a9a28e108e9fbea12727fe7c552",
+      "actual": "900c2ef372e53501494d9eaf557b9c08a7af8a9a28e108e9fbea12727fe7c552"
+    },
+    "experiments/ablation_v9/src/__init__.py": {
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/ablation_v9/configs/p0_mask_x.json": {
+      "expected": "9b6af0560b512a404074c48d17b576be5310986f379fe6dce7cb36083f3cf297",
+      "actual": "9b6af0560b512a404074c48d17b576be5310986f379fe6dce7cb36083f3cf297"
+    },
+    "experiments/ablation_v9/configs/p0_mask_x_padding_official.json": {
+      "expected": "93d9420b780ed21330e7fcccfe7a69bc5a6693fe3f2cbb23c9f5b346894f9139",
+      "actual": "93d9420b780ed21330e7fcccfe7a69bc5a6693fe3f2cbb23c9f5b346894f9139"
+    },
+    "experiments/ablation_v9/configs/p1_full_x.json": {
+      "expected": "9074312c1ee738b75695601b0b1a0789feddc7ab1769612413962822c6f3ba7b",
+      "actual": "9074312c1ee738b75695601b0b1a0789feddc7ab1769612413962822c6f3ba7b"
+    },
+    "experiments/ablation_v9/configs/p1_full_x_padding_official.json": {
+      "expected": "a37735270808f9ed7ba57056028ccf2ea0b17ae0454f00ce5239a142bcebb471",
+      "actual": "a37735270808f9ed7ba57056028ccf2ea0b17ae0454f00ce5239a142bcebb471"
+    },
+    "experiments/ablation_v9/configs/p2_full_x0.json": {
+      "expected": "3a7ab1e61495fa0e65cd72194fecd8b413ea60d25c09319c7e363ff75072c289",
+      "actual": "3a7ab1e61495fa0e65cd72194fecd8b413ea60d25c09319c7e363ff75072c289"
+    },
+    "experiments/ablation_v9/configs/p2_full_x0_padding_official.json": {
+      "expected": "390fcb9159b31c03f033dbaa7b8796159019804715e9c77453b3280d9d8ca7a4",
+      "actual": "390fcb9159b31c03f033dbaa7b8796159019804715e9c77453b3280d9d8ca7a4"
+    }
+  },
+  "cleanup_candidates_still_present": true,
+  "cleanup_applied": false,
+  "backup_file_count": 11,
+  "backup_total_bytes": 30167,
+  "existing_cpu_suite": {
+    "passed": 87,
+    "skipped_requires_gpu": 6,
+    "rerun_for_document_only_changes": false
+  },
+  "task_temporary_directory_removed": true
+}

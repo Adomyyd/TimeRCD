@@ -16,13 +16,13 @@ Git代码仓库不包含训练数据、官方权重和完整检查点，须通�
 | 原流程续训检查点 | experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/ | 保留latest/best及其原始日志、配置 |
 | v9现有检查点与日志 | experiments/ablation_v9/runs/ | 只迁移实际存在的run；旧P0目录本次未找到，不能假设可恢复；eval可加载完整模型，无resume |
 | 官方单变量/多变量权重 | best_model/ | 官方推理或原流程对比 |
-| 原流程外部检测数据 | datasets/TSB-AD-U/ | 仅compare需要，smoke不需要 |
+| 原流程外部检测数据 | datasets/TSB-AD-U/ | 原流程compare与v9 eval/all需要，smoke不需要 |
 
 历史符号链接和历史JSON中的位置只是原环境记录。新机器使用上表真实目录；不要依赖旧链接，也不要为迁移修改历史配置快照或重生成一份不同的400k数据。manifest中的旧位置字段不影响数据内容身份，应结合文件大小和已有校验值核对。大型文件校验按实际需要单独执行。
 
 ## v9配置与路径
 
-直接使用`experiments/ablation_v9/configs/`中的六份JSON，不生成本机副本。源配置的数据和manifest字段使用仓库相对路径，数据准备在上表目录即可跨机器使用。
+直接使用`experiments/ablation_v9/configs/`中的六份训练JSON，不生成本机副本；完整检测评测另用同目录eval_official.json。源配置的数据和manifest字段使用仓库相对路径，数据准备在上表目录即可跨机器使用。
 
 配置读取器将相对数据路径解释为**进程工作目录**下的位置，而非配置文件所在目录，所有命令必须从仓库根目录执行。数据确需另存时，对相关组统一修改`data.path`和`data.manifest_path`，保留实验超参一致；优先沿用约定目录。
 
@@ -33,7 +33,7 @@ Git代码仓库不包含训练数据、官方权重和完整检查点，须通�
 先安装项目与合成检查依赖，再运行无需真实训练数据的回归：
 
 ```bash
-python -m pip install . pytest
+python -m pip install . pytest -r experiments/ablation_v9/requirements-eval.txt
 python experiments/ablation_v9/tests/run_checks.py
 python experiments/original_400k/run_experiment.py --help
 python experiments/ablation_v9/run_experiment.py --help
@@ -65,6 +65,12 @@ python experiments/original_400k/run_experiment.py --mode train
 
 ## 当前配置能力与资产核查
 
-源JSON总batch32、length_bucket50；单卡README例子显式覆盖batch16，双卡保持32。迁移不自动调整batch/采样器，不将不同设置混成配对结果。mixed_precision字段目前不启用AMP；threshold_source不执行阈值拟合。bench会读完整数据并进行优化器更新，不能代替smoke。短程测速摘要、旧run缺失和最新训练启动事实见根实验记录第12节。
+源JSON总batch32、length_bucket50；单卡README例子显式覆盖batch16，双卡保持32。迁移不自动调整batch/采样器，不将不同设置混成配对结果。mixed_precision字段目前不启用AMP；threshold_source不执行阈值拟合。bench会读完整数据并进行优化器更新，不能代替smoke。短程测速摘要、旧run缺失和历史启动事实见根实验记录第12节；P0 official完成与ignore启动快照见第13–14节。
 
 原流程compare额外依赖pandas、scipy、statsmodels、scikit-learn、matplotlib、seaborn和tqdm；仅pip install .不足以覆盖这些实验依赖。生成器依赖见dataset_gen/requirements.txt。原流程CLI自定义--resume要求本机规范化后的检查点位置；默认latest命令无需额外路径。不要把历史源脚本的路径限制迁移到v9的相对配置用法。
+
+## 2026-11-12统一评测与代码审查
+
+v9 eval/all要求完整TSB-AD-U清单（11类700条）；协议、依赖和完整命令见v9 README。迁移训练run的config.json与完整检查点后使用统一入口eval；路径变化时对传入配置和checkpoint内历史data.path的核对需明确处理，不以编辑原checkpoint伪造新来源。完整合成pickle仍会读取；子集参数只减少逐序列评测，不减少加载内存。P0 ignore已由用户启动，不重复启动。
+
+已检查v9活动代码、隐藏备份和审计来源；具体清理范围与保留理由见ablation_v9/audits/eval_20261112/CODE_REVIEW.md。用户确认后已删除两隐藏备份目录内11文件及三处无用代码；当前已无这两个备份目录，两个占位配置字段保留；迁移时仍以实际存在文件为准。官方来源与回归依赖必须随代码迁移，不能只复制src/tests后遗漏audits/sources。

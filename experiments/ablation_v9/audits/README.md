@@ -15,5 +15,12 @@ padding_20261110/REPORT.md历史所指before/已移至`experiments/_archive/2026
 - bucket_review_20261111/REPORT.md：分桶覆盖、配对与bench计时问题审查；当时的文档待办已由后续文档整理处理，算法问题仍未修复。
 - bench_20261111/bench_summary.json：他次短程测速摘要，原四个run目录已移除；不视为完整轮次测量或通用设备结论。
 - docs_review_20261111/REPORT.md：当前代码与全文档核对、失效资产及能力边界、文档检查结果。
+- spike_20261111/REPORT.md：三次loss尖峰（400k epoch11、旧P0 epoch3、当前P0 official epoch1）的日志定位、标准化量级上界核验，以及与官方/论文公式的三处差异；不构成根因结论，逐batch诊断未实现。
 
 旧patch/parallel/padding报告里的batch16、三配置、固定顺序及“未测默认规模”均是当时事实；当前为六配置、源batch32、length_bucket，可选batch覆盖，执行状态见根实验记录。旧P0目录本次未找到，审计不保证其检查点仍可用。
+
+## 2026-11-12索引补充
+
+- eval_20261112/REPORT.md：合成留出与官方单变量TSB-AD-U统一检测评测；固定官方d458549源码、数据清单/推理/16指标数值核对、CPU回归及实际checkpoint兼容检查。sources被test_benchmark_eval.py读取，保留；不把此小测试当成全量检测成绩。
+
+- eval_20261112/CODE_REVIEW.md：v9全部活动代码、隐藏备份、审计来源与文档核查；记录精确范围、保留理由及cleanup_proposal.diff。用户确认后已清理两隐藏备份共11文件和三处无用代码；执行及CPU回归证据见同目录cleanup_execution.json、cleanup_cpu_tests.txt。

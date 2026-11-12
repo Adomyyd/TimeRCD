@@ -1,0 +1,14 @@
+{
+  "protocol_id": "official_uni_d458549",
+  "real_data_dir": "datasets/TSB-AD-U",
+  "window_size": 5000,
+  "inference_batch_size": 64,
+  "metrics_mode": "fast",
+  "heavy_workers": 4,
+  "light_workers": 4,
+  "cpu_threads": 1,
+  "f1_t_n_splits": 800,
+  "f1_t_chunk_size": 25,
+  "seed": 2024,
+  "save_scores": true
+}
