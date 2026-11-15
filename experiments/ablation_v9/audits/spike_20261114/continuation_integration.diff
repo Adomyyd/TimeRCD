@@ -1,0 +1,193 @@
+diff --git a/experiments/ablation_v9/run_experiment.py b/experiments/ablation_v9/run_experiment.py
+index 8f833cc..28d286b 100644
+--- a/experiments/ablation_v9/run_experiment.py
++++ b/experiments/ablation_v9/run_experiment.py
+@@ -37,6 +37,22 @@ def parse_args() -> argparse.Namespace:
+                         help="Batch limit for --mode bench (default 300)")
+     parser.add_argument("--batch-size", type=int, default=None,
+                         help="Override optimization.batch_size before the config snapshot")
++    parser.add_argument("--epochs", type=int, default=None,
++                        help="Override optimization.epochs (e.g. 2 for epoch0+epoch1)")
++    parser.add_argument("--resume-from", help="Epoch-boundary training checkpoint; writes a NEW run")
++    parser.add_argument("--checkpoint-keep-last", type=int, default=None,
++                        help="Keep only the latest N epoch checkpoints plus best and first-event predecessor")
++    parser.add_argument("--log-freq", type=int, default=None,
++                        help="Override console/train.log batch interval; diagnostics always writes every batch")
++    parser.add_argument("--diagnostics", action="store_true",
++                        help="Enable optional per-batch observations and first-event snapshot")
++    parser.add_argument("--diagnostic-reference-epoch0",
++                        help="Compare model/AdamW state after epoch0; optional strict stop flag below")
++    parser.add_argument("--diagnostic-stop-on-mismatch", action="store_true",
++                        help="Stop if the epoch0 reference differs; default records the difference and continues")
++    parser.add_argument("--diagnostic-loss-threshold", type=float, default=10.0)
++    parser.add_argument("--diagnostic-grad-threshold", type=float, default=1000.0)
++    parser.add_argument("--diagnostic-start-epoch", type=int, default=1)
+     parser.add_argument("--checkpoint", help="Checkpoint path for eval mode")
+     parser.add_argument("--eval-config", default=str(HERE / "configs" / "eval_official.json"),
+                         help="Detection evaluation protocol (synthetic held-out + official TSB-AD-U)")
+@@ -49,11 +65,33 @@ def parse_args() -> argparse.Namespace:
+     parser.add_argument("--gpu-ids", type=int, nargs="+", default=None,
+                         help="Visible CUDA device ids for data_parallel; first id gathers outputs")
+     args = parser.parse_args()
++    if args.resume_from and args.mode != "train":
++        parser.error("--resume-from requires --mode train")
++    if args.resume_from and not Path(args.resume_from).is_file():
++        parser.error("resume checkpoint does not exist")
++    if args.checkpoint_keep_last is not None and (args.checkpoint_keep_last < 2 or args.mode != "train"):
++        parser.error("--checkpoint-keep-last requires train mode and a value of at least 2")
+     if args.mode == "eval" and not args.checkpoint:
+         parser.error("--mode eval requires --checkpoint; use the training run's config.json")
+     for name in ("eval_max_synthetic", "eval_max_real"):
+         if getattr(args, name) is not None and getattr(args, name) <= 0:
+             parser.error("evaluation limits must be positive")
++    if (args.diagnostics or args.diagnostic_reference_epoch0) and args.mode != "train":
++        parser.error("diagnostics requires --mode train")
++    if args.diagnostic_stop_on_mismatch and not args.diagnostic_reference_epoch0:
++        parser.error("--diagnostic-stop-on-mismatch requires --diagnostic-reference-epoch0")
++    if args.diagnostic_reference_epoch0 and not args.diagnostics:
++        parser.error("--diagnostic-reference-epoch0 requires --diagnostics")
++    for name in ("epochs", "log_freq"):
++        if getattr(args, name) is not None and getattr(args, name) <= 0:
++            parser.error(f"--{name.replace('_', '-')} must be positive")
++    import math
++    if (args.diagnostic_start_epoch < 0 or
++            not all(math.isfinite(v) and v > 0 for v in
++                    (args.diagnostic_loss_threshold, args.diagnostic_grad_threshold))):
++        parser.error("diagnostic start epoch must be nonnegative; thresholds must be finite and positive")
++    if args.diagnostic_reference_epoch0 and not Path(args.diagnostic_reference_epoch0).is_file():
++        parser.error("diagnostic reference checkpoint does not exist")
+     return args
+ 
+ 
+@@ -148,6 +186,22 @@ def apply_runtime_overrides(config: ExperimentConfig, args: argparse.Namespace)
+     batch_size = getattr(args, "batch_size", None)
+     if batch_size is not None:
+         config.raw["optimization"]["batch_size"] = int(batch_size)
++    for name in ("epochs", "log_freq"):
++        value = getattr(args, name, None)
++        if value is not None:
++            config.raw["optimization"][name] = int(value)
++    if getattr(args, "diagnostics", False):
++        config.raw["diagnostics"] = {
++            "enabled": True, "every_batch": True,
++            "reference_epoch0": args.diagnostic_reference_epoch0,
++            "stop_on_mismatch": args.diagnostic_stop_on_mismatch,
++            "loss_threshold": args.diagnostic_loss_threshold,
++            "grad_threshold": args.diagnostic_grad_threshold,
++            "start_epoch": args.diagnostic_start_epoch,
++        }
++    elif (config.raw.get("diagnostics", {}).get("enabled")
++          and getattr(args, "mode", "train") in {"train", "all"}):
++        raise ValueError("A diagnostic config snapshot requires explicit --diagnostics")
+     validate_config(config.raw)
+ 
+ 
+@@ -204,7 +258,9 @@ def run_one(args: argparse.Namespace) -> None:
+             model = load_model(config)
+             smoke = run_smoke(model, config.raw)
+             write_json(run_dir / "smoke.json", smoke)
+-            result = train_model(model, config.raw, run_dir)
++            result = train_model(model, config.raw, run_dir,
++                                 resume_from=getattr(args, "resume_from", None),
++                                 checkpoint_keep_last=getattr(args, "checkpoint_keep_last", None))
+             write_json(run_dir / "metrics" / "train.json", result)
+ 
+         if args.mode in {"eval", "all"}:
+diff --git a/experiments/ablation_v9/src/train.py b/experiments/ablation_v9/src/train.py
+index 4c1feb3..dd0d775 100644
+--- a/experiments/ablation_v9/src/train.py
++++ b/experiments/ablation_v9/src/train.py
+@@ -125,7 +125,8 @@ def _build_train_loader(config: dict, train_indices: list[int]):
+     return loader, kind, None
+ 
+ 
+-def train_model(model, config: dict, run_dir: Path) -> dict:
++def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None = None,
++                checkpoint_keep_last: int | None = None) -> dict:
+     set_seed(int(config["runtime"]["seed"]))
+     device = _device(config)
+     data_start = time.time()
+@@ -168,13 +169,40 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
+     stale = 0
+     run_start = time.time()
+ 
+-    for epoch in range(int(config["optimization"]["epochs"])):
++    # OPTIONAL DIAGNOSTICS: remove this block and the other marked blocks freely.
++    diagnostics = None
++    if config.get("diagnostics", {}).get("enabled", False):
++        from .diagnostics import BatchDiagnostics
++        diagnostics = BatchDiagnostics(run_dir, config)
++    # END OPTIONAL DIAGNOSTICS
++
++    start_epoch = 0
++    if resume_from is not None:
++        from .resume import restore_training, restore_rng
++        restored = restore_training(resume_from, model, optimizer, config, run_dir)
++        start_epoch = int(restored["next_epoch"])
++        best_loss = float(restored["best_loss"])
++        best_epoch = int(restored["best_epoch"])
++        stale = int(restored["stale"])
++        # Restore AFTER model/optimizer/loader/diagnostic setup, immediately before iteration.
++        restore_rng(restored["rng"])
++        del restored
++        message = f"Resumed: next_epoch={start_epoch} best_epoch={best_epoch} stale={stale}\n"
++        print(message, end="", flush=True)
++        with log_path.open("a", encoding="utf-8") as handle:
++            handle.write(message)
++
++    for epoch in range(start_epoch, int(config["optimization"]["epochs"])):
+         model.train()
+         epoch_start = time.time()
+         last_log_time = epoch_start
+         last_log_batch = 0
+         if batch_sampler is not None:
+             batch_sampler.set_epoch(epoch)
++        # OPTIONAL DIAGNOSTICS
++        if diagnostics is not None:
++            diagnostics.begin_epoch(epoch, batch_sampler, train_indices)
++        # END OPTIONAL DIAGNOSTICS
+         total = 0.0
+         total_reconstruction = 0.0
+         total_classification = 0.0
+@@ -188,6 +216,10 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
+             )
+             x_input, encoder_mask, mask = make_batch_inputs(batch, config, generator)
+             batch_device = {key: value.to(device) for key, value in batch.items() if isinstance(value, torch.Tensor)}
++            # OPTIONAL DIAGNOSTICS
++            if diagnostics is not None:
++                diagnostics.before_forward()
++            # END OPTIONAL DIAGNOSTICS
+             output = model(x_input.to(device), encoder_mask.to(device))
+             losses = compute_losses(
+                 output,
+@@ -199,6 +231,11 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
+                 classification_padding=config["loss"].get("classification_padding", "ignore"),
+             )
+             losses["total"].backward()
++            # OPTIONAL DIAGNOSTICS: observe gradients and snapshot BEFORE the update.
++            if diagnostics is not None:
++                diagnostics.after_backward(model, optimizer, batch_index, batch, x_input,
++                                           encoder_mask, mask, output, losses, train_loader.dataset)
++            # END OPTIONAL DIAGNOSTICS
+             optimizer.step()
+ 
+             batch_total = float(losses["total"].detach().cpu())
+@@ -266,7 +303,18 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
+             "validation": validation,
+             "config": config,
+         }
++        if config.get("diagnostics", {}).get("enabled", False) or resume_from is not None:
++            from .resume import checkpoint_training_state
++            checkpoint["training_state"] = checkpoint_training_state(
++                epoch, validation_loss, best_loss, best_epoch, stale)
+         torch.save(checkpoint, checkpoint_dir / f"epoch_{epoch:04d}.pth")
++        if checkpoint_keep_last is not None:
++            from .resume import prune_epoch_checkpoints
++            prune_epoch_checkpoints(run_dir, checkpoint_keep_last)
++        # OPTIONAL DIAGNOSTICS
++        if diagnostics is not None:
++            diagnostics.end_epoch(epoch, checkpoint_dir / f"epoch_{epoch:04d}.pth")
++        # END OPTIONAL DIAGNOSTICS
+         if validation_loss < best_loss:
+             best_loss = validation_loss
+             best_epoch = epoch

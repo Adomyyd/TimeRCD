@@ -8,18 +8,19 @@
 - 文档命令从仓库根目录执行，先激活项目环境，再使用`python`与相对脚本/参数路径。代理实际执行遵循当前会话指定的解释器与连接约束；此类本机设置不写入共享文档。
 - 新实验代码写在`experiments/`；写代码前先说明目录、文件职责及统一入口。
 - 当前v9源配置为总batch32、length_bucket、bucket_multiplier50；配对组必须统一采样器、总batch、种子和并行方式。分桶会改变batch标准化与padding比例，不是数值等价优化；验证仍固定顺序。单卡可通过--batch-size覆盖，但对照组须一致。
-- v9直接使用configs中的六份源配置，数据字段采用仓库相对路径；不为迁移另生成本机配置副本。每次运行由入口保存实际配置快照。
-- 原流程使用`experiments/original_400k/run_experiment.py`；P0/P1/P2使用`experiments/ablation_v9/run_experiment.py`。不另建重复训练入口。
+- v9直接使用configs中的四份P0/P1源配置，数据字段采用仓库相对路径；不为迁移另生成本机配置副本。每次运行由入口保存实际配置快照。
+- 原流程使用`experiments/original_400k/run_experiment.py`；P0/P1使用`experiments/ablation_v9/run_experiment.py`。不另建重复训练入口。
 - 未获当前任务授权，不启动或恢复正式训练、生成数据、耗时评测，不替换官方权重。历史运行及计划不会自动授权重启。合成接口检查与正式训练必须区分。
 
 ## 代码与实验协议
 
-- 配置与逻辑分离，P0/P1/P2共用实现；注释只解释不明显的约束，不做无关重写和过度抽象。
+- 配置与逻辑分离，P0/P1共用实现；注释只解释不明显的约束，不做无关重写和过度抽象。
 - 配置校验、失败路径和损失分母明确，不吞异常。核心算法应可脱离完整流程测试。
 - 模型patch与遮挡块独立配置，默认16/16，比例0.15。配置类初始默认4不是当前单卡400k的运行值。
 - padding是独立消融轴：ignore过滤分类padding，official复现官方行为；同一配对除该项外保持一致。历史400k不能单独隔离padding效应。
 - DataParallel的batch_size指总batch，标准化和mask在分卡前生成、损失在汇总后计算。检查点保存完整未封装模型状态。
 - 完整检测评测由v9统一入口的eval/all执行，使用独立eval_official.json；训练验证仍在evaluate.py。官方协议固定到d458549，合成留出与单变量TSB-AD-U逐序列计算相同指标；oracle F1与部署阈值区分，限制条数明确标子集。audits/eval_20261112/sources也是数值回归依赖，不当作无用源码清理。
+- 完整eval的指标计算由src/metric_worker.py在持续复用的独立CPU进程执行；外层spawn隔离训练数据/GPU，Linux内部指标池fork小CPU进程。不得将官方进程池直接移回持有完整pickle/GPU的进程；公式/阈值不因执行优化改变。2026-11-14两个P0评测队列均按用户要求停止，修复后不自动重启；证据见audits/eval_20261114/performance。
 - 数据生成配置维持当前决定。实验初始化、划分、种子、权重、步数、评价与停止条件必须可追溯；不把重构改善当作检测、解耦或上下文利用的证明。
 
 ## 文档与资产
@@ -46,3 +47,17 @@
 - 修改前检查调用关系与已有未提交改动，只处理当前范围，不覆盖他人修改。
 - 为关键行为和回归风险做必要检查；未验证的内容明确说明。通过适当检查后不无故重复扩大测试。
 - 每次实验前登记问题、对照、数据和计划；结束、中断或失败后记录执行事实、产物及解释边界。状态优先写清“已停止/历史中断/仅合成测试/尚未正式运行”。
+
+## 可选诊断补充（2026-11-14）
+
+- v9 train可用--diagnostics开启独立逐batch观测；train.py中OPTIONAL DIAGNOSTICS块可整体移除。不得用诊断加入额外forward/backward、采样或梯度修正；普通训练默认关闭。日志/现场/RNG在新run的diagnostics/，详见RUNTIME_NOTES与audits/spike_20261114。
+- 最初获用户授权重跑P0 official的epoch0/1：p0_official_spike_diag_r3_20261114。epoch0模型/AdamW默认只核对并报告差异，继续作为同配置重跑；显式--diagnostic-stop-on-mismatch才在不匹配时停止。首次有限异常保存pre-step现场后继续，非有限值保存后报错。历史checkpoint缺RNG，匹配也不能预先承诺尖峰精确复现；用户随后明确授权继续诊断至原50轮上限（保留patience7），通过轮末恢复从epoch2继续到新run p0_official_spike_diag_continue_20261114；不包含评测授权。
+
+- train现支持--resume-from到新run，恢复模型/AdamW/完整RNG/best/stale；数据/模型/损失/批次/采样/运行条件须一致。缺完整RNG拒绝；r3同轮独立RNG+完整历史兼容。--checkpoint-keep-last 2只清理新run逐轮权重，保留best/最近两轮/首次事件前驱及独立现场，删除记账。实际是否已续跑查continuation_queue.json，不把等待当启动。
+
+## 当前研究与训练授权（2026-11-15）
+
+- 当前只有P0和新P1。P1保留P0遮挡输入、观测X重构与异常分类，同一次H新增独立正常参考头预测X^0，两个MSE在同一M∩V计算；首轮三损失权重均1，主线official padding。没有B/Z、显式偏差头或双视图。
+- 新P1标识p1_mask_x_normal，配置同名；旧p1_full_x与p2_full_x0实现/源配置已移除，历史run/配置快照不可按新语义解释。旧P1已按本次指令停止，保留产物。用户授权本次通过检查后启动新P1双卡正式训练；不自动启动完整评测或恢复P0诊断。
+- 新P1普通轮末检查点默认含完整RNG/best/stale，可经统一入口恢复到新run；P0保持普通历史语义，诊断/续跑时含完整状态。P1的valid_total含两项重构与有效点CE，不能与P0总loss数值直接比较方法优劣。
+- 文档以当前运行语义为准，历史执行集中实验记录与审计。清理范围是退出的代码/源配置及自己的临时文件，不删除既有run、数据、权重、registry或回归依赖的官方sources。

@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import importlib.metadata
 import json
+from time import perf_counter
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,7 @@ from torch.utils.data import DataLoader
 
 from .data import load_data, load_indices, sha256
 from .parallel import unwrap_model
+from .metric_worker import OfficialMetricWorker
 
 
 UPSTREAM_COMMIT = "d458549f6962029a5c5241c43a5baa1ec5eccbb2"
@@ -154,12 +156,10 @@ def official_metrics(scores: np.ndarray, labels: np.ndarray, sliding_window: int
         )
     else:
         result = get_metrics(scores, labels, slidingWindow=sliding_window, pred=pred)
-    # Do not silently aggregate absent/nonfinite results. Internal official zero
-    # fallbacks remain part of the reused implementation and are recorded in the manifest.
-    result = {key: float(result[key]) for key in METRIC_KEYS}
-    if not all(np.isfinite(value) for value in result.values()):
-        raise ValueError(f"Official metric returned nonfinite results: {result}")
-    return result
+    # The pinned official main.py writes returned values directly to its result
+    # DataFrame, including NaN produced by edge cases in affiliation metrics.
+    # Preserve that value in the per-series CSV; aggregate with NaN-aware means.
+    return {key: float(result[key]) for key in METRIC_KEYS}
 
 
 def verify_checkpoint_config(payload: dict, config: dict) -> None:
@@ -173,6 +173,12 @@ def verify_checkpoint_config(payload: dict, config: dict) -> None:
         raise ValueError("Checkpoint/config mismatch: synthetic dataset path")
 
 
+def _finite_mean(values) -> float | None:
+    array = np.asarray(list(values), dtype=float)
+    finite = array[np.isfinite(array)]
+    return float(finite.mean()) if len(finite) else None
+
+
 def summarize(rows: list[dict]) -> dict:
     result = {}
     for domain in ("synthetic", "real"):
@@ -181,14 +187,23 @@ def summarize(rows: list[dict]) -> dict:
             selected = [row for row in rows if row["domain"] == domain and row["score_kind"] == score_kind]
             groups = sorted({row["group"] for row in selected})
             per_group = {
-                group: {key: float(np.mean([row[key] for row in selected if row["group"] == group]))
+                group: {key: _finite_mean(row[key] for row in selected if row["group"] == group)
                         for key in METRIC_KEYS}
                 for group in groups
             }
+            series_macro = {key: _finite_mean(row[key] for row in selected) for key in METRIC_KEYS}
+            group_macro = {key: _finite_mean(per_group[group][key] for group in groups)
+                           for key in METRIC_KEYS}
+            valid_counts = {
+                "series_macro": {key: int(sum(np.isfinite(row[key]) for row in selected)) for key in METRIC_KEYS},
+                "group_macro": {key: sum(per_group[group][key] is not None for group in groups) for key in METRIC_KEYS},
+                "groups": {group: {key: int(sum(np.isfinite(row[key]) for row in selected if row["group"] == group))
+                                    for key in METRIC_KEYS} for group in groups},
+            }
             result[domain][score_kind] = {
                 "series_count": len(selected), "group_means": per_group,
-                "series_macro": {key: float(np.mean([row[key] for row in selected])) for key in METRIC_KEYS} if selected else {},
-                "group_macro": {key: float(np.mean([per_group[group][key] for group in groups])) for key in METRIC_KEYS} if groups else {},
+                "series_macro": series_macro, "group_macro": group_macro,
+                "valid_metric_counts": valid_counts,
             }
     return result
 
@@ -212,7 +227,9 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
 
     targets = real_targets(protocol["real_data_dir"])
     log(f"Preparing evaluation: {len(targets)} real series; loading synthetic pickle and reproducing held-out split")
+    preparation_started = perf_counter()
     _, held_out = load_indices(config["data"]["path"], float(config["split"]["train_ratio"]), int(config["split"]["seed"]))
+    log(f"Synthetic data and split ready in {perf_counter() - preparation_started:.3f}s")
     if not held_out:
         raise ValueError("Empty synthetic held-out split")
     all_synthetic_count, all_real_count = len(held_out), len(targets)
@@ -222,13 +239,15 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
     write_json(metrics_dir / "synthetic_indices.json", selected_indices)
     repo = Path(__file__).resolve().parents[3]
     source_paths = ("main.py", "HP_list.py", "models/TimeRCD.py", "utils/dataset.py", "utils/slidingWindows.py",
-                    "evaluation/metrics.py", "evaluation/basic_metrics.py", "experiments/ablation_v9/src/benchmark_eval.py")
+                    "evaluation/metrics.py", "evaluation/basic_metrics.py", "experiments/ablation_v9/src/benchmark_eval.py", "experiments/ablation_v9/src/metric_worker.py")
     official_defaults = all(protocol[key] == value for key, value in {
         "window_size": 5000, "inference_batch_size": 64, "metrics_mode": "fast",
         "f1_t_n_splits": 800, "f1_t_chunk_size": 25, "seed": 2024,
     }.items())
     manifest = {
         "protocol": protocol, "upstream_commit": UPSTREAM_COMMIT,
+        "metric_execution": {"backend": "persistent_spawn_cpu_worker", "workers": 1,
+                             "reason": "avoid forking the inference process and full synthetic cache"},
         "official_default_parameters": official_defaults,
         "checkpoint": str(checkpoint), "checkpoint_sha256": sha256(checkpoint), "checkpoint_epoch": checkpoint_epoch,
         "source_sha256": {p: sha256(repo / p) for p in source_paths},
@@ -242,7 +261,7 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
         "synthetic_protocol": "same held-out split used for validation; full raw sequence, official zero-shot inference and per-series metrics; not an independent test split",
         "aggregation": "per-series metrics; per-group mean; unweighted group macro and separate all-series macro; no concatenation across series",
         "thresholds": "official oracle benchmark search, not validation-fitted deployment thresholds; pred=mean+3std is passed exactly as main.py",
-        "metric_caveat": "official metric functions catch some internal errors and return zeros; those zeros are retained; missing/nonfinite results fail this run",
+        "metric_caveat": "official metric functions catch some internal errors and return zeros; returned NaN values are retained in per-series CSV and omitted from means with valid counts recorded",
         "local_metric_difference": "F1_T threshold execution is serial to avoid nested-pool stalls, with the same n_splits; see parity evidence in audits/eval_20261112",
     }
     write_json(run_dir / "evaluation_manifest.json", manifest)
@@ -253,28 +272,37 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
     score_dir = run_dir / "scores"
     if protocol["save_scores"]:
         score_dir.mkdir()
-    with (metrics_dir / "per_series.csv").open("w", encoding="utf-8", newline="") as csv_handle:
+    worker_started = perf_counter()
+    with OfficialMetricWorker(protocol) as metric_worker, \
+            (metrics_dir / "per_series.csv").open("w", encoding="utf-8", newline="") as csv_handle:
+        log(f"CPU metric worker ready in {perf_counter() - worker_started:.3f}s: {metric_worker.info}")
         writer = csv.DictWriter(csv_handle, fieldnames=fields)
         writer.writeheader()
         csv_handle.flush()
 
         def evaluate_one(domain, group, series_id, values, labels, full_values, boundary):
             log(f"{domain} {series_id}: inference, points={len(labels)}")
+            inference_started = perf_counter()
             probability, margin = score_series(scorer, values, protocol)
+            log(f"{domain} {series_id}: inference completed in {perf_counter() - inference_started:.3f}s")
+            preparation_started = perf_counter()
             sliding_window = int(find_length_rank(full_values, rank=1))
             if protocol["save_scores"]:
                 np.savez_compressed(score_dir / f"{domain}_{series_id}.npz", value=values,
                                     label=labels, anomaly_score=probability, logits=margin)
+            log(f"{domain} {series_id}: window selection and score saving completed in {perf_counter() - preparation_started:.3f}s")
             for score_kind, scores in (("probability", probability), ("logit", margin)):
                 log(f"{domain} {series_id}: {score_kind} metrics, sliding_window={sliding_window}")
-                result = official_metrics(scores, labels, sliding_window, protocol)
+                metric_started = perf_counter()
+                result = metric_worker.compute(scores, labels, sliding_window)
+                metric_seconds = perf_counter() - metric_started
                 row = dict(domain=domain, group=group, series_id=series_id, score_kind=score_kind,
                            points=len(labels), anomaly_points=int(labels.sum()), sliding_window=sliding_window,
                            train_index=boundary, **result)
                 writer.writerow(row)
                 csv_handle.flush()
                 rows.append(row)
-                log(f"{domain} {series_id} {score_kind}: AUC-PR={result['AUC-PR']:.6f} F1_T={result['F1_T']:.6f}")
+                log(f"{domain} {series_id} {score_kind}: AUC-PR={result['AUC-PR']:.6f} F1_T={result['F1_T']:.6f} elapsed={metric_seconds:.3f}s")
 
         try:
             log(f"Evaluation start: synthetic={len(selected_indices)}/{all_synthetic_count}, real={len(targets)}/{all_real_count}, full={full}")

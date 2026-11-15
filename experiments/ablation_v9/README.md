@@ -1,109 +1,78 @@
-# P0/P1/P2消融实验
+# P0 / P1 消融实验
 
-比较输入遮挡与正常参考监督对异常检测的影响，支持padding对照及单卡/多卡训练。
+比较“保留遮挡观测重构时，增加正常参考监督”对异常检测的影响。
 
-| 组别 | 输入 | 重构目标 |
+| 实验 | 训练输入 | 重构任务 |
 |---|---|---|
-| P0 | 遮挡后的观测序列 | 原观测序列 |
-| P1 | 完整观测序列 | 原观测序列 |
-| P2 | 完整观测序列 | 配对正常序列 |
+| P0 | 遮挡后的观测 X | 恢复观测 X |
+| P1 | 与P0相同 | 同时恢复观测 X、预测配对正常值 X⁰ |
 
-默认编码器patch和遮挡块均为16，遮挡/抽样比例15%，总batch为32，默认启用长度分桶采样。`ignore`排除分类padding；`official`复现原版将padding作为正常点计算分类损失的行为。
+P1两个重构头读取同一次Transformer输出，在相同抽样位置计算损失；另保留原异常分类任务，三项权重默认均为1。默认patch16、遮挡块16、抽样15%、总batch32、长度分桶。推理完整输入，只使用异常分类头。
 
-## 1. 准备数据
+## 准备与检查
 
-以下为Linux shell命令，全部从仓库根目录执行。先激活项目环境，并将已有400k数据及同名manifest放在`experiments/original_400k/data/`；数据不随Git下载。
-
-直接使用`experiments/ablation_v9/configs/`中的六份配置，无需生成或复制配置。数据路径以仓库根目录为基准。
-
-## 2. 检查能否运行
-
-先安装项目与测试依赖：
+以下Linux命令从仓库根目录执行，先激活项目环境。已有400k数据及同名manifest放在`experiments/original_400k/data/`；数据和模型产物不随Git下载。
 
 ```bash
 python -m pip install . pytest -r experiments/ablation_v9/requirements-eval.txt
-```
-
-合成回归不需要400k数据；smoke需要数据文件和manifest就位，但不加载完整数据：
-
-```bash
 python experiments/ablation_v9/tests/run_checks.py
 
 CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p0_mask_x.json \
-  --run-id "p0_smoke_$(date +%Y%m%d_%H%M%S)" --mode smoke
+  --config experiments/ablation_v9/configs/p1_mask_x_normal_padding_official.json \
+  --run-id "p1_smoke_$(date +%Y%m%d_%H%M%S)" --mode smoke
 ```
 
-## 3. 单卡训练P0、P1、P2
+测试只用合成小数据；smoke核对数据/manifest是否就位，不加载完整400k。
 
-以下单卡示例统一覆盖总batch为16，以降低显存需求；源配置总batch仍为32。默认使用GPU0和`ignore`模式，按需分别运行。将`CUDA_VISIBLE_DEVICES=0`改为`1`即可使用GPU1：
+## 双卡训练
 
-```bash
-CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p0_mask_x.json \
-  --run-id "p0_ignore_$(date +%Y%m%d_%H%M%S)" --batch-size 16 --mode train
-
-CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p1_full_x.json \
-  --run-id "p1_ignore_$(date +%Y%m%d_%H%M%S)" --batch-size 16 --mode train
-
-CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p2_full_x0.json \
-  --run-id "p2_ignore_$(date +%Y%m%d_%H%M%S)" --batch-size 16 --mode train
-```
-
-## 4. 比较padding处理
-
-同一P组分别运行`ignore`和`official`，其他设置保持一致。下面三条是`official`模式，对应上面的三条`ignore`命令：
+主线沿用P0表现更好的official padding。使用GPU0、1，总batch32、seed72；依次运行，不同时争用两张卡。已完成P0无需因为本次P1改动重跑。
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p0_mask_x_padding_official.json \
-  --run-id "p0_official_$(date +%Y%m%d_%H%M%S)" --batch-size 16 --mode train
-
-CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p1_full_x_padding_official.json \
-  --run-id "p1_official_$(date +%Y%m%d_%H%M%S)" --batch-size 16 --mode train
-
-CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p2_full_x0_padding_official.json \
-  --run-id "p2_official_$(date +%Y%m%d_%H%M%S)" --batch-size 16 --mode train
-```
-
-## 5. 双卡训练
-
-P0的两个padding对照均使用GPU0和GPU1、总batch32；分别运行，避免同时争用两张卡：
-
-```bash
-CUDA_VISIBLE_DEVICES=0,1 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p0_mask_x.json \
-  --run-id "p0_ignore_dp_$(date +%Y%m%d_%H%M%S)" \
-  --parallel data_parallel --gpu-ids 0 1 --mode train
-
-CUDA_VISIBLE_DEVICES=0,1 python experiments/ablation_v9/run_experiment.py \
+CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
   --config experiments/ablation_v9/configs/p0_mask_x_padding_official.json \
   --run-id "p0_official_dp_$(date +%Y%m%d_%H%M%S)" \
-  --parallel data_parallel --gpu-ids 0 1 --mode train
+  --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train
+
+CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
+  --config experiments/ablation_v9/configs/p1_mask_x_normal_padding_official.json \
+  --run-id "p1_mask_normal_official_dp_$(date +%Y%m%d_%H%M%S)" \
+  --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train
 ```
 
-采用DataParallel，总batch仍为32，保存的检查点包含完整模型。GPU编号相对于`CUDA_VISIBLE_DEVICES`；比较实验时保持设备和并行方式一致。
+建议在tmux中执行。P1为保持batch32使用重构头激活检查点降低显存，计算开销会增加。最多50轮、patience7，每100batch打印观测重构、正常参考、异常分类和总loss；加载数据约需数分钟，随后开始训练日志。
 
-## 6. 短程测速和已有模型评价
+## 单卡与padding对照
 
-测速会加载完整数据并执行训练更新，不保存模型，也不做验证。以下使用双卡和源配置总batch32，最多300个batch：
+单卡可使用下列命令；总batch仍为32，显存不足可加`--batch-size 16`，相应P0对照也必须一致修改。
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p0_mask_x.json \
-  --run-id "p0_bench_dp_$(date +%Y%m%d_%H%M%S)" \
-  --parallel data_parallel --gpu-ids 0 1 --mode bench --max-batches 300
+CUDA_VISIBLE_DEVICES=0 python -u experiments/ablation_v9/run_experiment.py \
+  --config experiments/ablation_v9/configs/p1_mask_x_normal_padding_official.json \
+  --run-id "p1_mask_normal_single_$(date +%Y%m%d_%H%M%S)" --parallel none --mode train
 ```
 
-测速输出`metrics/bench.json`。整轮时间只是部分批次外推，不含验证和存盘；短数据若`timed_batches=0`，该次测速无效。
+保留四份训练配置，无需生成本机副本：
 
-评价一次会依次处理合成留出集与官方单变量基准：沿用训练时95/5划分，默认约20000条合成序列；真实数据使用`datasets/TSB-AD-U/`中的700条序列、11类数据集。需先准备完整TSB-AD-U；缺组或数量不符会报错，不会静默跳过。
+| 实验 | ignore配置 | official配置 |
+|---|---|---|
+| P0 | p0_mask_x.json | p0_mask_x_padding_official.json |
+| P1 | p1_mask_x_normal.json | p1_mask_x_normal_padding_official.json |
 
-下面评价已完成的P0 official。等训练设备空闲后，从仓库根目录执行；评价其他模型时只修改`trained_run`。直接读取该训练run的配置，避免混用P组或padding策略：
+需要ignore对照时直接运行：
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
+  --config experiments/ablation_v9/configs/p1_mask_x_normal.json \
+  --run-id "p1_mask_normal_ignore_dp_$(date +%Y%m%d_%H%M%S)" \
+  --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train
+```
+
+official把分类padding视为正常点；ignore排除这些点。两模式都保持attention屏蔽padding，重构损失只用有效选中位置。同组两配置仅padding字段不同。
+
+## 评测已有模型
+
+准备完整`datasets/TSB-AD-U/`（700条、11类）及训练数据。把下列`trained_run`设为实际训练目录名：
 
 ```bash
 trained_run=p0_official_dp_20261111_003608
@@ -111,34 +80,37 @@ CUDA_VISIBLE_DEVICES=0,1 python experiments/ablation_v9/run_experiment.py \
   --config "experiments/ablation_v9/runs/$trained_run/config.json" \
   --checkpoint "experiments/ablation_v9/runs/$trained_run/checkpoints/best.pth" \
   --eval-config experiments/ablation_v9/configs/eval_official.json \
-  --run-id "${trained_run}_eval_$(date +%Y%m%d_%H%M%S)" \
-  --parallel data_parallel --gpu-ids 0 1 --mode eval
+  --run-id "${trained_run}_eval_s200_r700_$(date +%Y%m%d_%H%M%S)" \
+  --parallel data_parallel --gpu-ids 0 1 --eval-max-synthetic 200 --mode eval
 ```
 
-两侧均用完整输入检测；按官方测试序列标准化、5000点非重叠窗口和尾部补齐规则，分别计算异常概率与logit差的16项指标，包括AUC-PR/ROC、VUS-PR/ROC、Standard-F1、PA-F1、Affiliation和F1_T。指标复用仓库官方实现，默认fast、F1_T分位点800；F1类指标沿用官方最优阈值搜索，不能当作部署时可用的固定阈值成绩。合成侧仍是选择模型用过的留出集，不是独立测试集。
+同一次评测固定200条合成留出＋全部700条真实序列，计算官方16指标及probability/logit两类分数。去掉`--eval-max-synthetic 200`会评测全部约20000条合成留出；默认仍需完整pickle读取。检查流程可另加`--eval-max-real 1`并把合成限制设为2，结果会明确标为子集。
 
-完整评测按序列计算全部指标，明显慢于训练期间的验证。先检查流程时，可在同一命令末尾追加`--eval-max-synthetic 2 --eval-max-real 1`；输出会标记`full_benchmark=false`，不能当作完整成绩。限制条数仍需要加载完整合成pickle。
+合成留出参与过best选择，不是独立测试集；官方F1阈值用测试标签oracle搜索，不能视为部署阈值成绩。逐序列NaN保留原值，汇总排除非有限值并记录有效数。评测产物含`metrics/per_series.csv`、`metrics/eval.json`及分组/分域CSV。论文与已完成P0对照见[结果表](RESULTS.md)；新P1取得同协议成绩后在末行追加。
 
-评测参数只需修改`configs/eval_official.json`，无需生成配置。默认推理batch64与训练总batch32相互独立；显存不足可降低`inference_batch_size`，实际参数会记录。更改官方默认参数会标记`official_default_parameters=false`。单卡评测可使用`CUDA_VISIBLE_DEVICES=0`并将并行参数改为`--parallel none`，去掉`--gpu-ids`。
+## 续训、诊断与常用参数
 
-新评测run保存：`eval.log`、`eval_config.json`、`evaluation_manifest.json`、`metrics/per_series.csv`、`metrics/group_mean_metrics.csv`、`metrics/domain_summary.csv`、`metrics/eval.json`和`scores/*.npz`。CSV同时提供按序列均值和按数据集先平均再等权平均；原始概率/logit可追溯。`save_scores=false`可关闭分数文件。中途失败保留已完成行并标记failed，不伪报完成；当前不支持评测断点续跑。
+新P1轮末检查点默认保存完整续训状态。以下路径使用同一训练run：
 
-## 输出与常用设置
+```bash
+trained_run=替换为实际P1训练目录名
+CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
+  --config "experiments/ablation_v9/runs/$trained_run/config.json" \
+  --resume-from "experiments/ablation_v9/runs/$trained_run/checkpoints/epoch_0000.pth" \
+  --run-id "p1_resume_$(date +%Y%m%d_%H%M%S)" --epochs 50 --mode train
+```
 
-结果保存到`experiments/ablation_v9/runs/`下对应run-id目录，训练run包括`train.log`、实际配置、检查点和指标；其他模式只生成对应产物。训练日志在数据加载完成后开始写入，之后每100个batch打印分项损失及耗时；两种padding模式统一按有效点验证总损失`valid_total`选择最佳模型。
+源进程须先退出；`--epochs`是总轮数上限，已完成epoch0则从1继续。恢复校验要求训练条件一致；只允许改变轮数上限、日志和诊断设置。早期P0权重缺完整RNG，不能直接用它精确续训。
 
-需要调整时，修改`experiments/ablation_v9/configs/`中的对应JSON：
-
-| 设置 | 字段 |
+| 参数 | 用途 |
 |---|---|
-| 总batch | optimization.batch_size；或命令行--batch-size覆盖 |
-| 采样器 | optimization.batch_sampler（length_bucket／sequential） |
-| 分桶系数 | optimization.bucket_multiplier（默认50） |
-| 日志间隔 | optimization.log_freq |
-| 训练轮数 | optimization.epochs |
-| 遮挡块长度 | input.mask_patch_size |
-| 遮挡/抽样比例 | input.mask_ratio |
+| --log-freq 100 | 控制台/train.log的batch间隔 |
+| --diagnostics | 可选逐batch独立诊断，不更改损失或梯度 |
+| --checkpoint-keep-last 2 | 新run只保留best、最近两轮及首次诊断事件前驱 |
+| --epochs 50 | 总轮数上限 |
+| loss.normal_reference_weight | P1正常参考损失权重，JSON中默认1且须为正 |
+| input.mask_patch_size / mask_ratio | 遮挡块长度/比例，默认16/0.15 |
 
-P0/P1/P2比较时保持采样器、总batch、种子、padding模式和并行方式一致。分桶会减少padding，因此padding对照的结果对应当前采样设置。
+`bench --max-batches 300`会执行训练更新但不保存模型，用于短程测速；不是smoke。实际只支持FP32，没有AMP/DDP/FSDP或batch中途恢复。
 
-当前训练使用FP32，不支持通过配置启用AMP。v9不支持断点续训；已有run目录不会被覆盖。`eval`/`all`包含合成留出集与官方TSB-AD-U评测；`train`仍只做原验证及选best，不自动执行完整基准。
+所有产物位于`runs/<run-id>/`，已有目录拒绝覆盖。训练保存实际配置、日志、逐轮/best完整模型及指标；训练验证按各自valid_total选best，P1含额外正常参考项，不能直接横比P0/P1总loss。旧完整输入P1/P2已退役，旧run和配置快照保留为历史，不使用旧命令启动新P1。

@@ -1,0 +1,350 @@
+{
+  "checked_local": "2026-11-15T13:04:51.712527",
+  "run_id": "p1_mask_normal_official_dp_20261115_015137",
+  "process_exists": true,
+  "command": "/home/omnisky/anaconda3/envs/time-rcd/bin/python3 -u /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p1_mask_x_normal_padding_official.json --run-id p1_mask_normal_official_dp_20261115_015137 --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train ",
+  "status": {
+    "run_id": "p1_mask_normal_official_dp_20261115_015137",
+    "mode": "train",
+    "status": "running",
+    "started_utc": "2026-11-14T17:51:38.974184+00:00"
+  },
+  "log_age_seconds": 32.5,
+  "log_bytes": 283202,
+  "latest_batches": [
+    {
+      "epoch": 8,
+      "batch": 4300,
+      "batches": 11875,
+      "total": 0.2294,
+      "reconstruction": 0.0572,
+      "normal_reference": 0.0853,
+      "classification": 0.0869
+    },
+    {
+      "epoch": 8,
+      "batch": 4400,
+      "batches": 11875,
+      "total": 0.2796,
+      "reconstruction": 0.0616,
+      "normal_reference": 0.084,
+      "classification": 0.134
+    },
+    {
+      "epoch": 8,
+      "batch": 4500,
+      "batches": 11875,
+      "total": 0.3894,
+      "reconstruction": 0.0962,
+      "normal_reference": 0.1819,
+      "classification": 0.1114
+    },
+    {
+      "epoch": 8,
+      "batch": 4600,
+      "batches": 11875,
+      "total": 0.1963,
+      "reconstruction": 0.0405,
+      "normal_reference": 0.075,
+      "classification": 0.0807
+    },
+    {
+      "epoch": 8,
+      "batch": 4700,
+      "batches": 11875,
+      "total": 0.3242,
+      "reconstruction": 0.0969,
+      "normal_reference": 0.1053,
+      "classification": 0.122
+    }
+  ],
+  "logged_batch_count": 1000,
+  "epoch_summaries": [
+    {
+      "epoch": 0,
+      "train_total": 0.54724106,
+      "validation_total": 0.8906454,
+      "Average Total Loss": 0.5472,
+      "Average Recon Loss": 0.1494,
+      "Average Normal Reference Loss": 0.2296,
+      "Average Anomaly Loss": 0.1683,
+      "Validation Recon Loss": 0.2779,
+      "Validation Normal Reference Loss": 0.4023,
+      "Validation Objective Loss": 0.7843,
+      "Validation Valid Total Loss (selection)": 0.8906
+    },
+    {
+      "epoch": 1,
+      "train_total": 0.47759408,
+      "validation_total": 0.41690123,
+      "Average Total Loss": 0.4776,
+      "Average Recon Loss": 0.1307,
+      "Average Normal Reference Loss": 0.1912,
+      "Average Anomaly Loss": 0.1557,
+      "Validation Recon Loss": 0.108,
+      "Validation Normal Reference Loss": 0.161,
+      "Validation Objective Loss": 0.3452,
+      "Validation Valid Total Loss (selection)": 0.4169
+    },
+    {
+      "epoch": 2,
+      "train_total": 0.38624231,
+      "validation_total": 0.36258459,
+      "Average Total Loss": 0.3862,
+      "Average Recon Loss": 0.0992,
+      "Average Normal Reference Loss": 0.145,
+      "Average Anomaly Loss": 0.1421,
+      "Validation Recon Loss": 0.0959,
+      "Validation Normal Reference Loss": 0.1313,
+      "Validation Objective Loss": 0.3031,
+      "Validation Valid Total Loss (selection)": 0.3626
+    },
+    {
+      "epoch": 3,
+      "train_total": 0.34062058,
+      "validation_total": 0.31477281,
+      "Average Total Loss": 0.3406,
+      "Average Recon Loss": 0.0862,
+      "Average Normal Reference Loss": 0.1232,
+      "Average Anomaly Loss": 0.1312,
+      "Validation Recon Loss": 0.0762,
+      "Validation Normal Reference Loss": 0.1134,
+      "Validation Objective Loss": 0.2609,
+      "Validation Valid Total Loss (selection)": 0.3148
+    },
+    {
+      "epoch": 4,
+      "train_total": 0.30768633,
+      "validation_total": 0.31306425,
+      "Average Total Loss": 0.3077,
+      "Average Recon Loss": 0.0782,
+      "Average Normal Reference Loss": 0.1093,
+      "Average Anomaly Loss": 0.1202,
+      "Validation Recon Loss": 0.0843,
+      "Validation Normal Reference Loss": 0.1093,
+      "Validation Objective Loss": 0.2511,
+      "Validation Valid Total Loss (selection)": 0.3131
+    },
+    {
+      "epoch": 5,
+      "train_total": 0.35213376,
+      "validation_total": 1.03404678,
+      "Average Total Loss": 0.3521,
+      "Average Recon Loss": 0.0961,
+      "Average Normal Reference Loss": 0.1408,
+      "Average Anomaly Loss": 0.1152,
+      "Validation Recon Loss": 0.3475,
+      "Validation Normal Reference Loss": 0.4758,
+      "Validation Objective Loss": 0.9474,
+      "Validation Valid Total Loss (selection)": 1.034
+    },
+    {
+      "epoch": 6,
+      "train_total": 0.47209994,
+      "validation_total": 0.31347706,
+      "Average Total Loss": 0.4721,
+      "Average Recon Loss": 0.1462,
+      "Average Normal Reference Loss": 0.1861,
+      "Average Anomaly Loss": 0.1398,
+      "Validation Recon Loss": 0.0906,
+      "Validation Normal Reference Loss": 0.109,
+      "Validation Objective Loss": 0.255,
+      "Validation Valid Total Loss (selection)": 0.3135
+    },
+    {
+      "epoch": 7,
+      "train_total": 0.30938077,
+      "validation_total": 0.27539213,
+      "Average Total Loss": 0.3094,
+      "Average Recon Loss": 0.083,
+      "Average Normal Reference Loss": 0.1155,
+      "Average Anomaly Loss": 0.1108,
+      "Validation Recon Loss": 0.0744,
+      "Validation Normal Reference Loss": 0.102,
+      "Validation Objective Loss": 0.226,
+      "Validation Valid Total Loss (selection)": 0.2754
+    }
+  ],
+  "per_epoch_logged_max": [
+    {
+      "epoch": 0,
+      "logged_batches": 119,
+      "max_total": 2.5286,
+      "max_reconstruction": 0.9518,
+      "max_normal_reference": 0.876,
+      "max_classification": 0.7008
+    },
+    {
+      "epoch": 1,
+      "logged_batches": 119,
+      "max_total": 1.8253,
+      "max_reconstruction": 0.7467,
+      "max_normal_reference": 0.894,
+      "max_classification": 0.322
+    },
+    {
+      "epoch": 2,
+      "logged_batches": 119,
+      "max_total": 0.8145,
+      "max_reconstruction": 0.2324,
+      "max_normal_reference": 0.3787,
+      "max_classification": 0.2401
+    },
+    {
+      "epoch": 3,
+      "logged_batches": 119,
+      "max_total": 0.5631,
+      "max_reconstruction": 0.1953,
+      "max_normal_reference": 0.3045,
+      "max_classification": 0.2333
+    },
+    {
+      "epoch": 4,
+      "logged_batches": 119,
+      "max_total": 0.5815,
+      "max_reconstruction": 0.2207,
+      "max_normal_reference": 0.3091,
+      "max_classification": 0.226
+    },
+    {
+      "epoch": 5,
+      "logged_batches": 119,
+      "max_total": 1.9859,
+      "max_reconstruction": 0.78,
+      "max_normal_reference": 0.9391,
+      "max_classification": 0.2668
+    },
+    {
+      "epoch": 6,
+      "logged_batches": 119,
+      "max_total": 1.2738,
+      "max_reconstruction": 0.4345,
+      "max_normal_reference": 0.708,
+      "max_classification": 0.2499
+    },
+    {
+      "epoch": 7,
+      "logged_batches": 119,
+      "max_total": 0.7763,
+      "max_reconstruction": 0.1676,
+      "max_normal_reference": 0.5596,
+      "max_classification": 0.1898
+    },
+    {
+      "epoch": 8,
+      "logged_batches": 48,
+      "max_total": 0.429,
+      "max_reconstruction": 0.16,
+      "max_normal_reference": 0.1819,
+      "max_classification": 0.1775
+    }
+  ],
+  "top_total": [
+    {
+      "epoch": 0,
+      "batch": 0,
+      "batches": 11875,
+      "total": 2.5286,
+      "reconstruction": 0.9518,
+      "normal_reference": 0.876,
+      "classification": 0.7008
+    },
+    {
+      "epoch": 5,
+      "batch": 11400,
+      "batches": 11875,
+      "total": 1.9859,
+      "reconstruction": 0.78,
+      "normal_reference": 0.9391,
+      "classification": 0.2668
+    },
+    {
+      "epoch": 1,
+      "batch": 10600,
+      "batches": 11875,
+      "total": 1.8253,
+      "reconstruction": 0.7467,
+      "normal_reference": 0.8462,
+      "classification": 0.2324
+    },
+    {
+      "epoch": 5,
+      "batch": 11600,
+      "batches": 11875,
+      "total": 1.637,
+      "reconstruction": 0.6693,
+      "normal_reference": 0.7897,
+      "classification": 0.178
+    },
+    {
+      "epoch": 1,
+      "batch": 400,
+      "batches": 11875,
+      "total": 1.3814,
+      "reconstruction": 0.3282,
+      "normal_reference": 0.894,
+      "classification": 0.1593
+    },
+    {
+      "epoch": 5,
+      "batch": 11500,
+      "batches": 11875,
+      "total": 1.3449,
+      "reconstruction": 0.5412,
+      "normal_reference": 0.5564,
+      "classification": 0.2473
+    },
+    {
+      "epoch": 6,
+      "batch": 200,
+      "batches": 11875,
+      "total": 1.2738,
+      "reconstruction": 0.3203,
+      "normal_reference": 0.708,
+      "classification": 0.2455
+    },
+    {
+      "epoch": 5,
+      "batch": 11700,
+      "batches": 11875,
+      "total": 1.2428,
+      "reconstruction": 0.4557,
+      "normal_reference": 0.5738,
+      "classification": 0.2133
+    },
+    {
+      "epoch": 6,
+      "batch": 300,
+      "batches": 11875,
+      "total": 1.1554,
+      "reconstruction": 0.417,
+      "normal_reference": 0.5867,
+      "classification": 0.1518
+    },
+    {
+      "epoch": 0,
+      "batch": 900,
+      "batches": 11875,
+      "total": 1.1421,
+      "reconstruction": 0.2422,
+      "normal_reference": 0.6833,
+      "classification": 0.2166
+    }
+  ],
+  "logged_nonfinite": [],
+  "error_lines": [],
+  "log_tail": "e Loss: 0.1180\n  Anomaly Loss: 0.1242\n  Classification points: loss=161376, valid=160725, padding=651\nEpoch 8, Batch 3400/11875\n  Timing: local=12:55:29 elapsed=39617.7s window=46.9s per_batch=0.4692s samples_per_s=68.2\n  Total Loss: 0.2938\n  Recon Loss: 0.0760\n  Normal Reference Loss: 0.0827\n  Anomaly Loss: 0.1352\n  Classification points: loss=88704, valid=88281, padding=423\nEpoch 8, Batch 3500/11875\n  Timing: local=12:56:00 elapsed=39648.0s window=30.3s per_batch=0.3030s samples_per_s=105.6\n  Total Loss: 0.3504\n  Recon Loss: 0.0964\n  Normal Reference Loss: 0.1253\n  Anomaly Loss: 0.1287\n  Classification points: loss=160128, valid=159474, padding=654\nEpoch 8, Batch 3600/11875\n  Timing: local=12:56:31 elapsed=39679.9s window=31.9s per_batch=0.3186s samples_per_s=100.4\n  Total Loss: 0.2804\n  Recon Loss: 0.0659\n  Normal Reference Loss: 0.1106\n  Anomaly Loss: 0.1039\n  Classification points: loss=64864, valid=64592, padding=272\nEpoch 8, Batch 3700/11875\n  Timing: local=12:57:22 elapsed=39730.9s window=51.0s per_batch=0.5104s samples_per_s=62.7\n  Total Loss: 0.2534\n  Recon Loss: 0.0433\n  Normal Reference Loss: 0.0614\n  Anomaly Loss: 0.1488\n  Classification points: loss=91776, valid=91406, padding=370\nEpoch 8, Batch 3800/11875\n  Timing: local=12:58:06 elapsed=39774.5s window=43.6s per_batch=0.4357s samples_per_s=73.5\n  Total Loss: 0.2826\n  Recon Loss: 0.0844\n  Normal Reference Loss: 0.0926\n  Anomaly Loss: 0.1056\n  Classification points: loss=48448, valid=48168, padding=280\nEpoch 8, Batch 3900/11875\n  Timing: local=12:58:53 elapsed=39821.1s window=46.7s per_batch=0.4667s samples_per_s=68.6\n  Total Loss: 0.2869\n  Recon Loss: 0.0660\n  Normal Reference Loss: 0.0796\n  Anomaly Loss: 0.1413\n  Classification points: loss=40416, valid=40199, padding=217\nEpoch 8, Batch 4000/11875\n  Timing: local=12:59:16 elapsed=39844.7s window=23.5s per_batch=0.2355s samples_per_s=135.9\n  Total Loss: 0.2504\n  Recon Loss: 0.0673\n  Normal Reference Loss: 0.0856\n  Anomaly Loss: 0.0975\n  Classification points: loss=93344, valid=92979, padding=365\nEpoch 8, Batch 4100/11875\n  Timing: local=12:59:45 elapsed=39873.9s window=29.2s per_batch=0.2917s samples_per_s=109.7\n  Total Loss: 0.3203\n  Recon Loss: 0.1326\n  Normal Reference Loss: 0.1293\n  Anomaly Loss: 0.0583\n  Classification points: loss=62432, valid=62115, padding=317\nEpoch 8, Batch 4200/11875\n  Timing: local=13:00:09 elapsed=39897.8s window=24.0s per_batch=0.2398s samples_per_s=133.4\n  Total Loss: 0.2048\n  Recon Loss: 0.0462\n  Normal Reference Loss: 0.0919\n  Anomaly Loss: 0.0667\n  Classification points: loss=223584, valid=222515, padding=1069\nEpoch 8, Batch 4300/11875\n  Timing: local=13:00:59 elapsed=39947.1s window=49.3s per_batch=0.4928s samples_per_s=64.9\n  Total Loss: 0.2294\n  Recon Loss: 0.0572\n  Normal Reference Loss: 0.0853\n  Anomaly Loss: 0.0869\n  Classification points: loss=153536, valid=152837, padding=699\nEpoch 8, Batch 4400/11875\n  Timing: local=13:01:30 elapsed=39978.4s window=31.3s per_batch=0.3127s samples_per_s=102.3\n  Total Loss: 0.2796\n  Recon Loss: 0.0616\n  Normal Reference Loss: 0.0840\n  Anomaly Loss: 0.1340\n  Classification points: loss=191232, valid=190500, padding=732\nEpoch 8, Batch 4500/11875\n  Timing: local=13:02:18 elapsed=40026.2s window=47.8s per_batch=0.4782s samples_per_s=66.9\n  Total Loss: 0.3894\n  Recon Loss: 0.0962\n  Normal Reference Loss: 0.1819\n  Anomaly Loss: 0.1114\n  Classification points: loss=279296, valid=277681, padding=1615\nEpoch 8, Batch 4600/11875\n  Timing: local=13:03:37 elapsed=40105.1s window=78.9s per_batch=0.7888s samples_per_s=40.6\n  Total Loss: 0.1963\n  Recon Loss: 0.0405\n  Normal Reference Loss: 0.0750\n  Anomaly Loss: 0.0807\n  Classification points: loss=184768, valid=184040, padding=728\nEpoch 8, Batch 4700/11875\n  Timing: local=13:04:19 elapsed=40147.2s window=42.1s per_batch=0.4211s samples_per_s=76.0\n  Total Loss: 0.3242\n  Recon Loss: 0.0969\n  Normal Reference Loss: 0.1053\n  Anomaly Loss: 0.1220\n  Classification points: loss=92576, valid=92216, padding=360\n",
+  "metrics_files": [],
+  "checkpoint_files": [
+    "epoch_0001.pth",
+    "epoch_0003.pth",
+    "epoch_0005.pth",
+    "epoch_0000.pth",
+    "epoch_0002.pth",
+    "epoch_0004.pth",
+    "epoch_0006.pth",
+    "best.pth",
+    "epoch_0007.pth"
+  ],
+  "gpu": "0, 92 %, 10744 MiB, 11264 MiB, 84\n1, 89 %, 10147 MiB, 11264 MiB, 85\n"
+}

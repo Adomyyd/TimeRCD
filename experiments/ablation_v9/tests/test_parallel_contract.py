@@ -18,7 +18,7 @@ from run_experiment import apply_runtime_overrides
 import run_experiment as entry
 
 ROOT = Path(__file__).resolve().parents[1]
-VARIANTS = ["p0_mask_x", "p1_full_x", "p2_full_x0"]
+VARIANTS = ["p0_mask_x", "p1_mask_x_normal"]
 
 
 def config_for(variant="p0_mask_x"):

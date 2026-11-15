@@ -1,0 +1,31 @@
+{
+  "removed_completed_helpers": [
+    {
+      "path": "experiments/ablation_v9/.tmp_eval_20261114/launch.py",
+      "sha256": "f65c3e9ac94aaf2fee5d14028b8e2dc203f6d87d913c88a3e5c70422acfd450f"
+    },
+    {
+      "path": "experiments/ablation_v9/.tmp_eval_20261114/update_docs.py",
+      "sha256": "5d860c1df3eb7fef92117b3c804a06f5910e563a01c26034ab33957400c6930f"
+    },
+    {
+      "path": "experiments/ablation_v9/.tmp_eval_20261114/check.py",
+      "sha256": "d5dd25139ee9260930ed393e5e18293ba19b0884652c4e911f3bf7a2c81fc5ea"
+    },
+    {
+      "path": "experiments/ablation_v9/.tmp_eval_20261114/check_documents.py",
+      "sha256": "60cd52db8fb327c7016f3c83695900351d85c0469ccf714ee63ea0f2db7bdb0a"
+    },
+    {
+      "path": "experiments/ablation_v9/.tmp_eval_20261114/fix_doc_newlines.py",
+      "sha256": "9e0a82ed266cb7c73511e516004b28e017f19a0d414ee0c1a0e9899b5ac59020"
+    }
+  ],
+  "remaining_active_helpers": [
+    "supervise.py",
+    "progress.py",
+    "preflight_record.py"
+  ],
+  "note": "Evaluation still running; active operational helpers are needed until queue completion",
+  "updated_utc": "2026-11-14T05:24:43.852219+00:00"
+}

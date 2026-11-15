@@ -1,0 +1,63 @@
+{
+  "status": "completed",
+  "created_utc": "2026-11-14T06:03:30.332943+00:00",
+  "purpose": "Bounded diagnostic only: actual best checkpoint, two saved synthetic sequences and one real NAB sequence; pinned official zero_shot same weights; no production run",
+  "worker_info": {
+    "pid": 2434615,
+    "cpu_threads": 1,
+    "cuda_initialized": false,
+    "cached_datasets": 0,
+    "inner_start_method": "fork"
+  },
+  "records": [
+    {
+      "series": "synthetic_98915",
+      "points": 1394,
+      "gpu_inference_seconds": 0.39722406305372715,
+      "metric_seconds": {
+        "probability": 2.8723953682929277,
+        "logit": 2.3651894368231297
+      },
+      "maximum_score_differences": {
+        "probability_vs_pinned_official": 0.0,
+        "logit_vs_pinned_official": 0.0,
+        "data_parallel_vs_single_probability": 0.0,
+        "data_parallel_vs_single_logit": 0.0,
+        "probability_vs_saved": 0.0,
+        "logit_vs_saved": 0.0
+      }
+    },
+    {
+      "series": "synthetic_111967",
+      "points": 5478,
+      "gpu_inference_seconds": 0.46161526814103127,
+      "metric_seconds": {
+        "probability": 2.7930813394486904,
+        "logit": 2.678413884714246
+      },
+      "maximum_score_differences": {
+        "probability_vs_pinned_official": 0.0,
+        "logit_vs_pinned_official": 0.0,
+        "data_parallel_vs_single_probability": 2.8014183044433594e-06,
+        "data_parallel_vs_single_logit": 2.384185791015625e-05,
+        "probability_vs_saved": 0.0,
+        "logit_vs_saved": 0.0
+      }
+    },
+    {
+      "series": "023_NAB_id_23_Facility_tr_4512_1st_16551.csv",
+      "points": 13537,
+      "gpu_inference_seconds": 0.06274347752332687,
+      "metric_seconds": {
+        "probability": 0.7587239425629377,
+        "logit": 0.7947512529790401
+      },
+      "maximum_score_differences": {
+        "probability_vs_pinned_official": 0.0,
+        "logit_vs_pinned_official": 0.0,
+        "data_parallel_vs_single_probability": 8.732080459594727e-06,
+        "data_parallel_vs_single_logit": 6.103515625e-05
+      }
+    }
+  ]
+}

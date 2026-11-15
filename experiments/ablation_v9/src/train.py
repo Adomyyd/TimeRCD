@@ -44,12 +44,8 @@ def make_batch_inputs(batch, config: dict, generator: torch.Generator):
         float(config["input"]["mask_ratio"]),
         generator,
     )
-    if config["input"]["input_mode"] == "masked_x":
-        x_input = apply_input_mask(batch["x"], mask)
-        encoder_mask = batch["valid"] & ~mask
-    else:
-        x_input = batch["x"]
-        encoder_mask = batch["valid"]
+    x_input = apply_input_mask(batch["x"], mask)
+    encoder_mask = batch["valid"] & ~mask
     return x_input, encoder_mask, mask
 
 
@@ -77,6 +73,7 @@ def run_smoke(model, config: dict) -> dict:
         float(config["loss"]["classification_weight"]),
         mask.to(device),
         classification_padding=config["loss"].get("classification_padding", "ignore"),
+        normal_reference_weight=float(config["loss"].get("normal_reference_weight", 0)),
     )
     losses["total"].backward()
     return {
@@ -125,7 +122,8 @@ def _build_train_loader(config: dict, train_indices: list[int]):
     return loader, kind, None
 
 
-def train_model(model, config: dict, run_dir: Path) -> dict:
+def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None = None,
+                checkpoint_keep_last: int | None = None) -> dict:
     set_seed(int(config["runtime"]["seed"]))
     device = _device(config)
     data_start = time.time()
@@ -149,6 +147,9 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
         f"Parallel settings: {parallel_record(model, config)}\n"
         f"Loss settings: classification_padding={config['loss'].get('classification_padding', 'ignore')}, "
         f"checkpoint_selection=valid_total\n"
+        f"Loss weights: observation={config['loss']['reconstruction_weight']}, "
+        f"normal_reference={config['loss'].get('normal_reference_weight', 0)}, "
+        f"classification={config['loss']['classification_weight']}\n"
         f"Patch settings: encoder_patch_size={unwrap_model(model).encoder.patch_size}, "
         f"mask_patch_size={int(config['input']['mask_patch_size'])}, "
         f"mask_ratio={float(config['input']['mask_ratio'])}, "
@@ -168,15 +169,43 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
     stale = 0
     run_start = time.time()
 
-    for epoch in range(int(config["optimization"]["epochs"])):
+    # OPTIONAL DIAGNOSTICS: remove this block and the other marked blocks freely.
+    diagnostics = None
+    if config.get("diagnostics", {}).get("enabled", False):
+        from .diagnostics import BatchDiagnostics
+        diagnostics = BatchDiagnostics(run_dir, config)
+    # END OPTIONAL DIAGNOSTICS
+
+    start_epoch = 0
+    if resume_from is not None:
+        from .resume import restore_training, restore_rng
+        restored = restore_training(resume_from, model, optimizer, config, run_dir)
+        start_epoch = int(restored["next_epoch"])
+        best_loss = float(restored["best_loss"])
+        best_epoch = int(restored["best_epoch"])
+        stale = int(restored["stale"])
+        # Restore AFTER model/optimizer/loader/diagnostic setup, immediately before iteration.
+        restore_rng(restored["rng"])
+        del restored
+        message = f"Resumed: next_epoch={start_epoch} best_epoch={best_epoch} stale={stale}\n"
+        print(message, end="", flush=True)
+        with log_path.open("a", encoding="utf-8") as handle:
+            handle.write(message)
+
+    for epoch in range(start_epoch, int(config["optimization"]["epochs"])):
         model.train()
         epoch_start = time.time()
         last_log_time = epoch_start
         last_log_batch = 0
         if batch_sampler is not None:
             batch_sampler.set_epoch(epoch)
+        # OPTIONAL DIAGNOSTICS
+        if diagnostics is not None:
+            diagnostics.begin_epoch(epoch, batch_sampler, train_indices)
+        # END OPTIONAL DIAGNOSTICS
         total = 0.0
         total_reconstruction = 0.0
+        total_normal_reference = 0.0
         total_classification = 0.0
         batches = 0
         padded_points = 0
@@ -188,6 +217,10 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
             )
             x_input, encoder_mask, mask = make_batch_inputs(batch, config, generator)
             batch_device = {key: value.to(device) for key, value in batch.items() if isinstance(value, torch.Tensor)}
+            # OPTIONAL DIAGNOSTICS
+            if diagnostics is not None:
+                diagnostics.before_forward()
+            # END OPTIONAL DIAGNOSTICS
             output = model(x_input.to(device), encoder_mask.to(device))
             losses = compute_losses(
                 output,
@@ -197,15 +230,23 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
                 float(config["loss"]["classification_weight"]),
                 mask.to(device),
                 classification_padding=config["loss"].get("classification_padding", "ignore"),
+                normal_reference_weight=float(config["loss"].get("normal_reference_weight", 0)),
             )
             losses["total"].backward()
+            # OPTIONAL DIAGNOSTICS: observe gradients and snapshot BEFORE the update.
+            if diagnostics is not None:
+                diagnostics.after_backward(model, optimizer, batch_index, batch, x_input,
+                                           encoder_mask, mask, output, losses, train_loader.dataset)
+            # END OPTIONAL DIAGNOSTICS
             optimizer.step()
 
             batch_total = float(losses["total"].detach().cpu())
             batch_reconstruction = float(losses["reconstruction"].detach().cpu())
             batch_classification = float(losses["classification"].detach().cpu())
+            batch_normal_reference = float(losses["normal_reference"].detach().cpu())
             total += batch_total
             total_reconstruction += batch_reconstruction
+            total_normal_reference += batch_normal_reference
             total_classification += batch_classification
             batches += 1
             padded_points += int((~batch["valid"]).sum())
@@ -223,10 +264,8 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
                     f"samples_per_s={seen * len(batch['valid']) / max(1e-9, window):.1f}\n"
                     f"  Total Loss: {batch_total:.4f}\n"
                     f"  Recon Loss: {batch_reconstruction:.4f}\n"
+                    f"  Normal Reference Loss: {batch_normal_reference:.4f}\n"
                     f"  Anomaly Loss: {batch_classification:.4f}\n"
-                    f"  Classification points: loss={losses['classification_count']}, "
-                    f"valid={int((batch['valid'] & (batch['y'] >= 0)).sum())}, "
-                    f"padding={int((~batch['valid']).sum())}\n"
                 )
                 print(batch_log, end="", flush=True)
                 with log_path.open("a", encoding="utf-8") as handle:
@@ -236,6 +275,7 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
 
         average_total = total / max(1, batches)
         average_reconstruction = total_reconstruction / max(1, batches)
+        average_normal_reference = total_normal_reference / max(1, batches)
         average_classification = total_classification / max(1, batches)
         padding_fraction = padded_points / max(1, padded_points + valid_points)
         epoch_seconds = time.time() - epoch_start
@@ -248,7 +288,11 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
             f"Epoch {epoch} completed:\n"
             f"  Average Total Loss: {average_total:.4f}\n"
             f"  Average Recon Loss: {average_reconstruction:.4f}\n"
+            f"  Average Normal Reference Loss: {average_normal_reference:.4f}\n"
             f"  Average Anomaly Loss: {average_classification:.4f}\n"
+            f"  Validation Recon Loss: {float(validation.get('reconstruction', 0)):.4f}\n"
+            f"  Validation Normal Reference Loss: {float(validation.get('normal_reference', 0)):.4f}\n"
+            f"  Validation Anomaly Loss (valid): {float(validation.get('valid_classification', 0)):.4f}\n"
             f"  Validation Objective Loss: {float(validation['total']):.4f}\n"
             f"  Validation Valid Total Loss (selection): {validation_loss:.4f}\n"
             f"  Padding Fraction: {padding_fraction:.4f}\n"
@@ -266,7 +310,19 @@ def train_model(model, config: dict, run_dir: Path) -> dict:
             "validation": validation,
             "config": config,
         }
+        if (config["experiment_id"] == "p1_mask_x_normal"
+                or config.get("diagnostics", {}).get("enabled", False) or resume_from is not None):
+            from .resume import checkpoint_training_state
+            checkpoint["training_state"] = checkpoint_training_state(
+                epoch, validation_loss, best_loss, best_epoch, stale)
         torch.save(checkpoint, checkpoint_dir / f"epoch_{epoch:04d}.pth")
+        if checkpoint_keep_last is not None:
+            from .resume import prune_epoch_checkpoints
+            prune_epoch_checkpoints(run_dir, checkpoint_keep_last)
+        # OPTIONAL DIAGNOSTICS
+        if diagnostics is not None:
+            diagnostics.end_epoch(epoch, checkpoint_dir / f"epoch_{epoch:04d}.pth")
+        # END OPTIONAL DIAGNOSTICS
         if validation_loss < best_loss:
             best_loss = validation_loss
             best_epoch = epoch
@@ -343,6 +399,7 @@ def benchmark(model, config: dict, run_dir: Path, max_batches: int, warmup: int 
             float(config["loss"]["classification_weight"]),
             mask.to(device),
             classification_padding=config["loss"].get("classification_padding", "ignore"),
+            normal_reference_weight=float(config["loss"].get("normal_reference_weight", 0)),
         )
         losses["total"].backward()
         optimizer.step()

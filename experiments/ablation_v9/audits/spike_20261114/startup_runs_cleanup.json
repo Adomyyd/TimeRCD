@@ -1,0 +1,164 @@
+{
+  "authorized_by": "User requested prompt deletion of the two unused startup run directories",
+  "created_utc": "2026-11-14T11:50:34.546642+00:00",
+  "active_run_retained": "p0_official_spike_diag_r3_20261114",
+  "status": "completed",
+  "removed": [
+    {
+      "run_id": "p0_official_spike_diag_20261114",
+      "run_path": "experiments/ablation_v9/runs/p0_official_spike_diag_20261114",
+      "previous_status": {
+        "run_id": "p0_official_spike_diag_20261114",
+        "mode": "train",
+        "status": "aborted",
+        "started_utc": "2026-11-14T11:20:52.111949+00:00",
+        "completed_utc": "2026-11-14T11:31:50.685995+00:00",
+        "reason": "Agent stopped startup trial after historical trajectory divergence; moved statistics to CPU and added full-size controlled parity check"
+      },
+      "files": [
+        {
+          "path": "audit.json",
+          "bytes": 2099,
+          "sha256": "a0d6e388c5728ad4e9197add99034eca2f4eb150aa54fa1529f8202925f44ae9"
+        },
+        {
+          "path": "command.txt",
+          "bytes": 391,
+          "sha256": "c9915fdc4966ed6503a4fa2d28d8c20bcfc1203a27aaabca11c18e5d8eaf6d38"
+        },
+        {
+          "path": "config.json",
+          "bytes": 1680,
+          "sha256": "8da37147a67b28124e4020438062049c6168a3fc54376e0b9b647f3eb28ab939"
+        },
+        {
+          "path": "data_manifest.json",
+          "bytes": 1455,
+          "sha256": "662c76c1d519e19689e439ac11e404bc2e8f17c32072cfccdf62ef6572384731"
+        },
+        {
+          "path": "diagnostics/batches.jsonl",
+          "bytes": 1813423,
+          "sha256": "de6970407a45ce65a5f70eb56bb392adfc883165b19f3ea87928346f1334fbeb"
+        },
+        {
+          "path": "diagnostics/settings.json",
+          "bytes": 3183,
+          "sha256": "678262ca07a9fbc00cbb173d96f194ea021b2a21dc6e5f6713ae3b35bec9ca2b"
+        },
+        {
+          "path": "environment.json",
+          "bytes": 655,
+          "sha256": "09e3f574b1e538fd8309d81d829bb741e7767ad8dcdc5e9a94caab4c8e9cd92e"
+        },
+        {
+          "path": "smoke.json",
+          "bytes": 481,
+          "sha256": "b876350537fdc0f65108e8782dbc7f8d5b6cb1ef0b631f0a519e789767f6d2bd"
+        },
+        {
+          "path": "status.json",
+          "bytes": 351,
+          "sha256": "93cd78fd1d3b9137ed330b6123ba8da917a1691fd788836f2ce60b219966c493"
+        },
+        {
+          "path": "train.log",
+          "bytes": 2203,
+          "sha256": "b3dc5c5169da65410511492af8d0b3ec75238b7347ab0a528d5476a260769e11"
+        }
+      ],
+      "bytes": 1825921,
+      "diagnostic_batches": 678,
+      "last_batch": {
+        "epoch": 0,
+        "batch": 677,
+        "loss": {
+          "total": 0.4769272804260254,
+          "reconstruction": 0.23937687277793884,
+          "classification": 0.23755040764808655
+        }
+      },
+      "maximum_total_loss": 3.210606336593628,
+      "deleted": true
+    },
+    {
+      "run_id": "p0_official_spike_diag_cpu_20261114",
+      "run_path": "experiments/ablation_v9/runs/p0_official_spike_diag_cpu_20261114",
+      "previous_status": {
+        "run_id": "p0_official_spike_diag_cpu_20261114",
+        "mode": "train",
+        "status": "aborted",
+        "started_utc": "2026-11-14T11:31:13.650901+00:00",
+        "completed_utc": "2026-11-14T11:43:26.135266+00:00",
+        "reason": "Stopped after historical batch200 difference persisted; CPU NumPy statistics and explicit optional strict comparison policy implemented"
+      },
+      "files": [
+        {
+          "path": "audit.json",
+          "bytes": 2099,
+          "sha256": "a0d6e388c5728ad4e9197add99034eca2f4eb150aa54fa1529f8202925f44ae9"
+        },
+        {
+          "path": "command.txt",
+          "bytes": 395,
+          "sha256": "e19df2721c73530c3bd67888c23727e56107635edac3036e3c437d91bbcc652b"
+        },
+        {
+          "path": "config.json",
+          "bytes": 1680,
+          "sha256": "8da37147a67b28124e4020438062049c6168a3fc54376e0b9b647f3eb28ab939"
+        },
+        {
+          "path": "data_manifest.json",
+          "bytes": 1455,
+          "sha256": "662c76c1d519e19689e439ac11e404bc2e8f17c32072cfccdf62ef6572384731"
+        },
+        {
+          "path": "diagnostics/batches.jsonl",
+          "bytes": 1247439,
+          "sha256": "51b73e9687327a74811814276958b2aa8b3a04f4bad7a56865305e5c35f42467"
+        },
+        {
+          "path": "diagnostics/settings.json",
+          "bytes": 3183,
+          "sha256": "dcf2feda17b029f13c9b9aed5c720669279c5de3ea767fb8d9fc534a3b42f3ff"
+        },
+        {
+          "path": "environment.json",
+          "bytes": 655,
+          "sha256": "9834861ead9cfee6ba203a1b826e43ef56c5062f352cd546bdac9394d9854c02"
+        },
+        {
+          "path": "smoke.json",
+          "bytes": 481,
+          "sha256": "b876350537fdc0f65108e8782dbc7f8d5b6cb1ef0b631f0a519e789767f6d2bd"
+        },
+        {
+          "path": "status.json",
+          "bytes": 355,
+          "sha256": "20df3f405fb15720b865147ab540b967b3445594aedf1703c73a421f98555f13"
+        },
+        {
+          "path": "train.log",
+          "bytes": 1715,
+          "sha256": "4b4315e00564a2677286a3c92f9f7b488e8b96197e40e6e8d7d810e9a6a2f597"
+        }
+      ],
+      "bytes": 1259457,
+      "diagnostic_batches": 466,
+      "last_batch": {
+        "epoch": 0,
+        "batch": 465,
+        "loss": {
+          "total": 0.34462231397628784,
+          "reconstruction": 0.21306195855140686,
+          "classification": 0.13156035542488098
+        }
+      },
+      "maximum_total_loss": 3.210606336593628,
+      "deleted": true
+    }
+  ],
+  "completed_utc": "2026-11-14T11:50:34.840493+00:00",
+  "total_bytes_removed": 3085378
+}

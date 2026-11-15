@@ -71,7 +71,7 @@ def test_sample_and_zero_fill_match_original(filename, block_size, monkeypatch):
     assert torch.equal(apply_input_mask(x, actual), expected_x)
 
 
-@pytest.mark.parametrize("variant", ["p0_mask_x", "p1_full_x", "p2_full_x0"])
+@pytest.mark.parametrize("variant", ["p0_mask_x", "p1_mask_x_normal"])
 def test_train_and_eval_inputs_match_protocol(variant):
     config = load_config(ROOT / "configs" / f"{variant}.json").raw
     batch = {"x": torch.ones(2, 1024, 1), "valid": torch.ones(2, 1024, dtype=torch.bool)}
@@ -80,12 +80,8 @@ def test_train_and_eval_inputs_match_protocol(variant):
     assert all(torch.equal(a, b) for a, b in zip(train, evaluation))
     x_input, visible, selected = train
     assert selected.sum(1).tolist() == [144, 144]
-    if variant == "p0_mask_x":
-        assert torch.equal(visible, batch["valid"] & ~selected)
-        assert (x_input[selected] == 0).all()
-    else:
-        assert torch.equal(x_input, batch["x"])
-        assert torch.equal(visible, batch["valid"])
+    assert torch.equal(visible, batch["valid"] & ~selected)
+    assert (x_input[selected] == 0).all()
 
 
 def test_encoder_keeps_partially_visible_token():
@@ -110,7 +106,7 @@ def test_encoder_keeps_partially_visible_token():
     assert torch.isfinite(output).all()
 
 
-@pytest.mark.parametrize("variant", ["p0_mask_x", "p1_full_x", "p2_full_x0"])
+@pytest.mark.parametrize("variant", ["p0_mask_x", "p1_mask_x_normal"])
 def test_default_model_cpu_smoke(variant):
     config = load_config(ROOT / "configs" / f"{variant}.json").raw
     config["runtime"]["device"] = "cpu"

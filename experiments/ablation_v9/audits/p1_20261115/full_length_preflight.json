@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "batch_size": 32,
+  "length": 10000,
+  "parallel": "data_parallel",
+  "loss": {
+    "total": 2.686777114868164,
+    "reconstruction": 1.0045790672302246,
+    "classification": 0.6893361806869507,
+    "normal_reference": 0.9928618669509888,
+    "normal_reference_count": 47616.0,
+    "reconstruction_count": 47616.0,
+    "classification_count": 320000.0
+  },
+  "peak_mb": [
+    8855.288832,
+    8507.316736
+  ],
+  "finite_gradients": true
+}

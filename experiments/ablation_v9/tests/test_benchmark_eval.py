@@ -3,6 +3,8 @@ import argparse
 import copy
 import importlib.util
 import json
+import os
+import multiprocessing
 from pathlib import Path
 import pickle
 import sys
@@ -28,6 +30,27 @@ def protocol():
     result = bench.load_protocol()
     result.update(window_size=16, inference_batch_size=2, heavy_workers=1, light_workers=1)
     return result
+
+
+@pytest.fixture
+def inline_metric_worker(monkeypatch):
+    # Pipeline tests inject failures without sending unpicklable local functions
+    # to a child; the separate worker test exercises the real process boundary.
+    class InlineWorker:
+        def __init__(self, protocol):
+            self.protocol = protocol
+            self.info = {"backend": "test_inline"}
+
+        def __enter__(self):
+            return self
+
+        def compute(self, scores, labels, sliding_window):
+            return bench.official_metrics(scores, labels, sliding_window, self.protocol)
+
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr(bench, "OfficialMetricWorker", InlineWorker)
 
 
 @pytest.fixture
@@ -140,12 +163,12 @@ def test_checkpoint_mismatch_rejected():
     config = load_config(ROOT / "configs" / "p0_mask_x.json").raw
     bench.verify_checkpoint_config({"config": copy.deepcopy(config)}, config)
     saved = copy.deepcopy(config)
-    saved["experiment_id"] = "p1_full_x"
+    saved["experiment_id"] = "p1_mask_x_normal"
     with pytest.raises(ValueError, match="experiment_id"):
         bench.verify_checkpoint_config({"config": saved}, config)
 
 
-def test_joint_pipeline_split_full_inputs_and_partial_status(tmp_path, model, protocol, monkeypatch):
+def test_joint_pipeline_split_full_inputs_and_partial_status(tmp_path, model, protocol, monkeypatch, inline_metric_worker):
     config = copy.deepcopy(load_config(ROOT / "configs" / "p0_mask_x.json").raw)
     samples = [{"time_series": np.arange(13) + i, "labels": [0] * 7 + [1] * 6} for i in range(6)]
     path = tmp_path / "data.pkl"
@@ -178,7 +201,7 @@ def test_joint_pipeline_split_full_inputs_and_partial_status(tmp_path, model, pr
     assert len(pd.read_csv(run / "metrics/domain_summary.csv")) == 8
 
 
-def test_metrics_failure_preserves_partial_rows(tmp_path, model, protocol, monkeypatch):
+def test_metrics_failure_preserves_partial_rows(tmp_path, model, protocol, monkeypatch, inline_metric_worker):
     config = copy.deepcopy(load_config(ROOT / "configs" / "p0_mask_x.json").raw)
     path = tmp_path / "data.pkl"
     path.write_bytes(pickle.dumps([{"time_series": np.arange(13), "labels": [0]*7+[1]*6}] * 2))
@@ -212,7 +235,7 @@ def test_group_macro_is_not_pooled_series_macro():
     assert result["series_macro"]["AUC-PR"] == pytest.approx(1/3)
 
 
-def test_unified_eval_entry_loads_checkpoint_and_runs_both_domains(tmp_path, protocol, monkeypatch):
+def test_unified_eval_entry_loads_checkpoint_and_runs_both_domains(tmp_path, protocol, monkeypatch, inline_metric_worker):
     import run_experiment as entry
     config = copy.deepcopy(load_config(ROOT / "configs" / "p0_mask_x.json").raw)
     config["model"].update(d_model=16, d_proj=8, num_layers=1, num_heads=2, patch_size=4)
@@ -246,3 +269,66 @@ def test_unified_eval_entry_loads_checkpoint_and_runs_both_domains(tmp_path, pro
     assert result["summaries"]["synthetic"]["probability"]["series_count"] == 1
     assert result["summaries"]["real"]["probability"]["series_count"] == 1
     assert not (run / "metrics/train.json").exists()
+
+
+def test_spawn_worker_reuses_process_preserves_metrics_and_propagates_errors(protocol, monkeypatch):
+    from src.data import _DATA_CACHE
+    from src.metric_worker import OfficialMetricWorker
+
+    monkeypatch.setitem(_DATA_CACHE, "parent_only_fixture", [{"must_not_be_inherited": True}])
+    labels = np.zeros(64, dtype=int)
+    labels[8:15] = 1
+    labels[33:43] = 1
+    probability = np.round(.5 + .23 * np.sin(np.arange(64) * .37) + labels * .18, 3)
+    margin = np.log(probability / (1 - probability))
+    previous_threads = torch.get_num_threads()
+    torch.set_num_threads(protocol["cpu_threads"])
+    try:
+        expected = [bench.official_metrics(scores, labels, 5, protocol) for scores in (probability, margin)]
+        with OfficialMetricWorker(protocol) as worker:
+            pid = worker.info["pid"]
+            assert pid != os.getpid()
+            assert worker.info["cached_datasets"] == 0
+            assert worker.info["cuda_initialized"] is False
+            assert worker.info["cpu_threads"] == protocol["cpu_threads"]
+            if sys.platform.startswith("linux"):
+                assert worker.info["inner_start_method"] == "fork"
+            actual_probability = worker.compute(probability, labels, 5)
+            with pytest.raises(ValueError, match="aligned"):
+                worker.compute(probability[:-1], labels, 5)
+            actual_margin = worker.compute(margin, labels, 5)
+            assert worker.info["pid"] == pid
+        assert pid not in {child.pid for child in multiprocessing.active_children()}
+        with pytest.raises(RuntimeError, match="not running"):
+            worker.compute(probability, labels, 5)
+        for actual, reference in zip((actual_probability, actual_margin), expected):
+            assert set(actual) == set(bench.METRIC_KEYS)
+            for key in bench.METRIC_KEYS:
+                assert actual[key] == pytest.approx(reference[key], abs=1e-12), key
+    finally:
+        torch.set_num_threads(previous_threads)
+
+
+def test_official_metrics_preserves_official_nan(protocol, monkeypatch):
+    import evaluation.metrics as metric_module
+    returned = {key: 0.5 for key in bench.METRIC_KEYS}
+    returned["Affiliation-P"] = float("nan")
+    monkeypatch.setattr(metric_module, "get_metrics_optimized", lambda *args, **kwargs: returned)
+    scores = np.linspace(0, 1, 8)
+    labels = np.array([0, 0, 1, 1, 0, 0, 1, 0])
+    result = bench.official_metrics(scores, labels, 2, protocol)
+    assert np.isnan(result["Affiliation-P"])
+    assert result["AUC-PR"] == 0.5
+
+
+def test_summarize_omits_nan_and_records_valid_counts():
+    rows = []
+    for group, values in [("NAB", [0.4, float("nan")]), ("IOPS", [0.8])]:
+        for value in values:
+            rows.append({"domain": "real", "score_kind": "probability", "group": group,
+                         **{key: value for key in bench.METRIC_KEYS}})
+    summary = bench.summarize(rows)["real"]["probability"]
+    assert summary["group_means"]["NAB"]["AUC-PR"] == 0.4
+    assert summary["series_macro"]["AUC-PR"] == pytest.approx(0.6)
+    assert summary["group_macro"]["AUC-PR"] == pytest.approx(0.6)
+    assert summary["valid_metric_counts"]["series_macro"]["AUC-PR"] == 2

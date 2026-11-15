@@ -1,0 +1,10 @@
+{
+  "observer_blocks": 5,
+  "removed_blocks_ast_identical_to_reference": true,
+  "syntax_check": "passed",
+  "latest_full_suite": "102 passed in 32.31s",
+  "latest_diagnostic_suite": "6 passed, 96 deselected in 18.42s",
+  "statistics_backend": "CPU NumPy; no diagnostic CUDA reductions",
+  "epoch0_default_policy": "report mismatch and continue, label same-config rerun",
+  "strict_stop_policy": "--diagnostic-stop-on-mismatch"
+}

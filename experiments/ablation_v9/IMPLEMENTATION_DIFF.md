@@ -1,79 +1,42 @@
-# v9相对原始TimeRCD的实现差异
+# v9与原始TimeRCD的差异（Agent）
 
-更新时间：2026-11-12。用于核实当前代码，不将历史补丁按时间堆叠成互相冲突的协议。原始根training.py未因v9改写；400k原流程继续调用它。模型、训练设置和监督需分别核对，P0不是官方全流程复制。
+更新：2026-11-15。当前仅P0/P1。原流程original_400k与v9并列；P0是v9内部基线，不宣称官方全流程逐项复制。历史官方源码回归依赖保留在audits/patch_20261110/sources。
 
-## 1. 结构与输入/目标
+## 模型与损失
 
-复用time_rcd/_core/ts_encoder_bi_bias.py的TimeSeriesEncoder；重构头d→4d→4d→1，异常头d→floor(d/2)→2，隐藏层GELU/Dropout与原结构一致；logits按通道平均。当前num_features1，双向RoPE，patch投影后输出逐时间特征。
-
-| 组别 | 相对原遮蔽流程 |
-|---|---|
-| P0 | M处X置零、V&~M、M上重构X；保持原训练任务形态 |
-| P1 | 取消输入置零及attention遮蔽，完整X/V；仍仅同规则M上重构X |
-| P2 | P1相同前向，重构目标改为X^0 |
-
-共同forward只接收x/encoder_mask并返回h/reconstruction/logits。P0/P1/P2在train.make_batch_inputs、evaluate._make_eval_inputs及loss目标处分流。X^0/Y仅监督；没有B/Z、偏离头、基元、真实标签门控或额外时序聚合。
-
-## 2. patch/遮挡来源
-
-官方历史训练入口thu-sail-lab/Time-RCD@ebf4f056b571f7ea90602ef666ae56f7d717ebfe/training.py及本地400k均config=default_config后原地改patch16；当前单卡、workers0时原mask函数也读到16。不能用类默认4推断运行值。v9显式分为model.patch_size=16与input.mask_patch_size=16，mask_ratio0.15。
-
-原函数以ceil(valid_length/patch_size)块数选floor(P×ratio)块，范围裁到有效长度，M内X置零；v9保留该采样语义，训练采样使用独立显式种子。编码器把点可见性聚合为patch内任一点可见即token可见，只屏蔽全不可见token的Key/Value，Queries保留，不删除token。
-
-官方当前main库默认4/噪声替换与历史训练入口不同；spawn重导入全局默认4也是另一条路径，不等同当前400k或v9 DataParallel。论文附录D.5写patch16，正文mask15%，没有独立mask4依据。证据和回归来源见audits/patch_20261110/，其中sources仍是测试依赖。
-
-## 3. 分类padding独立开关
-
-src/losses.py的classification_padding默认ignore：先用valid及labels>=0筛选再二值化；official复现先(labels>0.5).long()再labels!=-1，使padding=-1成为正常0，全部B×T参与CE。三份默认配置显式ignore，三份*_padding_official.json仅该字段不同；旧配置缺省ignore会写入生效快照。
-
-开关不改模型、输入、attention、补齐、重构项、初始化或优化器。train/smoke/训练验证传递模式，日志、检查点、验证和结果记录模式及分母；audit协议字段随模式变化，避免official仍误报已过滤padding。
-
-两模式共同按valid_total早停/选best，保留目标loss供诊断；ignore时与原total一致。检测指标始终排除padding。该选择协议用于隔离训练padding作用，与原脚本直接按其验证目标loss选best的行为须区分。
-
-## 4. 数据/随机性与评价
-
-| 项目 | 原400k流程 | v9 |
+| 项目 | P0 | 新P1 |
 |---|---|---|
-| 训练顺序 | DistributedSampler每轮shuffle | 默认length_bucket按长度分池，每轮重排池及池内；可选sequential固定split后顺序 |
-| 总batch | 16 | 源配置32；CLI --batch-size可覆盖 |
-| 验证分批 | 原验证loader | 固定split后顺序、不分桶；使用同一总batch配置 |
-| 标准化 | batch观测X统计，配对共用 | 保持全batch观测统计、配对共用 |
-| 采样RNG | 原全局随机源 | 训练按seed/epoch/batch显式生成器 |
-| 验证M | 随全局随机流变化 | evaluation.validation_mask_seed固定 |
-| padding CE | 官方行为 | ignore默认/official可选 |
-| 最佳选择 | 原目标验证loss | 共同valid_total |
-| eval | 官方main逐真实CSV推理/指标 | 统一eval/all评测合成留出+同一官方单变量TSB-AD-U协议，另输出可追溯汇总；训练验证不改 |
+| 输入/attention | X选中块置零，V&~M | 与P0相同 |
+| 骨干/原头 | 原TimeSeriesEncoder、观测重构MLP和异常分类MLP | 全部保留，新增独立正常参考MLP |
+| 重构目标 | M∩V上预测X | 同集合分别预测X和X^0 |
+| 首轮loss | L_x+L_cls | L_x+L_n+L_cls |
+| 检测推理 | 完整X，异常头概率/logit | 相同，不执行重构头 |
 
-分桶由src/data.py的LengthBucketBatchSampler及src/train.py的_build_train_loader实现；池大小为batch_size×bucket_multiplier，当前32×50=1600，每轮覆盖一次并保留尾批。380000条训练数据对应11875步。批组成会改变全batch标准化、损失加权和SGD顺序；训练padding减少也改变padding实验的效应范围。
+src/models.py正常参考头结构复用原d→4d→4d→1，两隐藏层GELU/Dropout、输出无界Linear，参数独立。新增头在共享参数初始化后构造，保存/恢复CPU RNG，保证同种子原参数初值一致；训练额外Dropout不保证历史随机轨迹一致。forward只接收观测和encoder_mask，同一H供三头，不读X^0/Y，无B/Z/偏差头/双视图。
 
-因此历史400k与P0的loss差异不能只归因于padding或mask大小。不同目标的总loss也不能直接说明P2优于P1。外部VUS流程已实现，但本次未执行完整数据评测；分组split审计、密度分层、合法上下文干预与多种子统计仍未实现/执行。
+src/losses.py保留reconstruction为观测误差，新增normal_reference字段及normal_reference_weight；三项按配置加权，空选中集合显式零。config.py只接受p0_mask_x/p1_mask_x_normal；删除旧full-input与normal-only目标分流，旧P1/P2标识拒绝。删除四份旧源配置，保留四份P0/P1×padding配置及独立eval协议；不修改旧run快照。
 
-## 5. 可选并行、日志与运行管理
+## 与原官方训练的共同点及工程差异
 
-src/parallel.py实现单进程DataParallel，入口支持--parallel/--gpu-ids；原400k走根training.py的DDP路径（当前单进程world_size1）。v9只切batch维，全batch预处理/采样，汇总预测后计算loss，总batch和优化器步数不随卡数增加。首逻辑GPU为主卡。无DDP/FSDP/多机实现；已有默认规模短程测速汇总，未完成整轮吞吐验证；见audits/bench_20261111/bench_summary.json及RUNTIME_NOTES中的限制，单多卡不承诺逐位一致。
+原历史入口同进程patch/遮挡实际16/16、ratio0.15，非初始默认4；证据见patch审计。重构只在选中位置MSE，分类同次遮挡前向。模型patch线性投影、双向注意力、时间投影和原两头结构保留。官方训练输入标准化但不重新标准化输出；没有新增clip/学习率调度/AMP/尖峰跳过，历史不稳定根因未解决。
 
-v9检查点保存未封装完整state_dict、优化器、epoch、验证和config；支持单多卡eval加载，但当前没有训练resume接口。400k入口支持本run模型/优化器恢复，也不是完整RNG/早停恢复。
+official复现标签先二值化使padding成为正常点参与CE；ignore先过滤padding再CE。当前主线official，attention和重构仍排除padding。同组两配置仅该字段不同。原训练DistributedSampler/全局随机源与v9仍有差异，历史400k不能单独隔离padding影响。
 
-v9统一入口负责audit/smoke/bench/train/eval/report/all与独立run登记；all实际为audit→smoke→train→best eval，不自动report。默认每100batch输出分项loss和分类点数，epoch记录分项/验证。尚未加入逐batch尖峰触发保存，不能承诺周期日志捕获所有异常。
+v9随机95/5 seed42、运行seed72、分桶batch32、bucket_multiplier50；原400k历史batch16及顺序/步数不同。分桶改变同批统计、padding与更新顺序，不只是加速。训练X/X^0共同使用观测batch统计，推理沿用官方逐序列标准化。背景分组与生成器配对语义未完全审计。
 
-## 6. 核实位置与整理边界
+## 日志、选择与状态
 
-src/{models,sampling,losses,train,evaluate,parallel,audit,config}.py分别承担上述职责；README给出可执行命令，EXPERIMENT_SPEC约束工程行为。audits/patch_20261110、parallel_20261110、padding_20261110保留来源、差异、哈希与XML证据。
+训练每100batch报告总loss、观测重构、正常参考和异常分类，P1验证额外报告分区域/实际变化及复制基线；P0原输出和参数键保持兼容，正常参考日志为0。各组按自身valid_total选best和patience7早停，P1多含L_n，数值不可跨组直接判断方法优劣，需共同检测协议与实际预算。
 
-2026-11-10整理只修正audit元数据及其断言、归档旧备份并移除冗余入口/缓存。当时未改变训练数值逻辑；之后用户新增分桶、测速和总batch32，当前以本文件及源代码为准。2026-11-11本次只更新文档，不修改代码、配置或原始产物。原migrations、padding的before备份和一次性停止脚本移入`experiments/_archive/20261110_cleanup/`；run、registry、数据、权重保留原位。
+单进程DataParallel分batch、gather后全batch损失，完整未封装checkpoint；与官方多进程路径非逐项一致。统一入口负责run身份、快照、status/registry、audit与失败传播。新P1普通轮末默认保存完整RNG/best/stale；P0保留诊断/续跑时完整状态的历史语义。src/resume只做轮末恢复与保留策略，无训练循环；不把源检查点当新组预训练初始化。
 
-## 7. 配置字段与未实现能力
+可选诊断独立、默认关闭，不改变损失/梯度或增加采样/前后向；P1新增正常参考loss/预测/误差观测。P0历史事故缺RNG，不保证重现；用户已暂缓。
 
-入口另支持--batch-size（在实际config快照前覆盖总batch）和bench专用--max-batches（默认300）。bench读取完整训练数据并执行反向及优化器更新，不验证、不保存训练检查点，也不是smoke；实现限制见RUNTIME_NOTES。
+## 评测与历史
 
-runtime.mixed_precision虽存在于JSON，v9未读取该字段，也没有autocast/GradScaler，不能靠设为true启用AMP。evaluation.threshold_source只是训练协议记录，训练验证用logits argmax；完整eval改用官方oracle搜索，仍没有验证集部署阈值搜索。schema_version只要求字段存在，未校验具体版本。未使用的MODES常量已于用户确认后删除，实际模式由run_experiment.py的argparse choices定义。当前没有预训练权重初始化、训练resume、B/Z或P3–P5入口；方案中的这些部分仍是后续计划。
+benchmark_eval/metric_worker对接固定官方d458549及TSB-AD-U，额外统一合成留出评价。F1 oracle、两种分数、逐序列/组宏平均及NaN规则见RUNTIME_NOTES；不改变公式来加速。进程优化让持有大pickle的父进程复用小CPU worker，相关source是数值回归依赖，不能清理。两个P0配对评测已完成，RESULTS保留原数值。
 
-## 8. 完整评测相对旧eval的变化（2026-11-12）
+旧full-input P1已停止并保留run，不计为新P1；旧P2配置和未使用分流退出当前实现。新代码、退役配置与文档差异/检查/清理证据在audits/p1_20261115。旧日期审计代表历史，不回填新语义、不沿用旧测试数充当本次验证。
 
-新增benchmark_eval.py、eval_official.json、requirements-eval.txt及对应测试；run_experiment.py将eval/all接入统一基准，校验checkpoint与训练配置，明确eval的checkpoint参数。原evaluate_model保留作训练验证，train.py/模型/损失/采样及六训练JSON均未改。新评测完整输入，检测分数与官方一致；X0不用于推理或检测指标。根官方指标/数据处理代码未改，本次仅复用；两处历史F1_T执行修正与固定官方源码作数值对照。
 
-官方对齐版本d458549；逐字节主脚本核对、数据选择、预处理/尾窗口/概率及logit、16指标测试见audits/eval_20261112。官方main只写逐序列结果；本项目新增组均值/组等权宏平均/序列宏平均及合成侧同协议评测，是额外编排，不声称官方原脚本已经包含合成评测和这些汇总。训练seed/验证mask/选best不跟随评测seed2024改变。两侧全量评测尚未启动。
-
-## 9. 冗余代码核查（2026-11-12）
-
-已核查入口、全部src/tests与历史sources的引用。用户确认后已删除MODES、config_to_json和models.Optional，以及两隐藏备份目录共11文件。runtime.mixed_precision/evaluation.threshold_source为不生效配置记录，本轮保留。报告、已应用补丁和执行记录见audits/eval_20261112/CODE_REVIEW.md、cleanup_proposal.diff与cleanup_execution.json。evaluate.py、reporting.py、缓存、并行和审计来源均有职责，不因新eval加入而删除。
+显存执行说明（2026-11-15）：最长10000点/总batch32的双卡合成检查发现两个完整重构头保留激活会OOM。新P1训练模式对两个重构MLP启用non-reentrant激活检查点，preserve_rng_state=True，反向时重算头部；骨干仍只前向一次，不改变M/目标/权重/batch/FP32，P0执行路径不变。验证/检测不启用重算。CPU检查覆盖输出/梯度/Dropout RNG与普通头计算一致；最长序列完整前后向及AdamW更新已通过，峰值约8.86/8.51GB（十进制）。重算增加计算开销，不将其当作数值等价提速。

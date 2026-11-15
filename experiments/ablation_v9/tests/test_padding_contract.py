@@ -16,7 +16,7 @@ from src.evaluate import evaluate_model
 import src.train as training
 
 ROOT = Path(__file__).resolve().parents[1]
-VARIANTS = ('p0_mask_x', 'p1_full_x', 'p2_full_x0')
+VARIANTS = ('p0_mask_x', 'p1_mask_x_normal')
 POLICIES = ('ignore', 'official')
 
 

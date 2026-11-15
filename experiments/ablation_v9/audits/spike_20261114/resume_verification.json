@@ -1,0 +1,16 @@
+{
+  "purpose": "User-authorized continuation of P0 loss-spike diagnosis after epoch1",
+  "resume_contract": "epoch-boundary only, new run, restore model/AdamW/Python/NumPy/CPU/all CUDA RNG/best/stale",
+  "tests": {
+    "resume_suite": "6 passed, 102 deselected in 8.22s, CPU and two GPUs, native and legacy diagnostic state",
+    "full_cpu_suite": "98 passed, 10 skipped in 16.60s",
+    "concurrent_full_gpu_suite": "107 passed, 1 failed in 25.23s: full-size observer test could not allocate GPU memory while formal training active"
+  },
+  "source_run": "p0_official_spike_diag_r3_20261114",
+  "target_run": "p0_official_spike_diag_continue_20261114",
+  "next_epoch": 2,
+  "total_epoch_limit": 50,
+  "early_stopping_patience": 7,
+  "checkpoint_policy": "keep best, last two epoch files, first-event predecessor and independent first-event snapshot",
+  "numerical_limitation": "State restoration does not guarantee deterministic CUDA execution"
+}

@@ -1,0 +1,100 @@
+{
+  "recorded_utc": "2026-11-14T05:22:27.832765+00:00",
+  "configuration_differences": [
+    {
+      "field": "loss.classification_padding",
+      "ignore": "ignore",
+      "official": "official"
+    }
+  ],
+  "training_runs": [
+    {
+      "run": "experiments/ablation_v9/runs/p0_ignore_dp_20261112_170107",
+      "status": {
+        "run_id": "p0_ignore_dp_20261112_170107",
+        "mode": "train",
+        "status": "completed",
+        "started_utc": "2026-11-12T09:01:08.882043+00:00",
+        "completed_utc": "2026-11-13T18:01:27.379724+00:00"
+      },
+      "train_metrics": {
+        "status": "completed",
+        "best_epoch": 26,
+        "best_validation_loss": 0.0811527285337448,
+        "selection_metric": "valid_total",
+        "batch_sampler": "length_bucket",
+        "classification_padding": "ignore"
+      },
+      "best_checkpoint_bytes": 444798985
+    },
+    {
+      "run": "experiments/ablation_v9/runs/p0_official_dp_20261111_003608",
+      "status": {
+        "run_id": "p0_official_dp_20261111_003608",
+        "mode": "train",
+        "status": "completed",
+        "started_utc": "2026-11-10T16:36:09.863506+00:00",
+        "completed_utc": "2026-11-12T06:31:18.061505+00:00"
+      },
+      "train_metrics": {
+        "status": "completed",
+        "best_epoch": 31,
+        "best_validation_loss": 0.07948285787403583,
+        "selection_metric": "valid_total",
+        "batch_sampler": "length_bucket",
+        "classification_padding": "official"
+      },
+      "best_checkpoint_bytes": 444798985
+    }
+  ],
+  "ignore_evaluation_manifest": {
+    "checkpoint_epoch": 26,
+    "checkpoint_sha256": "c82b73f8e908609efccbf46ffd9de53a4cda456f558c5b17a0f14b1e32d27bac",
+    "synthetic_available": 20000,
+    "synthetic_selected": 20000,
+    "real_available": 700,
+    "real_selected": 700,
+    "full_benchmark": true,
+    "official_default_parameters": true,
+    "synthetic_indices_sha256": "ce8868c6eece26d7a3f4dfffc23b026c8b3d71646c7fa7fd401ef3f24dd55c8e",
+    "source_sha256": {
+      "main.py": "6a74ce860fa364f3adb2d52c1bab81084f13d6787d2faa4e90d5e08c5dd9a16e",
+      "HP_list.py": "d08c97eb67e67c3370e00acb27fbbd7819c689f7948b5ff3e1022c724d43c66f",
+      "models/TimeRCD.py": "e45c8cdf82dfdea392ece5cb56b6b5d226e840ab200acb33eb7bf4e51df2f0a9",
+      "utils/dataset.py": "19ce39599c9f2ee2684fb57a6af115992d7f29deaa7b4f7aa3b89c14e9a0f34a",
+      "utils/slidingWindows.py": "07d85ee90eac21c3a4b0642ed45b0245f0325639b087213842752c2337af0563",
+      "evaluation/metrics.py": "4974a176a3fa8a39890a7869cf528fc5e6dee51816d1f419490cdd890785f8b2",
+      "evaluation/basic_metrics.py": "80c5f10c4647a28b58ebed9293436e16d74faa6f3a8f513609f96b7d37622469",
+      "experiments/ablation_v9/src/benchmark_eval.py": "3e128c4403f7764caccfab9e45023c6974d274b289f4dd2f6fe5f8483345d725"
+    },
+    "protocol": {
+      "protocol_id": "official_uni_d458549",
+      "real_data_dir": "datasets/TSB-AD-U",
+      "window_size": 5000,
+      "inference_batch_size": 64,
+      "metrics_mode": "fast",
+      "heavy_workers": 4,
+      "light_workers": 4,
+      "cpu_threads": 1,
+      "f1_t_n_splits": 800,
+      "f1_t_chunk_size": 25,
+      "seed": 2024,
+      "save_scores": true
+    }
+  },
+  "partial_csv_check": {
+    "score_rows": 7,
+    "all_finite": true,
+    "unique_keys": true,
+    "note": "partial results; not a full benchmark summary"
+  },
+  "early_metric_timing_seconds": [
+    13.99,
+    12.79,
+    13.27,
+    13.38,
+    12.27,
+    12.21,
+    12.21
+  ]
+}

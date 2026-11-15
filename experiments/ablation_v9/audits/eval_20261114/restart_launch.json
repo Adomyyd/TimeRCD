@@ -1,0 +1,52 @@
+{
+  "pid": 2455565,
+  "run_ids": [
+    "p0_ignore_dp_20261112_170107_eval_20261114_restart_s200_r700",
+    "p0_official_dp_20261111_003608_eval_20261114_restart_s200_r700"
+  ],
+  "started_utc": "2026-11-14T06:30:20.847244+00:00",
+  "checks": {
+    "ignore_config": {
+      "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/runs/p0_ignore_dp_20261112_170107/config.json",
+      "exists": true,
+      "bytes": 1397
+    },
+    "ignore_checkpoint": {
+      "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/runs/p0_ignore_dp_20261112_170107/checkpoints/best.pth",
+      "exists": true,
+      "bytes": 444798985
+    },
+    "official_config": {
+      "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/runs/p0_official_dp_20261111_003608/config.json",
+      "exists": true,
+      "bytes": 1399
+    },
+    "official_checkpoint": {
+      "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/runs/p0_official_dp_20261111_003608/checkpoints/best.pth",
+      "exists": true,
+      "bytes": 444798985
+    },
+    "eval_config": {
+      "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/configs/eval_official.json",
+      "exists": true,
+      "bytes": 315
+    },
+    "real_dataset": {
+      "path": "/diskA/YYD/TimeRCD/datasets/TSB-AD-U",
+      "exists": true,
+      "bytes": null
+    },
+    "metric_worker": {
+      "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/src/metric_worker.py",
+      "exists": true,
+      "bytes": 2720
+    },
+    "entry": {
+      "path": "/diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py",
+      "exists": true,
+      "bytes": 10847
+    }
+  },
+  "queue_script": "/diskA/YYD/TimeRCD/experiments/ablation_v9/audits/eval_20261114/restart_eval_queue.py",
+  "queue_log": "/diskA/YYD/TimeRCD/experiments/ablation_v9/audits/eval_20261114/restart_eval_queue.log"
+}

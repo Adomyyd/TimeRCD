@@ -5,7 +5,7 @@
 | 路线 | 做什么 | 完整命令 |
 |---|---|---|
 | original_400k | 原TimeRCD流程的400k复现：生成数据、恢复训练、对比检测结果 | [使用说明](original_400k/README.md) |
-| ablation_v9 | P0/P1/P2消融、padding对照、多GPU训练、合成与真实数据统一评测 | [使用说明](ablation_v9/README.md) |
+| ablation_v9 | P0/P1消融、padding对照、多GPU训练、合成与真实数据统一评测 | [使用说明](ablation_v9/README.md) |
 
 ## 快速检查
 

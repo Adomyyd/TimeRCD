@@ -25,6 +25,7 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
     sums = {
         "total": 0.0,
         "reconstruction": 0.0,
+        "normal_reference": 0.0,
         "classification": 0.0,
         "valid_classification": 0.0,
         "valid_total": 0.0,
@@ -35,6 +36,10 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
         "copy_full_normal_error": 0.0,
         "copy_full_anomalous_error": 0.0,
     }
+    reference_sums = {name: 0.0 for name in (
+        "selected_normal", "selected_anomalous", "full_normal", "full_anomalous",
+        "selected_changed", "full_changed", "copy_selected_changed", "copy_full_changed")}
+    reference_counts = {name: 0 for name in ("selected_changed", "full_changed")}
     counts = {
         "batches": 0,
         "selected_normal_points": 0,
@@ -66,9 +71,11 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
                 float(config["loss"]["classification_weight"]),
                 mask.to(device),
                 classification_padding=config["loss"].get("classification_padding", "ignore"),
+                normal_reference_weight=float(config["loss"].get("normal_reference_weight", 0)),
             )
             sums["total"] += float(losses["total"])
             sums["reconstruction"] += float(losses["reconstruction"])
+            sums["normal_reference"] += float(losses["normal_reference"])
             sums["classification"] += float(losses["classification"])
             if config["loss"].get("classification_padding", "ignore") == "ignore":
                 valid_classification = losses["classification"]
@@ -80,16 +87,12 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
             sums["valid_total"] += float(
                 float(config["loss"]["reconstruction_weight"]) * losses["reconstruction"]
                 + float(config["loss"]["classification_weight"]) * valid_classification
+                + float(config["loss"].get("normal_reference_weight", 0)) * losses["normal_reference"]
             )
             counts["classification_loss_points"] += losses["classification_count"]
             counts["padding_points"] += int((~batch_device["valid"]).sum())
 
-            target = (
-                batch_device["x0"]
-                if config["input"]["target"] == "x0"
-                else batch_device["x"]
-            )
-            error = (output["reconstruction"] - target).square()
+            error = (output["reconstruction"] - batch_device["x"]).square()
             selected = mask.to(device) & batch_device["valid"]
             full = batch_device["valid"]
             selected_normal = selected & (batch_device["y"] == 0)
@@ -107,6 +110,18 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
                     sums[name] += float(error[active].sum())
 
             copy_error = (batch_device["x"] - batch_device["x0"]).square()
+            if "normal_reference" in output:
+                reference_error = (output["normal_reference"] - batch_device["x0"]).square()
+                for name, active in (("selected_normal", selected_normal),
+                                     ("selected_anomalous", selected_anomalous),
+                                     ("full_normal", full_normal),
+                                     ("full_anomalous", full_anomalous)):
+                    reference_sums[name] += float(reference_error[active].sum())
+                changed = full & (batch_device["x"] != batch_device["x0"]).any(dim=-1)
+                for name, active in (("selected_changed", selected & changed), ("full_changed", changed)):
+                    reference_counts[name] += int(active.sum())
+                    reference_sums[name] += float(reference_error[active].sum())
+                    reference_sums["copy_" + name] += float(copy_error[active].sum())
             if full_normal.any():
                 sums["copy_full_normal_error"] += float(copy_error[full_normal].sum())
             if full_anomalous.any():
@@ -139,7 +154,7 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
     recall = counts["true_positive"] / max(1, recall_den)
     f1 = 2 * precision * recall / max(1e-12, precision + recall)
 
-    return {
+    result = {
         "total": sums["total"] / max(1, counts["batches"]),
         "reconstruction": sums["reconstruction"] / max(1, counts["batches"]),
         "classification": sums["classification"] / max(1, counts["batches"]),
@@ -163,6 +178,16 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
         "classification_f1": f1,
         **counts,
     }
+    if config["experiment_id"] == "p1_mask_x_normal":
+        result["normal_reference"] = sums["normal_reference"] / max(1, counts["batches"])
+        for region in ("selected_normal", "selected_anomalous", "full_normal", "full_anomalous"):
+            result["normal_reference_" + region] = reference_sums[region] / max(1, counts[region + "_points"])
+        for region in ("selected_changed", "full_changed"):
+            denominator = reference_counts[region]
+            result["normal_reference_" + region] = reference_sums[region] / max(1, denominator)
+            result["copy_" + region + "_error"] = reference_sums["copy_" + region] / max(1, denominator)
+            result[region + "_points"] = denominator
+    return result
 
 
 def _make_eval_inputs(batch, config: dict, generator: torch.Generator):
@@ -172,6 +197,4 @@ def _make_eval_inputs(batch, config: dict, generator: torch.Generator):
         float(config["input"]["mask_ratio"]),
         generator,
     )
-    if config["input"]["input_mode"] == "masked_x":
-        return apply_input_mask(batch["x"], mask), batch["valid"] & ~mask, mask
-    return batch["x"], batch["valid"], mask
+    return apply_input_mask(batch["x"], mask), batch["valid"] & ~mask, mask

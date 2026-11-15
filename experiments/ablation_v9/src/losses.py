@@ -40,9 +40,18 @@ def classification_ce(logits: torch.Tensor, labels: torch.Tensor, valid: torch.T
 
 
 def compute_losses(output, batch, target: str, reconstruction_weight: float, classification_weight: float,
-                   reconstruction_mask: torch.Tensor, classification_padding: str = "ignore"):
-    reconstruction_target = batch["x0"] if target == "x0" else batch["x"]
-    recon_loss, recon_count = masked_mse(output["reconstruction"], reconstruction_target, reconstruction_mask)
+                   reconstruction_mask: torch.Tensor, classification_padding: str = "ignore",
+                   normal_reference_weight: float = 1.0):
+    if target != "x":
+        raise ValueError("Observation reconstruction target must be x; old P1/P2 are retired")
+    active = reconstruction_mask & batch["valid"]
+    recon_loss, recon_count = masked_mse(output["reconstruction"], batch["x"], active)
     cls_loss, cls_count = classification_ce(output["logits"], batch["y"], batch["valid"], classification_padding)
     total = reconstruction_weight * recon_loss + classification_weight * cls_loss
-    return {"total": total, "reconstruction": recon_loss, "classification": cls_loss, "reconstruction_count": recon_count, "classification_count": cls_count}
+    normal_loss, normal_count = recon_loss.new_zeros(()), 0
+    if "normal_reference" in output:
+        normal_loss, normal_count = masked_mse(output["normal_reference"], batch["x0"], active)
+        total = total + normal_reference_weight * normal_loss
+    return {"total": total, "reconstruction": recon_loss, "classification": cls_loss,
+            "normal_reference": normal_loss, "normal_reference_count": normal_count,
+            "reconstruction_count": recon_count, "classification_count": cls_count}

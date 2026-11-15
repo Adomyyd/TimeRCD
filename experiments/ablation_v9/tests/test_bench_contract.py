@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def config_for():
-    config = load_config(ROOT / "configs" / "p1_full_x.json").raw
+    config = load_config(ROOT / "configs" / "p1_mask_x_normal.json").raw
     config["runtime"].update(device="cpu", parallel="none", gpu_ids=None)
     config["model"].update(d_model=32, d_proj=8, num_layers=1, num_heads=4,
                            dropout=0.0, d_ff_dropout=0.0)

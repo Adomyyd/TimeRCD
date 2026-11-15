@@ -1,0 +1,16 @@
+{
+  "verified_utc": "2026-11-14T05:46:07.051904+00:00",
+  "eval_run": "p0_ignore_dp_20261112_170107_eval_20261114_s200_r700",
+  "synthetic_selected": 200,
+  "real_selected": 700,
+  "full_benchmark": false,
+  "official_default_parameters": true,
+  "fixed_subset_matches_full_prefix": true,
+  "source_sha256_unchanged": true,
+  "partial_score_rows": 14,
+  "finite_and_unique": true,
+  "overlapping_old_rows": 14,
+  "maximum_metric_difference_vs_full_partial": 0.0,
+  "document_machine_path_findings": [],
+  "note": "Partial launch validation only; official subset run remains queued; no final comparison yet"
+}

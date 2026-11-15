@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-11-14T05:39:10.055838+00:00",
+  "status": "aborted",
+  "plan": "User-selected fixed first 200 held-out synthetic series and all 700 official real series, same indices and metrics for both best checkpoints; sequential ignore then official",
+  "synthetic_per_model": 200,
+  "real_per_model": 700,
+  "runs": [
+    {
+      "training_run": "p0_ignore_dp_20261112_170107",
+      "eval_run": "p0_ignore_dp_20261112_170107_eval_20261114_s200_r700",
+      "started_utc": "2026-11-14T05:39:10.056209+00:00",
+      "status": "aborted",
+      "pid": 2408030,
+      "completed_utc": "2026-11-14T05:48:42.149685+00:00",
+      "stop_reason": "user_requested_performance_fix_first",
+      "preserved_score_rows": 27
+    }
+  ],
+  "completed_utc": "2026-11-14T05:48:42.149685+00:00",
+  "stop_reason": "user_requested_performance_fix_first"
+}

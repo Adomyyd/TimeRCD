@@ -1,0 +1,27 @@
+{
+  "status": "failed",
+  "source_run": "p0_official_spike_diag_r3_20261114",
+  "target_run": "p0_official_spike_diag_continue_20261114",
+  "total_epoch_limit": 50,
+  "next_epoch": 2,
+  "early_stopping_patience": 7,
+  "checkpoint_keep_last": 2,
+  "purpose": "Continue authorized spike diagnosis",
+  "queue_pid": 2988952,
+  "actual_training_started": true,
+  "console": "continuation_console.log",
+  "checks": "resume_verification.json",
+  "updated_utc": "2026-11-14T16:25:53.038481+00:00",
+  "source_status": "completed",
+  "training_pid": 3022987,
+  "exit_code": 1,
+  "final_status": {
+    "run_id": "p0_official_spike_diag_continue_20261114",
+    "mode": "train",
+    "status": "failed",
+    "started_utc": "2026-11-14T15:27:02.950474+00:00",
+    "error": "OutOfMemoryError('CUDA out of memory. Tried to allocate 622.00 MiB. GPU 0 has a total capacity of 10.75 GiB of which 534.62 MiB is free. Including non-PyTorch memory, this process has 10.22 GiB memory in use. Of the allocated memory 7.81 GiB is allocated by PyTorch, and 2.17 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)')",
+    "completed_utc": "2026-11-14T16:25:34.911765+00:00"
+  },
+  "completion_confirmed": false
+}

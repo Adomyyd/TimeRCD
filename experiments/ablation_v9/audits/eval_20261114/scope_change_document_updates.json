@@ -1,0 +1,26 @@
+{
+  "实验记录.md": {
+    "before_sha256": "73fe187913ca00b762b7a3ecae940b6d459698daa505ba5872ec46fe3fa9c923",
+    "after_sha256": "9a112561f5d37773d722d33c0afb701c957a86c5d4175d4c36fd3ac4e935e0cd"
+  },
+  "experiments/ablation_v9/RUNTIME_NOTES.md": {
+    "before_sha256": "1b0c18eb9f00add735442731607a8b658584352107e8dad8b5beb875839c450d",
+    "after_sha256": "ffc4f2d67cf51169ce2ba004228a0af41bf79fe399fb738d5b2120f8c27725b0"
+  },
+  "研究问题和思路.md": {
+    "before_sha256": "5b9702d5ad3c961289d51fc2a352fd87cbee44cc8652eb712ee872f4da4206b4",
+    "after_sha256": "d21eb2bacb8b446f76a047b90f48f01d5433ce89b06162ee0263eb97e15d21c3"
+  },
+  "方法设计.md": {
+    "before_sha256": "36cb1f5691ec32464232e03b447916a95d3050802e3beef0fb37a1c2b8b8346a",
+    "after_sha256": "195fd9634e056e6df7d65c3319e68b7b6efb45b12b5785598cdf648b06ce6fa0"
+  },
+  "experiments/ablation_v9/audits/eval_20261114/REPORT.md": {
+    "before_sha256": "c9a4e0706774717ce245ca0954488c68002fe721c5036b97e8e59d86dbcc92d3",
+    "after_sha256": "4d5a4a835a13acbf54f3acf05d7a74b208d117a23db3a74ecfe7aca27efa2431"
+  },
+  "experiments/ablation_v9/audits/README.md": {
+    "before_sha256": "86ec7577f975bc53da6dfa28945476c71e611e9b8a18f0ed72f9652845335f5f",
+    "after_sha256": "50fd9118f5ddb97638f0909a32334a4823dc3aaad05be2de9466c96c195389a9"
+  }
+}

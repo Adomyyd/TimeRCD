@@ -1,0 +1,36 @@
+{
+  "run_id": "p1_mask_normal_official_dp_20261115_015137",
+  "tmux_session": "p1_mask_normal",
+  "started_local": "2026-11-15T01:51:37.395778",
+  "command": [
+    "/home/omnisky/anaconda3/envs/time-rcd/bin/python3",
+    "-u",
+    "/diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py",
+    "--config",
+    "/diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p1_mask_x_normal_padding_official.json",
+    "--run-id",
+    "p1_mask_normal_official_dp_20261115_015137",
+    "--parallel",
+    "data_parallel",
+    "--gpu-ids",
+    "0",
+    "1",
+    "--batch-size",
+    "32",
+    "--mode",
+    "train"
+  ],
+  "phase": "training_verified",
+  "pid": 3157813,
+  "actual_command": "/home/omnisky/anaconda3/envs/time-rcd/bin/python3 -u /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py --config /diskA/YYD/TimeRCD/experiments/ablation_v9/configs/p1_mask_x_normal_padding_official.json --run-id p1_mask_normal_official_dp_20261115_015137 --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train ",
+  "verified_local": "2026-11-15T01:56:48.351070",
+  "observed": {
+    "epoch": 0,
+    "batch": 200,
+    "batches_per_epoch": 11875,
+    "total": 0.9076,
+    "reconstruction": 0.2662,
+    "normal_reference": 0.4006,
+    "classification": 0.2409
+  }
+}

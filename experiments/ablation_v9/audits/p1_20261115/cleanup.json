@@ -1,0 +1,9 @@
+{
+  "removed": [
+    "experiments/ablation_v9/configs/p1_full_x.json",
+    "experiments/ablation_v9/configs/p1_full_x_padding_official.json",
+    "experiments/ablation_v9/configs/p2_full_x0.json",
+    "experiments/ablation_v9/configs/p2_full_x0_padding_official.json"
+  ],
+  "preserved_old_run": "p1_official_dp_20261115_005859"
+}

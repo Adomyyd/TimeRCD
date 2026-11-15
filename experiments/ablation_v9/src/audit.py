@@ -39,6 +39,8 @@ def run_audit(config: ExperimentConfig) -> dict:
         "protocol_checks": {
             "input_mode": config.raw["input"]["input_mode"],
             "target": config.raw["input"]["target"],
+            "normal_reference_target": "x0" if model.normal_reference_head is not None else None,
+            "normal_reference_weight": float(config.raw["loss"].get("normal_reference_weight", 0)),
             "encoder_patch_size": model.encoder.patch_size,
             "mask_patch_size": int(config.raw["input"]["mask_patch_size"]),
             "mask_ratio": float(config.raw["input"]["mask_ratio"]),

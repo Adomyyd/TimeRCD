@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "scope": "Tiny CPU fixture only, one synthetic and one fake real series; actual unified entry, actual spawned metric worker, actual official metrics; no production registry or run changes",
+  "score_rows": 4,
+  "worker_backend": {
+    "backend": "persistent_spawn_cpu_worker",
+    "workers": 1,
+    "reason": "avoid forking the inference process and full synthetic cache"
+  },
+  "status_completed": true
+}

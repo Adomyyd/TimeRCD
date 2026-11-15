@@ -1,0 +1,91 @@
+{
+  "created_utc": "2026-11-14T05:42:20.382016+00:00",
+  "purpose": "Same saved scores, labels, sliding window and official protocol in a process without loading training pickle; compare exact metric outputs and runtime",
+  "dataset_loaded": false,
+  "records": [
+    {
+      "score_kind": "probability",
+      "elapsed_seconds": 3.0435410104691982,
+      "rss_before": "VmRSS:\t  400132 kB",
+      "maximum_absolute_metric_difference": 0.0,
+      "differences": {
+        "AUC-PR": 0.0,
+        "AUC-ROC": 0.0,
+        "VUS-PR": 0.0,
+        "VUS-ROC": 0.0,
+        "Standard-F1": 0.0,
+        "Standard-Precision": 0.0,
+        "Standard-Recall": 0.0,
+        "PA-F1": 0.0,
+        "PA-Precision": 0.0,
+        "PA-Recall": 0.0,
+        "Affiliation-F": 0.0,
+        "Affiliation-P": 0.0,
+        "Affiliation-R": 0.0,
+        "F1_T": 0.0,
+        "Precision_T": 0.0,
+        "Recall_T": 0.0
+      },
+      "metrics": {
+        "AUC-PR": 0.9999542124542125,
+        "AUC-ROC": 0.9999918925930731,
+        "VUS-PR": 0.999995913185997,
+        "VUS-ROC": 0.9999996325837289,
+        "Standard-F1": 0.9975903614457832,
+        "Standard-Precision": 1.0,
+        "Standard-Recall": 0.9951923076923077,
+        "PA-F1": 1.0,
+        "PA-Precision": 1.0,
+        "PA-Recall": 1.0,
+        "Affiliation-F": 0.9998912897805095,
+        "Affiliation-P": 1.0,
+        "Affiliation-R": 0.9997827031725337,
+        "F1_T": 0.9952153563499451,
+        "Precision_T": 0.9904761910438538,
+        "Recall_T": 1.0
+      }
+    },
+    {
+      "score_kind": "logit",
+      "elapsed_seconds": 2.17402314953506,
+      "rss_before": "VmRSS:\t  487008 kB",
+      "maximum_absolute_metric_difference": 0.0,
+      "differences": {
+        "AUC-PR": 0.0,
+        "AUC-ROC": 0.0,
+        "VUS-PR": 0.0,
+        "VUS-ROC": 0.0,
+        "Standard-F1": 0.0,
+        "Standard-Precision": 0.0,
+        "Standard-Recall": 0.0,
+        "PA-F1": 0.0,
+        "PA-Precision": 0.0,
+        "PA-Recall": 0.0,
+        "Affiliation-F": 0.0,
+        "Affiliation-P": 0.0,
+        "Affiliation-R": 0.0,
+        "F1_T": 0.0,
+        "Precision_T": 0.0,
+        "Recall_T": 0.0
+      },
+      "metrics": {
+        "AUC-PR": 0.9999542124542123,
+        "AUC-ROC": 0.9999918925930731,
+        "VUS-PR": 0.9999959131859972,
+        "VUS-ROC": 0.9999996325837289,
+        "Standard-F1": 0.9975903614457832,
+        "Standard-Precision": 1.0,
+        "Standard-Recall": 0.9951923076923077,
+        "PA-F1": 1.0,
+        "PA-Precision": 1.0,
+        "PA-Recall": 1.0,
+        "Affiliation-F": 0.9998912897805095,
+        "Affiliation-P": 1.0,
+        "Affiliation-R": 0.9997827031725337,
+        "F1_T": 0.9952153563499451,
+        "Precision_T": 0.9904761910438538,
+        "Recall_T": 1.0
+      }
+    }
+  ]
+}

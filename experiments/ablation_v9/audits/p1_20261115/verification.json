@@ -1,0 +1,160 @@
+{
+  "code_changes": [
+    {
+      "path": "configs/p1_full_x.json",
+      "before": "9074312c1ee738b75695601b0b1a0789feddc7ab1769612413962822c6f3ba7b",
+      "after": null,
+      "status": "deleted"
+    },
+    {
+      "path": "configs/p1_full_x_padding_official.json",
+      "before": "a37735270808f9ed7ba57056028ccf2ea0b17ae0454f00ce5239a142bcebb471",
+      "after": null,
+      "status": "deleted"
+    },
+    {
+      "path": "configs/p1_mask_x_normal.json",
+      "before": null,
+      "after": "41eb7e9788e387d8a5cbf24245a21b1e4e59b431af89c880d7e7e79987d47406",
+      "status": "added"
+    },
+    {
+      "path": "configs/p1_mask_x_normal_padding_official.json",
+      "before": null,
+      "after": "460b346293d0fcf24fbfa63102e9e59273cec213cb6e0b3ab64df65ed2a5e630",
+      "status": "added"
+    },
+    {
+      "path": "configs/p2_full_x0.json",
+      "before": "3a7ab1e61495fa0e65cd72194fecd8b413ea60d25c09319c7e363ff75072c289",
+      "after": null,
+      "status": "deleted"
+    },
+    {
+      "path": "configs/p2_full_x0_padding_official.json",
+      "before": "390fcb9159b31c03f033dbaa7b8796159019804715e9c77453b3280d9d8ca7a4",
+      "after": null,
+      "status": "deleted"
+    },
+    {
+      "path": "src/audit.py",
+      "before": "d86fdea9b3faacb77ea15f299df0a226dbc0f8954619ff95ca579e8428237ac0",
+      "after": "172458a6627815995b9bde7e74ae83b0c6f1b3c2e6ef6f46f7ef89f44315d8f2",
+      "status": "modified"
+    },
+    {
+      "path": "src/config.py",
+      "before": "c5bb4940f28ccc99de30855545ec0117d5a52fc1e0e7e55430a84c099b8f2bea",
+      "after": "7667c041bbf1b8de9019ff5aa8de80e7ed6aa5532b405d5996cc10d7be4e035c",
+      "status": "modified"
+    },
+    {
+      "path": "src/diagnostics.py",
+      "before": "2dca641d89bff97d2655b2c53188c86c1effed335df5f1924206c5af4f27331d",
+      "after": "d78f9d4faf413a158102368e1766ce8ef73d239c8bb7afa59d49a04a38ed7083",
+      "status": "modified"
+    },
+    {
+      "path": "src/evaluate.py",
+      "before": "eb71210613880f420292f9b28b65421605d1c6fce639650cc0d8118d6b5c2343",
+      "after": "aedd7bb6c9ee0f38f5a2de29883c3f0f8cc8528785c4ab7d1317e49c675cd3ff",
+      "status": "modified"
+    },
+    {
+      "path": "src/losses.py",
+      "before": "7db92a4c3190fc000e7fec7c6fb0639df5a1d99b1fb19dd2f51246e09972af4a",
+      "after": "90abc0e535c7bf1290808b5405a29782b40694be33789b7dc78b3678c4bfb9d5",
+      "status": "modified"
+    },
+    {
+      "path": "src/models.py",
+      "before": "fe97f704e06bd1af2bfc65e3321e551b165426e74b6b02c711c6821c01966407",
+      "after": "178a8631aa6d667dbe75d42d11cea4492060032b7fdaf92d1a15c120db52ca6c",
+      "status": "modified"
+    },
+    {
+      "path": "src/train.py",
+      "before": "06fe9eed227f89674bd82e210226a214b33c2d4c76f0bed21d5117f058f14355",
+      "after": "85faf0ae145464a91659b3585fe10dc7b2d3269926d55da18548f591fa11e7f8",
+      "status": "modified"
+    },
+    {
+      "path": "tests/test_bench_contract.py",
+      "before": "fb267642c81a0457b75d8f9f84ef427806d478e8e541fdacd3d6ee4a7009fe94",
+      "after": "e6fede95660016c295154fbf343a242231c47b60c829b687102e20eeb44d6b0d",
+      "status": "modified"
+    },
+    {
+      "path": "tests/test_benchmark_eval.py",
+      "before": "465a9060e6dd5312d69eaf717cb9b5f77d636ef9803dc479e934e4418e8e1dab",
+      "after": "9943c93f156b8665ed03126b6bf0769011f589c5337f44c8a021f0c16782aea0",
+      "status": "modified"
+    },
+    {
+      "path": "tests/test_config_contract.py",
+      "before": "3f9aaf14af15908f22f60a1c212c7e084f685fee9acc917e7bca15474bd0cd19",
+      "after": "5df0623a14e5bf2c50e951ee43a583ef22cc17abd3bc1f4696798657510e72e6",
+      "status": "modified"
+    },
+    {
+      "path": "tests/test_p1_normal_reference.py",
+      "before": null,
+      "after": "8f7ccbeb1863ba7cde440823def0e6792138744e56c2ed27396504d70a13135e",
+      "status": "added"
+    },
+    {
+      "path": "tests/test_padding_contract.py",
+      "before": "c614c30e3f260b5b92382b3dc78883e4f494cb5efb6e3ff1020aefcea4368bc5",
+      "after": "f7c29c5fc8e785dbf540978be15e1d3fd182e5a0d17c431ebe3d480b2bb55184",
+      "status": "modified"
+    },
+    {
+      "path": "tests/test_parallel_contract.py",
+      "before": "c6c3a478a5c9458a6eb9a1c7f03153348eebbd2f8a8eb9257f9d629c63c2ce7e",
+      "after": "24068061f6664858dd088a0bba1096448e6c33d49bc4425ea454a8fd72380a78",
+      "status": "modified"
+    },
+    {
+      "path": "tests/test_patch_parity.py",
+      "before": "d01bd3bc3ec6600bd784368ec3255310124173fa703541fdd6ddc16ec95fba7f",
+      "after": "cb8bce342ee574f4e0974299dd65f22f836bf3692180b5855b2899086993b448",
+      "status": "modified"
+    }
+  ],
+  "doc_sha256": {
+    "AGENTS.md": "86555a9551bcd4b8fecb8caf3efccf4942a9b44e34cd6aab859fcd13a3367da7",
+    "README.md": "0193370afb4f523a23c98315355694734de1ef508d8143de9a73e3ab69078263",
+    "方法设计.md": "df90933be4eb1c8666b45b2d2581b7bd7f664377b0f3727254cd32969ef519d6",
+    "研究问题和思路.md": "6c6a3cdbb506e409e324938c7dce7a345419b1b4f406b8aba50ef93b4a2d0a11",
+    "实验记录.md": "a1f75452e747c95bb1b5412603b798fe5ceba9c5bef00fddc6fdc416f27a416a",
+    "experiments/README.md": "2177b0133c9edf00f39ffcf419b4abf9e13d281dafc8c3a83d5ec28ae65eb7be",
+    "experiments/MIGRATION.md": "883c335bc87e8027f80ec4bc28b1f25f33726b5bedfe814a06cbdf0f461ac8a6",
+    "experiments/ablation_v9/RESULTS.md": "e44d42288d1e0285d80d3dd511a7a161fd5e85121abfb7ed9e446e01d7c96e6d",
+    "experiments/ablation_v9/EXPERIMENT_SPEC.md": "5209367f5f33aa1dfb876aa54a71d488da80c93976ac73c7408a0c6c3100f00b",
+    "experiments/ablation_v9/README.md": "325bb3282aeac199cf9712e54c811086a3b6c20a1d5a024c10de2eccc5255e9d",
+    "experiments/ablation_v9/IMPLEMENTATION_DIFF.md": "e24ed60d97bef4e9d40f4c9cbd633b86df24015545a93df00430463725d18e65",
+    "experiments/ablation_v9/RUNTIME_NOTES.md": "9c6a91f617447ca944a9e39932fc68bbeddb3fa9d7fcc6d4033a676cf21c5b2f",
+    "experiments/ablation_v9/audits/README.md": "746b4189600abf705b5a274ae127b0b78b92d86c76d5b38737b0bff77a2398a2"
+  },
+  "checks": "109 passed in 33.61s",
+  "long_sequence_preflight": "batch32 length10000 FP32 two GPUs passed",
+  "doc_command_and_readme_links": "passed",
+  "full_input_branches_removed": true,
+  "final_training_verification": {
+    "epoch": 0,
+    "batch": 200,
+    "batches_per_epoch": 11875,
+    "total": 0.9076,
+    "reconstruction": 0.2662,
+    "normal_reference": 0.4006,
+    "classification": 0.2409
+  },
+  "temporary_scripts_removed": [
+    "_maintenance_p1.py",
+    "_inspect_p1.py",
+    "_finish_p1.py",
+    "_doccheck_p1.py",
+    "_complete_p1.py"
+  ],
+  "final_document_check": "final_document_check.json: passed"
+}

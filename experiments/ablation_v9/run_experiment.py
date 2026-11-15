@@ -37,6 +37,22 @@ def parse_args() -> argparse.Namespace:
                         help="Batch limit for --mode bench (default 300)")
     parser.add_argument("--batch-size", type=int, default=None,
                         help="Override optimization.batch_size before the config snapshot")
+    parser.add_argument("--epochs", type=int, default=None,
+                        help="Override optimization.epochs (e.g. 2 for epoch0+epoch1)")
+    parser.add_argument("--resume-from", help="Epoch-boundary training checkpoint; writes a NEW run")
+    parser.add_argument("--checkpoint-keep-last", type=int, default=None,
+                        help="Keep only the latest N epoch checkpoints plus best and first-event predecessor")
+    parser.add_argument("--log-freq", type=int, default=None,
+                        help="Override console/train.log batch interval; diagnostics always writes every batch")
+    parser.add_argument("--diagnostics", action="store_true",
+                        help="Enable optional per-batch observations and first-event snapshot")
+    parser.add_argument("--diagnostic-reference-epoch0",
+                        help="Compare model/AdamW state after epoch0; optional strict stop flag below")
+    parser.add_argument("--diagnostic-stop-on-mismatch", action="store_true",
+                        help="Stop if the epoch0 reference differs; default records the difference and continues")
+    parser.add_argument("--diagnostic-loss-threshold", type=float, default=10.0)
+    parser.add_argument("--diagnostic-grad-threshold", type=float, default=1000.0)
+    parser.add_argument("--diagnostic-start-epoch", type=int, default=1)
     parser.add_argument("--checkpoint", help="Checkpoint path for eval mode")
     parser.add_argument("--eval-config", default=str(HERE / "configs" / "eval_official.json"),
                         help="Detection evaluation protocol (synthetic held-out + official TSB-AD-U)")
@@ -49,11 +65,33 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gpu-ids", type=int, nargs="+", default=None,
                         help="Visible CUDA device ids for data_parallel; first id gathers outputs")
     args = parser.parse_args()
+    if args.resume_from and args.mode != "train":
+        parser.error("--resume-from requires --mode train")
+    if args.resume_from and not Path(args.resume_from).is_file():
+        parser.error("resume checkpoint does not exist")
+    if args.checkpoint_keep_last is not None and (args.checkpoint_keep_last < 2 or args.mode != "train"):
+        parser.error("--checkpoint-keep-last requires train mode and a value of at least 2")
     if args.mode == "eval" and not args.checkpoint:
         parser.error("--mode eval requires --checkpoint; use the training run's config.json")
     for name in ("eval_max_synthetic", "eval_max_real"):
         if getattr(args, name) is not None and getattr(args, name) <= 0:
             parser.error("evaluation limits must be positive")
+    if (args.diagnostics or args.diagnostic_reference_epoch0) and args.mode != "train":
+        parser.error("diagnostics requires --mode train")
+    if args.diagnostic_stop_on_mismatch and not args.diagnostic_reference_epoch0:
+        parser.error("--diagnostic-stop-on-mismatch requires --diagnostic-reference-epoch0")
+    if args.diagnostic_reference_epoch0 and not args.diagnostics:
+        parser.error("--diagnostic-reference-epoch0 requires --diagnostics")
+    for name in ("epochs", "log_freq"):
+        if getattr(args, name) is not None and getattr(args, name) <= 0:
+            parser.error(f"--{name.replace('_', '-')} must be positive")
+    import math
+    if (args.diagnostic_start_epoch < 0 or
+            not all(math.isfinite(v) and v > 0 for v in
+                    (args.diagnostic_loss_threshold, args.diagnostic_grad_threshold))):
+        parser.error("diagnostic start epoch must be nonnegative; thresholds must be finite and positive")
+    if args.diagnostic_reference_epoch0 and not Path(args.diagnostic_reference_epoch0).is_file():
+        parser.error("diagnostic reference checkpoint does not exist")
     return args
 
 
@@ -148,6 +186,22 @@ def apply_runtime_overrides(config: ExperimentConfig, args: argparse.Namespace) 
     batch_size = getattr(args, "batch_size", None)
     if batch_size is not None:
         config.raw["optimization"]["batch_size"] = int(batch_size)
+    for name in ("epochs", "log_freq"):
+        value = getattr(args, name, None)
+        if value is not None:
+            config.raw["optimization"][name] = int(value)
+    if getattr(args, "diagnostics", False):
+        config.raw["diagnostics"] = {
+            "enabled": True, "every_batch": True,
+            "reference_epoch0": args.diagnostic_reference_epoch0,
+            "stop_on_mismatch": args.diagnostic_stop_on_mismatch,
+            "loss_threshold": args.diagnostic_loss_threshold,
+            "grad_threshold": args.diagnostic_grad_threshold,
+            "start_epoch": args.diagnostic_start_epoch,
+        }
+    elif (config.raw.get("diagnostics", {}).get("enabled")
+          and getattr(args, "mode", "train") in {"train", "all"}):
+        raise ValueError("A diagnostic config snapshot requires explicit --diagnostics")
     validate_config(config.raw)
 
 
@@ -204,7 +258,9 @@ def run_one(args: argparse.Namespace) -> None:
             model = load_model(config)
             smoke = run_smoke(model, config.raw)
             write_json(run_dir / "smoke.json", smoke)
-            result = train_model(model, config.raw, run_dir)
+            result = train_model(model, config.raw, run_dir,
+                                 resume_from=getattr(args, "resume_from", None),
+                                 checkpoint_keep_last=getattr(args, "checkpoint_keep_last", None))
             write_json(run_dir / "metrics" / "train.json", result)
 
         if args.mode in {"eval", "all"}:
