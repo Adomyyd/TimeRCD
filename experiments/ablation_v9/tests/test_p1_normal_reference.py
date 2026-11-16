@@ -66,6 +66,7 @@ def test_both_targets_share_valid_selected_mask_and_gradients():
         assert output[key].grad[0, 1].item() == output[key].grad[0, 3].item() == 0
     empty = compute_losses(output, batch, 'x', 1, 1, torch.zeros_like(mask))
     assert empty['normal_reference'].item() == empty['reconstruction'].item() == 0
+    assert empty['normal_reference_count'] == empty['reconstruction_count'] == 0
 
 
 def test_normal_task_reaches_encoder_and_only_its_own_head(tmp_path):

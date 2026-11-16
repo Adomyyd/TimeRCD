@@ -6,7 +6,7 @@ from src.config import load_config
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_all_variant_configs_match_single_gpu_training_patch_sizes():
+def test_current_training_configs_keep_patch_protocol():
     configs = sorted((ROOT / "configs").glob("p[012]_*.json"))
     variants = {"p0_mask_x", "p1_mask_x_normal"}
     assert {path.stem for path in configs} == variants | {f"{name}_padding_official" for name in variants}

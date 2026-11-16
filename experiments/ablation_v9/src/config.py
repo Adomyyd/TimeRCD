@@ -112,9 +112,19 @@ def validate_config(raw: dict[str, Any]) -> None:
     if "diagnostics" in raw:
         import math
         diagnostic = raw["diagnostics"]
-        allowed = {"enabled", "every_batch", "reference_epoch0", "loss_threshold", "grad_threshold", "start_epoch", "stop_on_mismatch"}
+        allowed = {"enabled", "every_batch", "reference_epoch0", "loss_threshold", "grad_threshold", "start_epoch", "stop_on_mismatch", "detailed", "detail_interval", "snapshot_interval", "max_events"}
         if not isinstance(diagnostic, dict) or set(diagnostic) - allowed:
             raise ValueError("Invalid diagnostics fields")
+        if not isinstance(diagnostic.get("detailed", False), bool):
+            raise ValueError("diagnostics.detailed must be boolean")
+        if int(diagnostic.get("snapshot_interval", 0)) < 0:
+            raise ValueError("diagnostics.snapshot_interval must be nonnegative")
+        if int(diagnostic.get("detail_interval", 100)) < 1:
+            raise ValueError("diagnostics.detail_interval must be positive")
+        if int(diagnostic.get("max_events", 6)) < 1:
+            raise ValueError("diagnostics.max_events must be positive")
+        if diagnostic.get("snapshot_interval", 0) and not diagnostic.get("detailed", False):
+            raise ValueError("diagnostics.snapshot_interval requires detailed diagnostics")
         if not isinstance(diagnostic.get("enabled", False), bool):
             raise ValueError("diagnostics.enabled must be boolean")
         if not isinstance(diagnostic.get("stop_on_mismatch", False), bool):

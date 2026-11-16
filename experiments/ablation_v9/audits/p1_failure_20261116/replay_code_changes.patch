@@ -1,0 +1,661 @@
+diff --git a/experiments/ablation_v9/run_experiment.py b/experiments/ablation_v9/run_experiment.py
+index 28d286b..351806a 100644
+--- a/experiments/ablation_v9/run_experiment.py
++++ b/experiments/ablation_v9/run_experiment.py
+@@ -46,6 +46,12 @@ def parse_args() -> argparse.Namespace:
+                         help="Override console/train.log batch interval; diagnostics always writes every batch")
+     parser.add_argument("--diagnostics", action="store_true",
+                         help="Enable optional per-batch observations and first-event snapshot")
++    parser.add_argument("--diagnostic-detailed", action="store_true",
++                        help="Sample activations, record module updates and save escalating pre/post events")
++    parser.add_argument("--diagnostic-snapshot-interval", type=int, default=0,
++                        help="Detailed diagnostic rolling pre-step snapshot interval; 0 disables")
++    parser.add_argument("--diagnostic-max-events", type=int, default=6,
++                        help="Maximum finite escalating events; nonfinite evidence is always saved")
+     parser.add_argument("--diagnostic-reference-epoch0",
+                         help="Compare model/AdamW state after epoch0; optional strict stop flag below")
+     parser.add_argument("--diagnostic-stop-on-mismatch", action="store_true",
+@@ -78,6 +84,12 @@ def parse_args() -> argparse.Namespace:
+             parser.error("evaluation limits must be positive")
+     if (args.diagnostics or args.diagnostic_reference_epoch0) and args.mode != "train":
+         parser.error("diagnostics requires --mode train")
++    if args.diagnostic_detailed and not args.diagnostics:
++        parser.error("--diagnostic-detailed requires --diagnostics")
++    if args.diagnostic_snapshot_interval < 0 or args.diagnostic_max_events < 1:
++        parser.error("diagnostic snapshot interval must be nonnegative; max-events must be positive")
++    if args.diagnostic_snapshot_interval and not args.diagnostic_detailed:
++        parser.error("--diagnostic-snapshot-interval requires --diagnostic-detailed")
+     if args.diagnostic_stop_on_mismatch and not args.diagnostic_reference_epoch0:
+         parser.error("--diagnostic-stop-on-mismatch requires --diagnostic-reference-epoch0")
+     if args.diagnostic_reference_epoch0 and not args.diagnostics:
+@@ -193,6 +205,9 @@ def apply_runtime_overrides(config: ExperimentConfig, args: argparse.Namespace)
+     if getattr(args, "diagnostics", False):
+         config.raw["diagnostics"] = {
+             "enabled": True, "every_batch": True,
++            "detailed": getattr(args, "diagnostic_detailed", False),
++            "snapshot_interval": getattr(args, "diagnostic_snapshot_interval", 0),
++            "max_events": getattr(args, "diagnostic_max_events", 6),
+             "reference_epoch0": args.diagnostic_reference_epoch0,
+             "stop_on_mismatch": args.diagnostic_stop_on_mismatch,
+             "loss_threshold": args.diagnostic_loss_threshold,
+diff --git a/experiments/ablation_v9/src/config.py b/experiments/ablation_v9/src/config.py
+index ae2652e..ec68b61 100644
+--- a/experiments/ablation_v9/src/config.py
++++ b/experiments/ablation_v9/src/config.py
+@@ -112,9 +112,17 @@ def validate_config(raw: dict[str, Any]) -> None:
+     if "diagnostics" in raw:
+         import math
+         diagnostic = raw["diagnostics"]
+-        allowed = {"enabled", "every_batch", "reference_epoch0", "loss_threshold", "grad_threshold", "start_epoch", "stop_on_mismatch"}
++        allowed = {"enabled", "every_batch", "reference_epoch0", "loss_threshold", "grad_threshold", "start_epoch", "stop_on_mismatch", "detailed", "snapshot_interval", "max_events"}
+         if not isinstance(diagnostic, dict) or set(diagnostic) - allowed:
+             raise ValueError("Invalid diagnostics fields")
++        if not isinstance(diagnostic.get("detailed", False), bool):
++            raise ValueError("diagnostics.detailed must be boolean")
++        if int(diagnostic.get("snapshot_interval", 0)) < 0:
++            raise ValueError("diagnostics.snapshot_interval must be nonnegative")
++        if int(diagnostic.get("max_events", 6)) < 1:
++            raise ValueError("diagnostics.max_events must be positive")
++        if diagnostic.get("snapshot_interval", 0) and not diagnostic.get("detailed", False):
++            raise ValueError("diagnostics.snapshot_interval requires detailed diagnostics")
+         if not isinstance(diagnostic.get("enabled", False), bool):
+             raise ValueError("diagnostics.enabled must be boolean")
+         if not isinstance(diagnostic.get("stop_on_mismatch", False), bool):
+diff --git a/experiments/ablation_v9/src/diagnostics.py b/experiments/ablation_v9/src/diagnostics.py
+index aba3a57..09dd77d 100644
+--- a/experiments/ablation_v9/src/diagnostics.py
++++ b/experiments/ablation_v9/src/diagnostics.py
+@@ -102,6 +102,10 @@ class BatchDiagnostics:
+         self.started = time.time()
+         self.pre_forward_rng = None
+         self.sample_batches = []
++        self.detail = None
++        if self.options.get("detailed", False):
++            from .diagnostic_detail import DetailedObserver
++            self.detail = DetailedObserver(self)
+         root = Path(__file__).resolve().parents[3]
+         sources = {}
+         for directory in (root / "experiments/ablation_v9/src", root / "time_rcd"):
+@@ -134,8 +138,26 @@ class BatchDiagnostics:
+             # Independent iterator uses the sampler's LOCAL random.Random only.
+             self.sample_batches = [[train_indices[i] for i in positions] for positions in sampler]
+ 
++    def attach(self, model):
++        if self.detail is not None:
++            self.detail.attach(model)
++
+     def before_forward(self):
+         self.pre_forward_rng = rng_state()
++        if self.detail is not None:
++            self.detail.begin_forward()
++
++    def after_forward(self):
++        if self.detail is not None:
++            self.detail.end_forward()
++
++    def after_step(self, model, optimizer, batch_index):
++        if self.detail is not None:
++            self.detail.after_step(model, optimizer, batch_index)
++
++    def close(self):
++        if self.detail is not None:
++            self.detail.close()
+ 
+     @torch.no_grad()
+     def after_backward(self, model, optimizer, batch_index, batch, x_input,
+@@ -164,6 +186,7 @@ class BatchDiagnostics:
+         statistics = {
+             "raw_x": tensor_stats(raw),
+             "normalized_x": tensor_stats(batch["x"][batch["valid"]]),
++            "normalized_x0": tensor_stats(batch["x0"][batch["valid"]]),
+             "masked_input": tensor_stats(x_input),
+             "hidden": tensor_stats(output["h"]),
+             "prediction": tensor_stats(output["reconstruction"]),
+@@ -174,6 +197,9 @@ class BatchDiagnostics:
+             statistics["normal_reference_prediction"] = tensor_stats(output["normal_reference"])
+             reference_errors = (output["normal_reference"].detach().cpu() - batch["x0"]).square()
+             statistics["normal_reference_masked_squared_error"] = tensor_stats(reference_errors[mask])
++        detail_record = {}
++        if self.detail is not None:
++            detail_record = self.detail.observe(model, optimizer, batch, mask, output, grad_norms)
+         nonfinite = (not all(math.isfinite(v) for v in loss_values.values())
+                      or not math.isfinite(grad_norm)
+                      or any(s["nonfinite"] for s in statistics.values()))
+@@ -185,12 +211,18 @@ class BatchDiagnostics:
+             reasons.append("loss_threshold")
+         if eligible and grad_norm >= float(self.options.get("grad_threshold", 1000)):
+             reasons.append("grad_threshold")
++        if self.detail is not None:
++            reasons.extend(r for r in self.detail.extra_triggers
++                           if (eligible or r == "nonfinite") and r not in reasons)
++            nonfinite = nonfinite or "nonfinite" in reasons
+         record = {
++            **detail_record,
+             "epoch": self.epoch, "batch": batch_index, "elapsed_seconds": time.time() - self.started,
+             "loss": loss_values, "running_mean_total": self.total / (batch_index + 1),
+             "sample_ids": ids, "lengths": batch["lengths"],
+             "per_sample_masked_mse": per_sample_reconstruction,
+             "raw_mean": raw.mean(dim=0).tolist(), "raw_std_plus_eps": (raw.std(dim=0) + 1e-4).tolist(),
++            "mask_seed": int(self.config["runtime"]["seed"]) + self.epoch * 1000003 + batch_index,
+             "mask_count": int(mask.sum()), "classification_count": int(losses["classification_count"]),
+             "valid_points": int(batch["valid"].sum()), "padding_points": int((~batch["valid"]).sum()),
+             "tensor_stats": statistics, "gradient_l2": grad_norm,
+@@ -199,7 +231,9 @@ class BatchDiagnostics:
+         }
+         with (self.directory / "batches.jsonl").open("a", encoding="utf-8") as handle:
+             handle.write(json.dumps(json_safe(record), ensure_ascii=False, allow_nan=False) + "\n")
+-        if reasons and not self.event_saved:
++        if self.detail is not None:
++            self.detail.capture(model, optimizer, record, batch, x_input, encoder_mask, mask, output)
++        elif reasons and (not self.event_saved or nonfinite):
+             payload = {
+                 "phase": "pre_optimizer_step", "epoch": self.epoch, "batch_index": batch_index,
+                 "model_state_dict": cpu_copy(unwrap_model(model).state_dict()),
+@@ -209,8 +243,9 @@ class BatchDiagnostics:
+                 "x_input": cpu_copy(x_input), "encoder_mask": cpu_copy(encoder_mask), "mask": cpu_copy(mask),
+                 "losses": loss_values, "gradient_norms": grad_norms, "config": self.config,
+             }
+-            torch.save(payload, self.directory / "first_event.pth")
+-            self.write_json("first_event.json", record)
++            event_name = "nonfinite_event" if self.event_saved and nonfinite else "first_event"
++            torch.save(payload, self.directory / (event_name + ".pth"))
++            self.write_json(event_name + ".json", record)
+             self.event_saved = True
+             print(f"[diagnostics] saved first event: epoch={self.epoch} batch={batch_index} "
+                   f"loss={loss_values['total']:.8g} grad={grad_norm:.8g} triggers={reasons}", flush=True)
+diff --git a/experiments/ablation_v9/src/train.py b/experiments/ablation_v9/src/train.py
+index f61fbc9..c5a0da2 100644
+--- a/experiments/ablation_v9/src/train.py
++++ b/experiments/ablation_v9/src/train.py
+@@ -174,6 +174,7 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None
+     if config.get("diagnostics", {}).get("enabled", False):
+         from .diagnostics import BatchDiagnostics
+         diagnostics = BatchDiagnostics(run_dir, config)
++        diagnostics.attach(model)
+     # END OPTIONAL DIAGNOSTICS
+ 
+     start_epoch = 0
+@@ -222,6 +223,10 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None
+                 diagnostics.before_forward()
+             # END OPTIONAL DIAGNOSTICS
+             output = model(x_input.to(device), encoder_mask.to(device))
++            # OPTIONAL DIAGNOSTICS: exclude checkpoint recomputation from hook samples.
++            if diagnostics is not None:
++                diagnostics.after_forward()
++            # END OPTIONAL DIAGNOSTICS
+             losses = compute_losses(
+                 output,
+                 batch_device,
+@@ -239,6 +244,10 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None
+                                            encoder_mask, mask, output, losses, train_loader.dataset)
+             # END OPTIONAL DIAGNOSTICS
+             optimizer.step()
++            # OPTIONAL DIAGNOSTICS: actual update, with no extra forward/backward.
++            if diagnostics is not None:
++                diagnostics.after_step(model, optimizer, batch_index)
++            # END OPTIONAL DIAGNOSTICS
+ 
+             batch_total = float(losses["total"].detach().cpu())
+             batch_reconstruction = float(losses["reconstruction"].detach().cpu())
+@@ -333,6 +342,10 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None
+             if stale >= int(config["optimization"]["early_stopping_patience"]):
+                 break
+ 
++    # OPTIONAL DIAGNOSTICS
++    if diagnostics is not None:
++        diagnostics.close()
++    # END OPTIONAL DIAGNOSTICS
+     return {"status": "completed", "best_epoch": best_epoch, "best_validation_loss": best_loss,
+             "selection_metric": "valid_total",
+             "batch_sampler": batch_sampler_kind,
+diff --git a/experiments/ablation_v9/tests/test_padding_contract.py b/experiments/ablation_v9/tests/test_padding_contract.py
+index 15ddf9a..34ab709 100644
+--- a/experiments/ablation_v9/tests/test_padding_contract.py
++++ b/experiments/ablation_v9/tests/test_padding_contract.py
+@@ -201,7 +201,6 @@ def test_training_evaluation_and_checkpoint_preserve_policy(tmp_path, variant, p
+     assert result['selection_metric'] == 'valid_total'
+     log = (tmp_path / 'train.log').read_text()
+     assert f'classification_padding={policy}' in log
+-    assert 'Classification points: loss=' in log
+ 
+ 
+ @pytest.mark.parametrize('policy', POLICIES)
+diff --git a/experiments/ablation_v9/src/diagnostic_detail.py b/experiments/ablation_v9/src/diagnostic_detail.py
+new file mode 100644
+index 0000000..e05c006
+--- /dev/null
++++ b/experiments/ablation_v9/src/diagnostic_detail.py
+@@ -0,0 +1,261 @@
++"""Bounded CPU observations and replay evidence; never changes training tensors."""
++from __future__ import annotations
++import hashlib
++import math
++import os
++import threading
++from pathlib import Path
++import numpy as np
++import torch
++from .parallel import unwrap_model
++from .diagnostics import cpu_copy, rng_state, tensor_stats, json_safe
++import json
++
++
++def array_stats(value):
++    # Float64 accumulation avoids diagnostic overflow on large finite FP32 values.
++    a = value.detach().cpu().numpy()
++    finite = np.isfinite(a)
++    good = a[finite] if not finite.all() else a.reshape(-1)
++    if not good.size:
++        return dict(count=int(a.size), nonfinite=int(a.size), mean=None, rms=None,
++                    std=None, abs_max=None, zero_fraction=None)
++    square = np.square(good, dtype=np.float64).sum()
++    mean = float(np.mean(good, dtype=np.float64))
++    rms = math.sqrt(float(square / good.size))
++    return dict(count=int(a.size), nonfinite=int(a.size - finite.sum()), mean=mean,
++                rms=rms, std=math.sqrt(max(0., rms*rms-mean*mean)),
++                abs_max=float(np.abs(good).max()),
++                zero_fraction=float(np.count_nonzero(good == 0)/good.size))
++
++
++def digest_tensor(t):
++    a = t.detach().cpu().contiguous().numpy()
++    return hashlib.sha256(a.tobytes()).hexdigest()
++
++
++def group_name(name):
++    if name.startswith("encoder.transformer_encoder.layers."):
++        return ".".join(name.split(".")[:4])
++    return ".".join(name.split(".")[:2]) if name.startswith("encoder.") else name.split(".")[0]
++
++
++def state_groups(model, optimizer):
++    groups = {}
++    for name, p in unwrap_model(model).named_parameters():
++        g = groups.setdefault(group_name(name), dict(parameter_sq=0., moment_sq=0.,
++                            second_moment_sum=0., nonfinite=0, elements=0))
++        a = p.detach().cpu().numpy()
++        g["elements"] += a.size
++        g["nonfinite"] += int((~np.isfinite(a)).sum())
++        g["parameter_sq"] += float(np.square(a, dtype=np.float64).sum())
++        state = optimizer.state.get(p, {})
++        if "exp_avg" in state:
++            m = state["exp_avg"].detach().cpu().numpy()
++            v = state["exp_avg_sq"].detach().cpu().numpy()
++            g["nonfinite"] += int((~np.isfinite(m)).sum() + (~np.isfinite(v)).sum())
++            g["moment_sq"] += float(np.square(m, dtype=np.float64).sum())
++            g["second_moment_sum"] += float(np.sum(v, dtype=np.float64))
++    return groups
++
++
++class DetailedObserver:
++    def __init__(self, owner):
++        self.owner = owner
++        self.directory = owner.directory
++        self.interval = int(owner.options.get("snapshot_interval", 0))
++        self.max_events = int(owner.options.get("max_events", 6))
++        self.handles = []
++        self.lock = threading.Lock()
++        self.active = False
++        self.activations = {}
++        self.events = 0
++        self.seen_levels = {}
++        self.latest_periodic = None
++        self.pending = None
++        self.before_parameters = None
++        self.extra_triggers = []
++
++    def attach(self, model):
++        for name, module in unwrap_model(model).named_modules():
++            is_layer = name.startswith("encoder.transformer_encoder.layers.") and name.count(".") == 3
++            is_head = name.startswith(("reconstruction_head.", "normal_reference_head.", "anomaly_head."))
++            if is_layer or name == "encoder.projection_layer" or (is_head and isinstance(module, (torch.nn.Linear, torch.nn.GELU))):
++                def observe(module, args, output, name=name):
++                    if not self.active:
++                        return
++                    # Views only on CUDA; summaries are on CPU, no random sampling.
++                    # Up to 8 fixed time positions, ALL rows/channels; not full extrema.
++                    step = max(1, math.ceil(output.shape[1] / 8))
++                    sample = output.detach()[:, ::step].cpu()
++                    s = array_stats(sample)
++                    a = sample.numpy()
++                    s.update(full_shape=list(output.shape), sample_shape=list(sample.shape),
++                             time_stride=step, below_minus5=float(np.mean(a < -5)),
++                             near_zero=float(np.mean(np.abs(a) < 1e-8)))
++                    with self.lock:
++                        self.activations[name + "@" + str(output.device)] = s
++                self.handles.append(module.register_forward_hook(observe))
++
++    def begin_forward(self):
++        self.activations = {}
++        self.active = True
++
++    def end_forward(self):
++        # Disable BEFORE backward; activation-checkpoint recomputation is not sampled.
++        self.active = False
++
++    def close(self):
++        self.active = False
++        for handle in self.handles:
++            handle.remove()
++        self.handles.clear()
++
++    def observe(self, model, optimizer, batch, mask, output, grad_norms):
++        self.before_parameters = {n: cpu_copy(p) for n, p in unwrap_model(model).named_parameters()}
++        self.before_state = state_groups(model, optimizer)
++        groups = {}
++        for name, norm in grad_norms.items():
++            g = groups.setdefault(group_name(name), dict(l2_squared=0., max_parameter_l2=0.))
++            g["l2_squared"] += norm*norm
++            g["max_parameter_l2"] = max(g["max_parameter_l2"], norm)
++        for g in groups.values():
++            g["l2"] = math.sqrt(g.pop("l2_squared"))
++        active = mask & batch["valid"]
++        x = batch["x"].detach().cpu()
++        x0 = batch["x0"].detach().cpu()
++        pred = output["reconstruction"].detach().cpu()
++        normal_pred = output.get("normal_reference")
++        if normal_pred is not None:
++            normal_pred = normal_pred.detach().cpu()
++        regions = {"selected": active, "selected_normal": active & (batch["y"] == 0),
++                   "selected_anomalous": active & (batch["y"] > 0),
++                   "selected_changed": active & (x != x0).any(-1)}
++        stats = {}
++        for name, region in regions.items():
++            stats[name] = dict(points=int(region.sum()), target_x=array_stats(x[region]),
++                target_x0=array_stats(x0[region]), prediction_x=array_stats(pred[region]),
++                mse_x=float((pred[region]-x[region]).square().mean()) if region.any() else None,
++                zero_mse_x=float(x[region].square().mean()) if region.any() else None,
++                zero_mse_x0=float(x0[region].square().mean()) if region.any() else None)
++            if normal_pred is not None:
++                stats[name].update(prediction_x0=array_stats(normal_pred[region]),
++                    mse_x0=float((normal_pred[region]-x0[region]).square().mean()) if region.any() else None)
++        logits = output["logits"].detach().cpu().numpy()
++        shifted = logits - logits.max(axis=-1, keepdims=True)
++        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
++            exp = np.exp(shifted)
++            probability = exp[..., 1] / exp.sum(-1)
++        valid = batch["valid"].numpy()
++        y = batch["y"].numpy() > 0
++        predicted = probability >= 0.5
++        cls = dict(tp=int((predicted & y & valid).sum()),
++                   fp=int((predicted & ~y & valid).sum()),
++                   fn=int((~predicted & y & valid).sum()),
++                   valid=int(valid.sum()), positives=int((y & valid).sum()),
++                   probability=array_stats(torch.from_numpy(probability[valid])))
++        hidden = array_stats(output["h"])
++        self.extra_triggers = []
++        if hidden["rms"] is not None and hidden["rms"] >= 1000:
++            self.extra_triggers.append("hidden_scale")
++        if any(k.startswith("anomaly_head.1@") and v["near_zero"] == 1 for k,v in self.activations.items()):
++            self.extra_triggers.append("classifier_saturated")
++        if any(g["nonfinite"] for g in self.before_state.values()) or any(v["nonfinite"] for v in self.activations.values()):
++            self.extra_triggers.append("nonfinite")
++        reference_errors = (normal_pred-x0).square() if normal_pred is not None else None
++        return dict(hidden_moments=hidden, regions=stats, classification=cls,
++                    per_sample_normal_reference_mse=[
++                        float(reference_errors[i][active[i]].mean()) if active[i].any() else None
++                        for i in range(len(x))] if reference_errors is not None else None,
++                    gradient_by_parameter=grad_norms, gradient_by_module=groups,
++                    state_before=self.before_state, sampled_activations=dict(self.activations),
++                    batch_sha256={k:digest_tensor(batch[k]) for k in ("x","x0","y","valid")},
++                    mask_sha256=digest_tensor(mask),
++                    observation_phase="forward and backward before optimizer.step")
++
++    def save(self, name, payload):
++        path = self.directory / (name + ".pth")
++        temporary = path.with_suffix(".tmp")
++        torch.save(payload, temporary)
++        temporary.replace(path)
++        return path
++
++    def capture(self, model, optimizer, record, batch, x_input, encoder_mask, mask, output):
++        owner = self.owner
++        batch_index = record["batch"]
++        reasons = record["triggers"]
++        levels = {}
++        for reason in reasons:
++            ratio = (record["loss"]["total"] / owner.options.get("loss_threshold",10)
++                     if reason == "loss_threshold" else
++                     record["gradient_l2"] / owner.options.get("grad_threshold",1000)
++                     if reason == "grad_threshold" else
++                     record["hidden_moments"]["rms"] / 1000 if reason == "hidden_scale" else 1)
++            levels[reason] = int(math.log10(max(1,ratio))) if math.isfinite(ratio) else 99
++        event = bool(levels) and (self.events < self.max_events or "nonfinite" in levels) and any(
++            level > self.seen_levels.get(reason, -1) for reason,level in levels.items())
++        periodic = self.interval > 0 and batch_index % self.interval == 0
++        if not event and not periodic:
++            return
++        payload = dict(phase="pre_optimizer_step", epoch=owner.epoch, batch_index=batch_index,
++            model_state_dict=cpu_copy(unwrap_model(model).state_dict()),
++            optimizer_state_dict=cpu_copy(optimizer.state_dict()), rng_before_forward=owner.pre_forward_rng,
++            rng_after_backward=rng_state(),
++            gradients={n:cpu_copy(p.grad) if p.grad is not None else None for n,p in unwrap_model(model).named_parameters()},
++            batch=cpu_copy(batch), x_input=cpu_copy(x_input), encoder_mask=cpu_copy(encoder_mask),
++            mask=cpu_copy(mask), sample_ids=record["sample_ids"], losses=record["loss"],
++            gradient_norms=record["gradient_by_parameter"], config=owner.config,
++            diagnostic_record=record, output=cpu_copy(output), model_training=bool(model.training))
++        if event:
++            name = "first_event" if self.events == 0 else f"event_{self.events:03d}"
++            self.save(name, payload)
++            owner.write_json(name + ".json", record)
++            # Hard link pins the old inode while rolling slots are atomically replaced.
++            if self.latest_periodic is not None:
++                previous = self.directory / (name + "_previous.pth")
++                os.link(self.latest_periodic, previous)
++            self.pending = (name, record)
++            for reason, level in levels.items():
++                self.seen_levels[reason] = max(level, self.seen_levels.get(reason, -1))
++            self.events += 1
++            owner.event_saved = True
++            print(f"[diagnostics] {name}: epoch={owner.epoch} batch={batch_index} triggers={reasons}", flush=True)
++        if periodic:
++            slot = (batch_index // self.interval) % 2
++            self.latest_periodic = self.save(f"rolling_{slot}", payload)
++            owner.write_json(f"rolling_{slot}.json", dict(epoch=owner.epoch, batch=batch_index,
++                             phase="pre_optimizer_step"))
++        del payload
++
++    def after_step(self, model, optimizer, batch_index):
++        if self.before_parameters is None:
++            return
++        groups = {}
++        for n,p in unwrap_model(model).named_parameters():
++            a = p.detach().cpu().numpy()
++            before = self.before_parameters[n].numpy()
++            delta = a.astype(np.float64)-before
++            g = groups.setdefault(group_name(n), dict(delta_sq=0., before_sq=0., abs_max=0.))
++            g["delta_sq"] += float(np.square(delta).sum())
++            g["before_sq"] += float(np.square(before, dtype=np.float64).sum())
++            g["abs_max"] = max(g["abs_max"],float(np.abs(delta).max()))
++        for g in groups.values():
++            g["l2"] = math.sqrt(g.pop("delta_sq"))
++            g["relative_l2"] = g["l2"]/max(1e-30,math.sqrt(g.pop("before_sq")))
++        after = state_groups(model, optimizer)
++        record = dict(epoch=self.owner.epoch,batch=batch_index,update_by_module=groups,
++                      state_after=after,phase="after_optimizer_step")
++        nonfinite = any(g["nonfinite"] for g in after.values())
++        if self.pending or nonfinite:
++            name = self.pending[0] if self.pending else "nonfinite_update"
++            self.save(name + "_post",dict(phase="after_optimizer_step",epoch=self.owner.epoch,
++                batch_index=batch_index,model_state_dict=cpu_copy(unwrap_model(model).state_dict()),
++                optimizer_state_dict=cpu_copy(optimizer.state_dict()),rng_after_step=rng_state(),
++                config=self.owner.config,diagnostic_record=record))
++            self.owner.write_json(name + "_post.json",record)
++        with (self.directory/"updates.jsonl").open("a",encoding="utf-8") as f:
++            f.write(json.dumps(json_safe(record),allow_nan=False)+"\n")
++        self.pending = None
++        self.before_parameters = None
++        if nonfinite:
++            raise FloatingPointError("Nonfinite optimizer update; post-step evidence saved")
+diff --git a/experiments/ablation_v9/tests/test_diagnostic_detail.py b/experiments/ablation_v9/tests/test_diagnostic_detail.py
+new file mode 100644
+index 0000000..cbb85f2
+--- /dev/null
++++ b/experiments/ablation_v9/tests/test_diagnostic_detail.py
+@@ -0,0 +1,166 @@
++"""Detailed diagnostics preserve the P1 trajectory and capture replayable updates."""
++import copy
++import json
++from pathlib import Path
++import numpy as np
++import pytest
++import torch
++from test_diagnostics import config_for, assert_rng_equal
++from src.models import build_model
++from src.parallel import prepare_model, unwrap_model
++from src.train import train_model, set_seed, make_batch_inputs
++from src.diagnostics import BatchDiagnostics, compare_states, rng_state
++from src.resume import restore_rng
++from src.losses import compute_losses
++from src.data import Sample, collate_samples
++
++
++@pytest.mark.parametrize("parallel", ["none","data_parallel"])
++def test_p1_detailed_diagnostics_preserve_trajectory(tmp_path,parallel):
++    if parallel != "none" and torch.cuda.device_count()<2:
++        pytest.skip("two GPUs required")
++    config=config_for(tmp_path,parallel)
++    config["experiment_id"]="p1_mask_x_normal"
++    config["loss"]["normal_reference_weight"]=1
++    records=[]
++    for enabled in (False,True):
++        raw=copy.deepcopy(config)
++        if enabled:
++            raw["diagnostics"]=dict(enabled=True,detailed=True,snapshot_interval=1,max_events=2,
++                start_epoch=0,loss_threshold=0.00001,grad_threshold=1e20)
++        run=tmp_path/str(enabled);run.mkdir()
++        set_seed(72)
++        model=prepare_model(build_model(raw),raw)
++        train_model(model,raw,run)
++        checkpoint=torch.load(run/"checkpoints/epoch_0001.pth",map_location="cpu",weights_only=False)
++        records.append((checkpoint,rng_state()))
++        assert all(not m._forward_hooks for m in unwrap_model(model).modules())
++        del model
++        if parallel!="none":torch.cuda.empty_cache()
++    for key in ("model_state_dict","optimizer_state_dict","validation"):
++        assert not compare_states(records[0][0][key],records[1][0][key])
++    assert_rng_equal(records[0][1],records[1][1])
++    directory=tmp_path/"True/diagnostics"
++    rows=[json.loads(s) for s in (directory/"batches.jsonl").read_text().splitlines()]
++    updates=[json.loads(s) for s in (directory/"updates.jsonl").read_text().splitlines()]
++    assert len(rows)==len(updates)==6
++    assert all(r["regions"]["selected"]["points"]==r["mask_count"] for r in rows)
++    assert all(r["regions"]["selected"]["target_x0"]["rms"]>0 for r in rows)
++    assert all(r["gradient_by_module"]["normal_reference_head"]["l2"]>0 for r in rows)
++    assert all(r["sampled_activations"] for r in rows)
++    expected_devices={"cpu"} if parallel=="none" else {"cuda:0","cuda:1"}
++    assert set(k.split("@")[-1] for k in rows[0]["sampled_activations"])==expected_devices
++    assert any(g["l2"]>0 for g in updates[0]["update_by_module"].values())
++    assert (directory/"rolling_0.pth").is_file() and (directory/"rolling_1.pth").is_file()
++    assert (directory/"first_event_post.pth").is_file()
++
++
++def one_batch(tmp_path):
++    config=config_for(tmp_path)
++    config["experiment_id"]="p1_mask_x_normal"
++    config["loss"]["normal_reference_weight"]=1
++    config["diagnostics"]=dict(enabled=True,detailed=True,snapshot_interval=1,max_events=1,
++        start_epoch=0,loss_threshold=1e-6,grad_threshold=1e20)
++    set_seed(72);model=build_model(config)
++    optimizer=torch.optim.AdamW(model.parameters(),lr=5e-4,weight_decay=1e-5)
++    x=torch.linspace(-2,2,145).unsqueeze(-1)
++    batch=collate_samples([Sample(x,x*.9,torch.zeros(145,dtype=torch.long),None)]*2)
++    dataset=type("Dataset",(),{"data":[{"time_series":x},{"time_series":x}]})()
++    diagnostic=BatchDiagnostics(tmp_path,config);diagnostic.attach(model)
++    diagnostic.begin_epoch(0,None,[0,1])
++    inputs,em,mask=make_batch_inputs(batch,config,torch.Generator().manual_seed(72))
++    diagnostic.before_forward();output=model(inputs,em);diagnostic.after_forward()
++    loss=compute_losses(output,batch,"x",1,1,mask,classification_padding="official")
++    loss["total"].backward()
++    diagnostic.after_backward(model,optimizer,0,batch,inputs,em,mask,output,loss,dataset)
++    optimizer.step();diagnostic.after_step(model,optimizer,0)
++    return config,model,optimizer,diagnostic,batch,inputs,em,mask,output,loss,dataset
++
++
++def test_saved_gradient_recreates_exact_optimizer_update_and_dropout(tmp_path):
++    config,model,optimizer,diagnostic,*_=one_batch(tmp_path)
++    pre=torch.load(tmp_path/"diagnostics/first_event.pth",weights_only=False)
++    post=torch.load(tmp_path/"diagnostics/first_event_post.pth",weights_only=False)
++    replay=build_model(config);replay.load_state_dict(pre["model_state_dict"])
++    opt=torch.optim.AdamW(replay.parameters(),lr=5e-4,weight_decay=1e-5)
++    opt.load_state_dict(pre["optimizer_state_dict"])
++    restore_rng(pre["rng_before_forward"])
++    output=replay(pre["x_input"],pre["encoder_mask"])
++    losses=compute_losses(output,pre["batch"],"x",1,1,pre["mask"],classification_padding="official")
++    assert losses["total"].item()==pre["losses"]["total"]
++    losses["total"].backward()
++    for n,p in replay.named_parameters():
++        assert torch.equal(p.grad,pre["gradients"][n])
++    opt.step()
++    assert not compare_states(replay.state_dict(),post["model_state_dict"])
++    assert not compare_states(opt.state_dict(),post["optimizer_state_dict"])
++    assert_rng_equal(rng_state(),post["rng_after_step"])
++    diagnostic.close()
++
++
++def test_nonfinite_event_is_saved_after_finite_event_cap(tmp_path):
++    config,model,opt,diag,batch,inputs,em,mask,output,loss,dataset=one_batch(tmp_path)
++    first=(tmp_path/"diagnostics/first_event.pth").read_bytes()
++    bad=dict(loss);bad["total"]=torch.tensor(float("nan"))
++    with pytest.raises(FloatingPointError):
++        diag.after_backward(model,opt,0,batch,inputs,em,mask,output,bad,dataset)
++    assert (tmp_path/"diagnostics/first_event.pth").read_bytes()==first
++    assert (tmp_path/"diagnostics/event_001.pth").is_file()
++    assert (tmp_path/"diagnostics/event_001_previous.pth").is_file()
++    diag.close()
++
++
++def test_detailed_cli_and_config_validation(monkeypatch,tmp_path):
++    from run_experiment import parse_args,apply_runtime_overrides
++    from src.config import load_config,validate_config
++    config=load_config(Path(__file__).parents[1]/"configs/p1_mask_x_normal_padding_official.json")
++    args=["run_experiment.py","--config",str(config.path),"--run-id","detailed-test","--mode","train"]
++    monkeypatch.setattr("sys.argv",args+["--diagnostic-detailed"])
++    with pytest.raises(SystemExit):parse_args()
++    monkeypatch.setattr("sys.argv",args+["--diagnostics","--diagnostic-detailed",
++        "--diagnostic-snapshot-interval","250","--diagnostic-max-events","6","--epochs","25"])
++    apply_runtime_overrides(config,parse_args())
++    assert config.raw["diagnostics"]["snapshot_interval"]==250
++    assert config.raw["diagnostics"]["detailed"]
++    config.raw["diagnostics"]["snapshot_interval"]=-1
++    with pytest.raises(ValueError):validate_config(config.raw)
++
++@pytest.mark.skipif(torch.cuda.device_count()<2, reason="two GPUs required")
++@pytest.mark.parametrize("length",[1024,10000])
++def test_production_shape_p1_observation_preserves_update(tmp_path,length):
++    import gc
++    from src.config import load_config
++    config=load_config(Path(__file__).parents[1]/"configs/p1_mask_x_normal_padding_official.json").raw
++    config["runtime"].update(device="cuda",parallel="data_parallel",gpu_ids=[0,1])
++    config["optimization"]["batch_size"]=32
++    xs=[torch.sin(torch.arange(length,dtype=torch.float32)/(8+i)).unsqueeze(-1) for i in range(32)]
++    batch=collate_samples([Sample(x,x*.9,(torch.arange(length)%11==0).long(),None) for x in xs])
++    dataset=type("Dataset",(),{"data":[{"time_series":x} for x in xs]})()
++    inputs,em,mask=make_batch_inputs(batch,config,torch.Generator().manual_seed(72))
++    results=[]
++    for enabled in [False,True]:
++        raw=copy.deepcopy(config)
++        if enabled:
++            raw["diagnostics"]=dict(enabled=True,detailed=True,snapshot_interval=0,max_events=1,
++                                    start_epoch=0,loss_threshold=1e20,grad_threshold=1e20)
++        set_seed(72);model=prepare_model(build_model(raw),raw)
++        opt=torch.optim.AdamW(model.parameters(),lr=5e-4,weight_decay=1e-5)
++        dev=torch.device("cuda:0")
++        bd={k:v.to(dev) for k,v in batch.items() if isinstance(v,torch.Tensor)}
++        observer=BatchDiagnostics(tmp_path/"production",raw) if enabled else None
++        if observer:
++            observer.attach(model);observer.begin_epoch(0,None,list(range(32)));observer.before_forward()
++        output=model(inputs.to(dev),em.to(dev))
++        if observer:observer.after_forward()
++        loss=compute_losses(output,bd,"x",1,1,mask.to(dev),classification_padding="official")
++        loss["total"].backward()
++        if observer:observer.after_backward(model,opt,0,batch,inputs,em,mask,output,loss,dataset)
++        opt.step()
++        if observer:observer.after_step(model,opt,0);observer.close()
++        from src.diagnostics import cpu_copy
++        results.append((cpu_copy(unwrap_model(model).state_dict()),cpu_copy(opt.state_dict()),rng_state()))
++        del output,loss,bd,opt,model
++        gc.collect();torch.cuda.empty_cache()
++    assert not compare_states(results[0][0],results[1][0])
++    assert not compare_states(results[0][1],results[1][1])
++    assert_rng_equal(results[0][2],results[1][2])

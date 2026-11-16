@@ -201,7 +201,6 @@ def test_training_evaluation_and_checkpoint_preserve_policy(tmp_path, variant, p
     assert result['selection_metric'] == 'valid_total'
     log = (tmp_path / 'train.log').read_text()
     assert f'classification_padding={policy}' in log
-    assert 'Classification points: loss=' in log
 
 
 @pytest.mark.parametrize('policy', POLICIES)

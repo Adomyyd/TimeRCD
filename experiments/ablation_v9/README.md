@@ -2,10 +2,10 @@
 
 比较“保留遮挡观测重构时，增加正常参考监督”对异常检测的影响。
 
-| 实验 | 训练输入 | 重构任务 |
-|---|---|---|
-| P0 | 遮挡后的观测 X | 恢复观测 X |
-| P1 | 与P0相同 | 同时恢复观测 X、预测配对正常值 X⁰ |
+| 实验 | 训练输入       | 重构任务                           |
+| ---- | -------------- | ---------------------------------- |
+| P0   | 遮挡后的观测 X | 恢复观测 X                         |
+| P1   | 与P0相同       | 同时恢复观测 X、预测配对正常值 X⁰ |
 
 P1两个重构头读取同一次Transformer输出，在相同抽样位置计算损失；另保留原异常分类任务，三项权重默认均为1。默认patch16、遮挡块16、抽样15%、总batch32、长度分桶。推理完整输入，只使用异常分类头。
 
@@ -54,10 +54,10 @@ CUDA_VISIBLE_DEVICES=0 python -u experiments/ablation_v9/run_experiment.py \
 
 保留四份训练配置，无需生成本机副本：
 
-| 实验 | ignore配置 | official配置 |
-|---|---|---|
-| P0 | p0_mask_x.json | p0_mask_x_padding_official.json |
-| P1 | p1_mask_x_normal.json | p1_mask_x_normal_padding_official.json |
+| 实验 | ignore配置            | official配置                           |
+| ---- | --------------------- | -------------------------------------- |
+| P0   | p0_mask_x.json        | p0_mask_x_padding_official.json        |
+| P1   | p1_mask_x_normal.json | p1_mask_x_normal_padding_official.json |
 
 需要ignore对照时直接运行：
 
@@ -102,14 +102,17 @@ CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
 
 源进程须先退出；`--epochs`是总轮数上限，已完成epoch0则从1继续。恢复校验要求训练条件一致；只允许改变轮数上限、日志和诊断设置。早期P0权重缺完整RNG，不能直接用它精确续训。
 
-| 参数 | 用途 |
-|---|---|
-| --log-freq 100 | 控制台/train.log的batch间隔 |
-| --diagnostics | 可选逐batch独立诊断，不更改损失或梯度 |
-| --checkpoint-keep-last 2 | 新run只保留best、最近两轮及首次诊断事件前驱 |
-| --epochs 50 | 总轮数上限 |
-| loss.normal_reference_weight | P1正常参考损失权重，JSON中默认1且须为正 |
-| input.mask_patch_size / mask_ratio | 遮挡块长度/比例，默认16/0.15 |
+| 参数                               | 用途                                           |
+| ---------------------------------- | ---------------------------------------------- |
+| --log-freq 100                     | 控制台/train.log的batch间隔                    |
+| --diagnostics                      | 可选逐batch独立诊断，不更改损失或梯度          |
+| --diagnostic-detailed              | 启用定期详细统计和异常升级现场                 |
+| --diagnostic-detail-interval 100   | 完整统计每100批一次；设为1可每批采集，开销较大 |
+| --diagnostic-snapshot-interval 250 | 详细诊断每250步保存滚动现场，保留最近两份      |
+| --checkpoint-keep-last 2           | 新run只保留best、最近两轮及首次诊断事件前驱    |
+| --epochs 50                        | 总轮数上限                                     |
+| loss.normal_reference_weight       | P1正常参考损失权重，JSON中默认1且须为正        |
+| input.mask_patch_size / mask_ratio | 遮挡块长度/比例，默认16/0.15                   |
 
 `bench --max-batches 300`会执行训练更新但不保存模型，用于短程测速；不是smoke。实际只支持FP32，没有AMP/DDP/FSDP或batch中途恢复。
 

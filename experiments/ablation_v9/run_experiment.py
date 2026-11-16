@@ -46,6 +46,14 @@ def parse_args() -> argparse.Namespace:
                         help="Override console/train.log batch interval; diagnostics always writes every batch")
     parser.add_argument("--diagnostics", action="store_true",
                         help="Enable optional per-batch observations and first-event snapshot")
+    parser.add_argument("--diagnostic-detailed", action="store_true",
+                        help="Sample activations, record module updates and save escalating pre/post events")
+    parser.add_argument("--diagnostic-detail-interval", type=int, default=100,
+                        help="Detailed statistics every N batches (default 100); new events promote immediately")
+    parser.add_argument("--diagnostic-snapshot-interval", type=int, default=0,
+                        help="Detailed diagnostic rolling pre-step snapshot interval; 0 disables")
+    parser.add_argument("--diagnostic-max-events", type=int, default=6,
+                        help="Maximum finite escalating events; nonfinite evidence is always saved")
     parser.add_argument("--diagnostic-reference-epoch0",
                         help="Compare model/AdamW state after epoch0; optional strict stop flag below")
     parser.add_argument("--diagnostic-stop-on-mismatch", action="store_true",
@@ -78,6 +86,14 @@ def parse_args() -> argparse.Namespace:
             parser.error("evaluation limits must be positive")
     if (args.diagnostics or args.diagnostic_reference_epoch0) and args.mode != "train":
         parser.error("diagnostics requires --mode train")
+    if args.diagnostic_detailed and not args.diagnostics:
+        parser.error("--diagnostic-detailed requires --diagnostics")
+    if args.diagnostic_detail_interval < 1:
+        parser.error("--diagnostic-detail-interval must be positive")
+    if args.diagnostic_snapshot_interval < 0 or args.diagnostic_max_events < 1:
+        parser.error("diagnostic snapshot interval must be nonnegative; max-events must be positive")
+    if args.diagnostic_snapshot_interval and not args.diagnostic_detailed:
+        parser.error("--diagnostic-snapshot-interval requires --diagnostic-detailed")
     if args.diagnostic_stop_on_mismatch and not args.diagnostic_reference_epoch0:
         parser.error("--diagnostic-stop-on-mismatch requires --diagnostic-reference-epoch0")
     if args.diagnostic_reference_epoch0 and not args.diagnostics:
@@ -193,6 +209,10 @@ def apply_runtime_overrides(config: ExperimentConfig, args: argparse.Namespace) 
     if getattr(args, "diagnostics", False):
         config.raw["diagnostics"] = {
             "enabled": True, "every_batch": True,
+            "detailed": getattr(args, "diagnostic_detailed", False),
+            "detail_interval": getattr(args, "diagnostic_detail_interval", 100),
+            "snapshot_interval": getattr(args, "diagnostic_snapshot_interval", 0),
+            "max_events": getattr(args, "diagnostic_max_events", 6),
             "reference_epoch0": args.diagnostic_reference_epoch0,
             "stop_on_mismatch": args.diagnostic_stop_on_mismatch,
             "loss_threshold": args.diagnostic_loss_threshold,

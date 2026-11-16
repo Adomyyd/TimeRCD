@@ -82,6 +82,42 @@ def gradient_l2(tensor):
     return float(np.sqrt(np.square(value, dtype=np.float64).sum()))
 
 
+@torch.no_grad()
+def tensor_l2_values(named_tensors):
+    """Reduce on the source device; copy only scalars, never full CUDA gradients."""
+    result, devices = {}, {}
+    for name, tensor in named_tensors:
+        if tensor.device.type == "cpu":
+            result[name] = gradient_l2(tensor)
+        else:
+            devices.setdefault(tensor.device, []).append(
+                (name, torch.linalg.vector_norm(tensor.detach(), dtype=torch.float64)))
+    for values in devices.values():
+        norms = torch.stack([value for _, value in values]).cpu().tolist()
+        result.update((name, value) for (name, _), value in zip(values, norms))
+    return result
+
+
+@torch.no_grad()
+def compact_tensor_stats(tensor):
+    """Exact full-tensor extrema and RMS without copying the full hidden state."""
+    value = tensor.detach()
+    if value.device.type == "cpu":
+        stats = tensor_stats(value)
+        stats["rms"] = gradient_l2(value) / math.sqrt(max(1, value.numel()))
+        return stats
+    low, high = torch.aminmax(value)
+    norm = torch.linalg.vector_norm(value, dtype=torch.float64)
+    low, high, norm = torch.stack((low.double(), high.double(), norm)).cpu().tolist()
+    if not all(math.isfinite(x) for x in (low, high, norm)):
+        # Rare failure path keeps the original finite-only statistics and count.
+        stats = tensor_stats(value)
+        stats["rms"] = None
+        return stats
+    return dict(shape=list(value.shape), nonfinite=0, min=low, max=high,
+                abs_max=max(abs(low), abs(high)), rms=norm / math.sqrt(max(1, value.numel())))
+
+
 def json_safe(value):
     if isinstance(value, float) and not math.isfinite(value):
         return str(value)
@@ -102,6 +138,10 @@ class BatchDiagnostics:
         self.started = time.time()
         self.pre_forward_rng = None
         self.sample_batches = []
+        self.detail = None
+        if self.options.get("detailed", False):
+            from .diagnostic_detail import DetailedObserver
+            self.detail = DetailedObserver(self)
         root = Path(__file__).resolve().parents[3]
         sources = {}
         for directory in (root / "experiments/ablation_v9/src", root / "time_rcd"):
@@ -112,10 +152,13 @@ class BatchDiagnostics:
         sources[str(entry.relative_to(root))] = hashlib.sha256(entry.read_bytes()).hexdigest()
         self.write_json("settings.json", {
             "options": self.options, "source_sha256": sources,
+            "diagnostic_schema_version": 2,
+            "detail_interval": int(self.options.get("detail_interval", 100)),
+            "reduction_backend": "source_device_float64_l2_cpu_scalar_transfer",
             "batch_index_origin": 0, "epoch_origin": 0,
             "snapshot_phase": "after backward, before optimizer.step",
             "rng_phase": "before forward",
-            "threshold_action": "save first event; stop only on nonfinite",
+            "threshold_action": "save first event or bounded detailed escalations; stop on nonfinite",
         })
 
     def write_json(self, name, value):
@@ -134,8 +177,26 @@ class BatchDiagnostics:
             # Independent iterator uses the sampler's LOCAL random.Random only.
             self.sample_batches = [[train_indices[i] for i in positions] for positions in sampler]
 
-    def before_forward(self):
+    def attach(self, model):
+        if self.detail is not None:
+            self.detail.attach(model)
+
+    def before_forward(self, batch_index=0):
         self.pre_forward_rng = rng_state()
+        if self.detail is not None:
+            self.detail.begin_forward(batch_index)
+
+    def after_forward(self):
+        if self.detail is not None:
+            self.detail.end_forward()
+
+    def after_step(self, model, optimizer, batch_index):
+        if self.detail is not None:
+            self.detail.after_step(model, optimizer, batch_index)
+
+    def close(self):
+        if self.detail is not None:
+            self.detail.close()
 
     @torch.no_grad()
     def after_backward(self, model, optimizer, batch_index, batch, x_input,
@@ -144,11 +205,9 @@ class BatchDiagnostics:
                        ("total", "reconstruction", "classification")}
         if "normal_reference" in output:
             loss_values["normal_reference"] = float(losses["normal_reference"].detach().cpu())
-        grad_norms = {
-            name: gradient_l2(p.grad)
-            for name, p in unwrap_model(model).named_parameters() if p.grad is not None
-        }
-        grad_norm = math.sqrt(sum(value * value for value in grad_norms.values()))
+        grad_norms = tensor_l2_values(
+            (name, p.grad) for name, p in unwrap_model(model).named_parameters() if p.grad is not None)
+        grad_norm = math.hypot(*grad_norms.values())
         largest = max(grad_norms, key=grad_norms.get, default=None)
         ids = self.sample_batches[batch_index]
         raw = torch.cat([torch.as_tensor(dataset.data[i]["time_series"], dtype=torch.float32).reshape(
@@ -164,8 +223,9 @@ class BatchDiagnostics:
         statistics = {
             "raw_x": tensor_stats(raw),
             "normalized_x": tensor_stats(batch["x"][batch["valid"]]),
+            "normalized_x0": tensor_stats(batch["x0"][batch["valid"]]),
             "masked_input": tensor_stats(x_input),
-            "hidden": tensor_stats(output["h"]),
+            "hidden": compact_tensor_stats(output["h"]),
             "prediction": tensor_stats(output["reconstruction"]),
             "logits": tensor_stats(output["logits"]),
             "masked_squared_error": tensor_stats(errors[mask]),
@@ -185,21 +245,43 @@ class BatchDiagnostics:
             reasons.append("loss_threshold")
         if eligible and grad_norm >= float(self.options.get("grad_threshold", 1000)):
             reasons.append("grad_threshold")
+        hidden = statistics["hidden"]
+        if self.detail is not None and eligible and hidden["rms"] is not None and hidden["rms"] >= 1000:
+            reasons.append("hidden_scale")
+        detail_record = {}
+        if self.detail is not None:
+            reasons.extend(r for r in self.detail.activation_triggers()
+                           if (eligible or r == "nonfinite") and r not in reasons)
+            nonfinite = nonfinite or "nonfinite" in reasons
+            candidate = dict(loss=loss_values, gradient_l2=grad_norm,
+                             hidden_moments=hidden, triggers=reasons)
+            detailed = (self.detail.scheduled(batch_index)
+                        or self.detail.wants_event(candidate) or nonfinite)
+            detail_record = self.detail.observe(
+                model, optimizer, batch, mask, output, grad_norms, detailed=detailed)
+            reasons.extend(r for r in self.detail.extra_triggers
+                           if (eligible or r == "nonfinite") and r not in reasons)
+            nonfinite = nonfinite or "nonfinite" in reasons
         record = {
+            **detail_record,
             "epoch": self.epoch, "batch": batch_index, "elapsed_seconds": time.time() - self.started,
             "loss": loss_values, "running_mean_total": self.total / (batch_index + 1),
             "sample_ids": ids, "lengths": batch["lengths"],
             "per_sample_masked_mse": per_sample_reconstruction,
             "raw_mean": raw.mean(dim=0).tolist(), "raw_std_plus_eps": (raw.std(dim=0) + 1e-4).tolist(),
+            "mask_seed": int(self.config["runtime"]["seed"]) + self.epoch * 1000003 + batch_index,
             "mask_count": int(mask.sum()), "classification_count": int(losses["classification_count"]),
             "valid_points": int(batch["valid"].sum()), "padding_points": int((~batch["valid"]).sum()),
             "tensor_stats": statistics, "gradient_l2": grad_norm,
+            "hidden_moments": detail_record.get("hidden_moments", hidden),
             "largest_gradient_parameter": largest,
             "largest_gradient_l2": grad_norms.get(largest), "triggers": reasons,
         }
         with (self.directory / "batches.jsonl").open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(json_safe(record), ensure_ascii=False, allow_nan=False) + "\n")
-        if reasons and not self.event_saved:
+        if self.detail is not None:
+            self.detail.capture(model, optimizer, record, batch, x_input, encoder_mask, mask, output)
+        elif reasons and (not self.event_saved or nonfinite):
             payload = {
                 "phase": "pre_optimizer_step", "epoch": self.epoch, "batch_index": batch_index,
                 "model_state_dict": cpu_copy(unwrap_model(model).state_dict()),
@@ -209,8 +291,9 @@ class BatchDiagnostics:
                 "x_input": cpu_copy(x_input), "encoder_mask": cpu_copy(encoder_mask), "mask": cpu_copy(mask),
                 "losses": loss_values, "gradient_norms": grad_norms, "config": self.config,
             }
-            torch.save(payload, self.directory / "first_event.pth")
-            self.write_json("first_event.json", record)
+            event_name = "nonfinite_event" if self.event_saved and nonfinite else "first_event"
+            torch.save(payload, self.directory / (event_name + ".pth"))
+            self.write_json(event_name + ".json", record)
             self.event_saved = True
             print(f"[diagnostics] saved first event: epoch={self.epoch} batch={batch_index} "
                   f"loss={loss_values['total']:.8g} grad={grad_norm:.8g} triggers={reasons}", flush=True)

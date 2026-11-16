@@ -1,0 +1,727 @@
+{
+  "run_id": "p1_epoch24_continue_20261116_210441",
+  "phase": "training_verified",
+  "created_utc": "2026-11-16T13:04:41.453844+00:00",
+  "source_run": "p1_mask_normal_official_dp_20261115_015137",
+  "source_checkpoint": "epoch_0023.pth",
+  "source_checkpoint_sha256": "c13980d970b3fe821ee1ff98c6901cf59e2a0af2cee5e958a5c724de1ae5ce5e",
+  "best_checkpoint_sha256": "6de7323c647126b2688e02ec21f2fa34134356770cfb82107fb03ff91217f3d3",
+  "next_epoch": 24,
+  "best_epoch": 22,
+  "stale": 1,
+  "total_epoch_limit": 50,
+  "early_stopping_patience": 7,
+  "parallel": "data_parallel",
+  "gpu_ids": [
+    0,
+    1
+  ],
+  "batch_size": 32,
+  "diagnostic_detail_interval": 100,
+  "snapshot_interval": 250,
+  "max_events": 6,
+  "checkpoint_keep_last": 2,
+  "tmux_session": "p1_epoch24_continue",
+  "console_log": "experiments/ablation_v9/audits/p1_failure_20261116/replay_continue_console_20261116.log",
+  "command": [
+    "python",
+    "-u",
+    "experiments/ablation_v9/run_experiment.py",
+    "--config",
+    "experiments/ablation_v9/runs/p1_mask_normal_official_dp_20261115_015137/config.json",
+    "--resume-from",
+    "experiments/ablation_v9/runs/p1_mask_normal_official_dp_20261115_015137/checkpoints/epoch_0023.pth",
+    "--run-id",
+    "p1_epoch24_continue_20261116_210441",
+    "--epochs",
+    "50",
+    "--log-freq",
+    "100",
+    "--mode",
+    "train",
+    "--diagnostics",
+    "--diagnostic-detailed",
+    "--diagnostic-detail-interval",
+    "100",
+    "--diagnostic-start-epoch",
+    "24",
+    "--diagnostic-loss-threshold",
+    "1",
+    "--diagnostic-grad-threshold",
+    "1000",
+    "--diagnostic-snapshot-interval",
+    "250",
+    "--diagnostic-max-events",
+    "6",
+    "--checkpoint-keep-last",
+    "2"
+  ],
+  "source_sha256": {
+    "experiments/ablation_v9/run_experiment.py": "82b8554aab02864f77c14f54e0de0aa997a037d5766cbfea66871b0a7bfb3c7e",
+    "experiments/ablation_v9/src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/ablation_v9/src/audit.py": "172458a6627815995b9bde7e74ae83b0c6f1b3c2e6ef6f46f7ef89f44315d8f2",
+    "experiments/ablation_v9/src/benchmark_eval.py": "4fa359c2c8508b721b07aa2627e5170715f095dd8514e5998f42eb0152137de9",
+    "experiments/ablation_v9/src/config.py": "401c60efcfa5b609bc09d1af773f78c6b534429a2852b093980882f75b15128f",
+    "experiments/ablation_v9/src/data.py": "ab155e5d4b4b11e363ea5e080789105a93227a893a04b15a06163b27c38a6f41",
+    "experiments/ablation_v9/src/diagnostic_detail.py": "bae36122b19ac614cfbab0bd64560b62ed7cb1e1d3f7742307fd567ee78dfd64",
+    "experiments/ablation_v9/src/diagnostics.py": "72919090ad5d73cd0156ee9a4eb96edfc5f43ce3c8a38fa26daae8a4e7f68552",
+    "experiments/ablation_v9/src/evaluate.py": "aedd7bb6c9ee0f38f5a2de29883c3f0f8cc8528785c4ab7d1317e49c675cd3ff",
+    "experiments/ablation_v9/src/losses.py": "90abc0e535c7bf1290808b5405a29782b40694be33789b7dc78b3678c4bfb9d5",
+    "experiments/ablation_v9/src/metric_worker.py": "5793e7c3a4bf10e7162f574fb8c80ed9ce0a4bd3d118b5adccfbc5ff70c2bf90",
+    "experiments/ablation_v9/src/models.py": "178a8631aa6d667dbe75d42d11cea4492060032b7fdaf92d1a15c120db52ca6c",
+    "experiments/ablation_v9/src/parallel.py": "e0ac55c40ac47b674100c2c0d3d0944a2ccb831ac148abd58caa8407aa616997",
+    "experiments/ablation_v9/src/reporting.py": "70b5af635ceb5b625e2451c4a566434ab8d79b2130a508c7e2da069e82c89086",
+    "experiments/ablation_v9/src/resume.py": "9b3ee3b80992f2a811897182e3b3d6a4943f698f2312417d8e99c4886a84c1da",
+    "experiments/ablation_v9/src/sampling.py": "439993e7b25cc05233228a8a7581080dff21dff7320d7f49523ed71606c271dc",
+    "experiments/ablation_v9/src/train.py": "d5da4b24f49108dfec28a085512a2d45338723a3f1206144f600b4695097adc8"
+  },
+  "limitation": "State restored; historical CUDA trajectory need not be bitwise identical. No full detection evaluation authorized.",
+  "launched_utc": "2026-11-16T13:04:43.720813+00:00",
+  "pane_pid": "1644968",
+  "verification": {
+    "verified_utc": "2026-11-16T13:10:35.223306+00:00",
+    "pane_pid": 1644968,
+    "resume": {
+      "source_run": "p1_mask_normal_official_dp_20261115_015137",
+      "source_checkpoint": "epoch_0023.pth",
+      "checkpoint_sha256": "c13980d970b3fe821ee1ff98c6901cf59e2a0af2cee5e958a5c724de1ae5ce5e",
+      "rng_source": "checkpoint.training_state.rng",
+      "rng_sha256": null,
+      "best_checkpoint_sha256": "6de7323c647126b2688e02ec21f2fa34134356770cfb82107fb03ff91217f3d3",
+      "source_epoch": 23,
+      "next_epoch": 24,
+      "best_loss": 0.1709372573494911,
+      "best_epoch": 22,
+      "stale": 1,
+      "total_epoch_limit": 50,
+      "numerical_limit": "Restores RNG and optimizer; CUDA execution need not be bitwise identical."
+    },
+    "batches_observed": 303,
+    "updates_observed": 303,
+    "last_epoch": 24,
+    "last_batch": 302,
+    "batch_observation_levels": {
+      "detailed": 5,
+      "light": 298
+    },
+    "update_observation_levels": {
+      "detailed": 5,
+      "light": 298
+    },
+    "triggered_batches": 0,
+    "nonfinite_update_rows": 0,
+    "batch100": {
+      "observation_level": "detailed",
+      "activations_complete_for_schedule": true,
+      "hidden_moments": {
+        "count": 77086720,
+        "nonfinite": 0,
+        "mean": 2.677485254792666,
+        "rms": 117.70335325504193,
+        "std": 117.67289594546213,
+        "abs_max": 3644.467529296875,
+        "zero_fraction": 0.0
+      },
+      "classification": {
+        "tp": 14564,
+        "fp": 183,
+        "fn": 5301,
+        "valid": 299220,
+        "positives": 19865,
+        "probability": {
+          "count": 299220,
+          "nonfinite": 0,
+          "mean": 0.05702156158254714,
+          "rms": 0.21113715748025325,
+          "std": 0.20329151675249277,
+          "abs_max": 1.0,
+          "zero_fraction": 0.0
+        }
+      },
+      "per_sample_normal_reference_mse": [
+        0.024692360311746597,
+        0.0030881434213370085,
+        0.01599176414310932,
+        0.03348349407315254,
+        0.09218258410692215,
+        0.008996587246656418,
+        0.02198011428117752,
+        0.059920720756053925,
+        0.01661102846264839,
+        0.05266240984201431,
+        0.0052362349815666676,
+        0.17545738816261292,
+        0.0639837458729744,
+        0.052030567079782486,
+        0.03439886495471001,
+        0.022381793707609177,
+        0.030447611585259438,
+        0.04655269533395767,
+        0.03734179586172104,
+        0.11402305960655212,
+        0.012234378606081009,
+        0.01999749056994915,
+        0.020834708586335182,
+        0.0008344000088982284,
+        0.008263715542852879,
+        0.12475992739200592,
+        0.031522784382104874,
+        0.006509791593998671,
+        0.06295982748270035,
+        0.002898245817050338,
+        0.10691115260124207,
+        0.004753506742417812
+      ],
+      "batch_sha256": {
+        "x": "30c38cbd9a81b54c735801162892b2b90be997af018f51709ce867724656a135",
+        "x0": "ef4a3bdf330a9592d56d99ca92b371d2353a2cd37cbcb50ee59626af36121089",
+        "y": "25e287fe9ef98a33e329eab1138fbf3b1c6c6c846f4c342802ac43bce86087ca",
+        "valid": "5e8e4c673590e1a0b7215724d05ef290ed73b98b69dfe05dc1819ee4c7fb22ee"
+      },
+      "mask_sha256": "2bcf93a0c05cfa9e70ab83c764bec9e2eb24cdef4f0ddedcbf619a05ee929a02",
+      "observation_phase": "forward and backward before optimizer.step",
+      "epoch": 24,
+      "batch": 100,
+      "elapsed_seconds": 37.65563750267029,
+      "loss": {
+        "total": 0.13042524456977844,
+        "reconstruction": 0.030453259125351906,
+        "classification": 0.05890285596251488,
+        "normal_reference": 0.04106912389397621
+      },
+      "running_mean_total": 0.19965612608017308,
+      "sample_ids": [
+        100710,
+        261223,
+        102294,
+        12398,
+        369349,
+        342114,
+        328028,
+        268517,
+        43740,
+        207277,
+        144712,
+        346723,
+        335981,
+        262031,
+        76358,
+        118719,
+        1801,
+        390413,
+        377714,
+        243103,
+        216079,
+        317005,
+        245074,
+        355083,
+        383373,
+        191659,
+        53064,
+        51907,
+        306714,
+        219174,
+        55516,
+        349296
+      ],
+      "lengths": [
+        9327,
+        9396,
+        9328,
+        9300,
+        9320,
+        9401,
+        9389,
+        9297,
+        9295,
+        9380,
+        9313,
+        9379,
+        9359,
+        9297,
+        9391,
+        9410,
+        9309,
+        9378,
+        9319,
+        9398,
+        9326,
+        9313,
+        9361,
+        9317,
+        9337,
+        9326,
+        9399,
+        9384,
+        9356,
+        9406,
+        9310,
+        9399
+      ],
+      "per_sample_masked_mse": [
+        0.02194352075457573,
+        0.002322219777852297,
+        0.017139846459031105,
+        0.030430154874920845,
+        0.0786207988858223,
+        0.009393708780407906,
+        0.029988545924425125,
+        0.06875337660312653,
+        0.013338768854737282,
+        0.017450394108891487,
+        0.006201716605573893,
+        0.016391966491937637,
+        0.033474165946245193,
+        0.05687708035111427,
+        0.02598615735769272,
+        0.01258105132728815,
+        0.016898194327950478,
+        0.05454736575484276,
+        0.04425155743956566,
+        0.1157938539981842,
+        0.013379083015024662,
+        0.023070383816957474,
+        0.015190775506198406,
+        0.009016890078783035,
+        0.00843791663646698,
+        0.1128818690776825,
+        0.024708712473511696,
+        0.005888026673346758,
+        0.025391554459929466,
+        0.003792355302721262,
+        0.05701084062457085,
+        0.003940487280488014
+      ],
+      "raw_mean": [
+        8.159234954341343e-10
+      ],
+      "raw_std_plus_eps": [
+        0.9262174367904663
+      ],
+      "mask_seed": 24000244,
+      "mask_count": 44734,
+      "classification_count": 301120,
+      "valid_points": 299220,
+      "padding_points": 1900,
+      "tensor_stats": {
+        "raw_x": {
+          "shape": [
+            299220,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.0,
+          "max": 3.0,
+          "abs_max": 3.0
+        },
+        "normalized_x": {
+          "shape": [
+            299220,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.238980293273926,
+          "max": 3.238980293273926,
+          "abs_max": 3.238980293273926
+        },
+        "normalized_x0": {
+          "shape": [
+            299220,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.646913528442383,
+          "max": 3.238980293273926,
+          "abs_max": 3.646913528442383
+        },
+        "masked_input": {
+          "shape": [
+            32,
+            9410,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.238980293273926,
+          "max": 3.238980293273926,
+          "abs_max": 3.238980293273926
+        },
+        "hidden": {
+          "shape": [
+            32,
+            9410,
+            1,
+            256
+          ],
+          "nonfinite": 0,
+          "min": -3492.939697265625,
+          "max": 3644.467529296875,
+          "abs_max": 3644.467529296875,
+          "rms": 117.70335325504202
+        },
+        "prediction": {
+          "shape": [
+            32,
+            9410,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -10.015510559082031,
+          "max": 13.057252883911133,
+          "abs_max": 13.057252883911133
+        },
+        "logits": {
+          "shape": [
+            32,
+            9410,
+            2
+          ],
+          "nonfinite": 0,
+          "min": -137.51429748535156,
+          "max": 153.56761169433594,
+          "abs_max": 153.56761169433594
+        },
+        "masked_squared_error": {
+          "shape": [
+            44734,
+            1
+          ],
+          "nonfinite": 0,
+          "min": 1.0594845313571799e-13,
+          "max": 10.458510398864746,
+          "abs_max": 10.458510398864746
+        },
+        "normal_reference_prediction": {
+          "shape": [
+            32,
+            9410,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.552612543106079,
+          "max": 18.402328491210938,
+          "abs_max": 18.402328491210938
+        },
+        "normal_reference_masked_squared_error": {
+          "shape": [
+            44734,
+            1
+          ],
+          "nonfinite": 0,
+          "min": 1.6458905419125536e-11,
+          "max": 7.125982761383057,
+          "abs_max": 7.125982761383057
+        }
+      },
+      "gradient_l2": 3.0099901014734134,
+      "largest_gradient_parameter": "reconstruction_head.6.weight",
+      "largest_gradient_l2": 2.1657659036602808,
+      "triggers": []
+    },
+    "latest_batch": {
+      "observation_level": "light",
+      "activations_complete_for_schedule": false,
+      "sampled_activations": {
+        "anomaly_head.1@cuda:0": {
+          "count": 16384,
+          "nonfinite": 0,
+          "mean": 1.6175405653548505,
+          "rms": 12.585886838101587,
+          "std": 12.481510726708137,
+          "abs_max": 344.5318298339844,
+          "zero_fraction": 0.965087890625,
+          "full_shape": [
+            16,
+            3142,
+            1,
+            128
+          ],
+          "sample_shape": [
+            16,
+            8,
+            1,
+            128
+          ],
+          "time_stride": 393,
+          "below_minus5": 0.0,
+          "near_zero": 0.965087890625
+        },
+        "anomaly_head.1@cuda:1": {
+          "count": 16384,
+          "nonfinite": 0,
+          "mean": 1.6202922025982414,
+          "rms": 11.980221921840032,
+          "std": 11.870146185904192,
+          "abs_max": 400.329833984375,
+          "zero_fraction": 0.96826171875,
+          "full_shape": [
+            16,
+            3142,
+            1,
+            128
+          ],
+          "sample_shape": [
+            16,
+            8,
+            1,
+            128
+          ],
+          "time_stride": 393,
+          "below_minus5": 0.0,
+          "near_zero": 0.96826171875
+        }
+      },
+      "epoch": 24,
+      "batch": 302,
+      "elapsed_seconds": 116.66390585899353,
+      "loss": {
+        "total": 0.12390737235546112,
+        "reconstruction": 0.037129729986190796,
+        "classification": 0.057067107409238815,
+        "normal_reference": 0.029710527509450912
+      },
+      "running_mean_total": 0.19174544766496118,
+      "sample_ids": [
+        90304,
+        191938,
+        115089,
+        42775,
+        5286,
+        323192,
+        198296,
+        39926,
+        160205,
+        272106,
+        165354,
+        194659,
+        67433,
+        325176,
+        171781,
+        317218,
+        398196,
+        177457,
+        7666,
+        23009,
+        80576,
+        151904,
+        399529,
+        54529,
+        328577,
+        83028,
+        312400,
+        364755,
+        228238,
+        52065,
+        19971,
+        200412
+      ],
+      "lengths": [
+        3140,
+        3120,
+        3120,
+        3141,
+        3123,
+        3141,
+        3119,
+        3130,
+        3131,
+        3117,
+        3133,
+        3137,
+        3142,
+        3120,
+        3140,
+        3125,
+        3130,
+        3141,
+        3135,
+        3119,
+        3141,
+        3136,
+        3132,
+        3117,
+        3118,
+        3138,
+        3125,
+        3131,
+        3133,
+        3126,
+        3125,
+        3129
+      ],
+      "per_sample_masked_mse": [
+        0.05605871230363846,
+        0.0022508297115564346,
+        0.15358513593673706,
+        0.023802775889635086,
+        0.016098355874419212,
+        0.01605043187737465,
+        0.0033791963942348957,
+        0.005495890509337187,
+        0.053750719875097275,
+        0.05205944553017616,
+        0.0508074127137661,
+        0.02565833181142807,
+        0.03247468173503876,
+        0.05929480865597725,
+        0.005751410964876413,
+        0.048267949372529984,
+        0.001995784230530262,
+        0.018871143460273743,
+        0.034854739904403687,
+        0.04358474165201187,
+        0.07882720232009888,
+        0.046536874026060104,
+        0.0074236118234694,
+        0.04558394476771355,
+        0.025153748691082,
+        0.05129416659474373,
+        0.012396125122904778,
+        0.0360577255487442,
+        0.052960582077503204,
+        0.05806122347712517,
+        0.01464761234819889,
+        0.055629681795835495
+      ],
+      "raw_mean": [
+        1.7139571706348278e-10
+      ],
+      "raw_std_plus_eps": [
+        0.8788658380508423
+      ],
+      "mask_seed": 24000446,
+      "mask_count": 14820,
+      "classification_count": 100544,
+      "valid_points": 100155,
+      "padding_points": 389,
+      "tensor_stats": {
+        "raw_x": {
+          "shape": [
+            100155,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.0,
+          "max": 3.0,
+          "abs_max": 3.0
+        },
+        "normalized_x": {
+          "shape": [
+            100155,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.4134902954101562,
+          "max": 3.4134902954101562,
+          "abs_max": 3.4134902954101562
+        },
+        "normalized_x0": {
+          "shape": [
+            100155,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.4134902954101562,
+          "max": 3.4134902954101562,
+          "abs_max": 3.4134902954101562
+        },
+        "masked_input": {
+          "shape": [
+            32,
+            3142,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.4134902954101562,
+          "max": 3.4134902954101562,
+          "abs_max": 3.4134902954101562
+        },
+        "hidden": {
+          "shape": [
+            32,
+            3142,
+            1,
+            256
+          ],
+          "nonfinite": 0,
+          "min": -3370.31494140625,
+          "max": 4040.27587890625,
+          "abs_max": 4040.27587890625,
+          "rms": 111.79581629601954
+        },
+        "prediction": {
+          "shape": [
+            32,
+            3142,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.901806592941284,
+          "max": 3.69926381111145,
+          "abs_max": 3.901806592941284
+        },
+        "logits": {
+          "shape": [
+            32,
+            3142,
+            2
+          ],
+          "nonfinite": 0,
+          "min": -110.4732666015625,
+          "max": 151.369873046875,
+          "abs_max": 151.369873046875
+        },
+        "masked_squared_error": {
+          "shape": [
+            14820,
+            1
+          ],
+          "nonfinite": 0,
+          "min": 9.240608278560103e-12,
+          "max": 12.976497650146484,
+          "abs_max": 12.976497650146484
+        },
+        "normal_reference_prediction": {
+          "shape": [
+            32,
+            3142,
+            1
+          ],
+          "nonfinite": 0,
+          "min": -3.435853958129883,
+          "max": 3.762352466583252,
+          "abs_max": 3.762352466583252
+        },
+        "normal_reference_masked_squared_error": {
+          "shape": [
+            14820,
+            1
+          ],
+          "nonfinite": 0,
+          "min": 3.810507465118462e-12,
+          "max": 3.3254685401916504,
+          "abs_max": 3.3254685401916504
+        }
+      },
+      "gradient_l2": 2.2518828301832365,
+      "hidden_moments": {
+        "shape": [
+          32,
+          3142,
+          1,
+          256
+        ],
+        "nonfinite": 0,
+        "min": -3370.31494140625,
+        "max": 4040.27587890625,
+        "abs_max": 4040.27587890625,
+        "rms": 111.79581629601954
+      },
+      "largest_gradient_parameter": "anomaly_head.3.weight",
+      "largest_gradient_l2": 1.7078974572694376,
+      "triggers": []
+    },
+    "initial_rolling_snapshot_exists": true,
+    "source_files_match_launch_hashes": true,
+    "training_config_matches_source_except_authorized_logging_diagnostics_epochs": true
+  }
+}

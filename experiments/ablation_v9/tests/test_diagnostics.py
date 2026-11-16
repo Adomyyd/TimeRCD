@@ -57,8 +57,7 @@ def assert_rng_equal(a, b):
 def test_full_loop_observation_is_numerically_inert(tmp_path, parallel):
     if parallel != "none" and torch.cuda.device_count() < 2:
         pytest.skip("two CUDA devices required")
-    if not SNAPSHOT.exists():
-        pytest.skip("historical training source snapshot unavailable")
+    assert SNAPSHOT.is_file(), "required historical training source snapshot is missing"
     config = config_for(tmp_path, parallel)
     spec = importlib.util.spec_from_file_location("src._reference_training", SNAPSHOT)
     original = importlib.util.module_from_spec(spec)

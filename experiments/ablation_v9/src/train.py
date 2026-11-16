@@ -174,6 +174,7 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
     if config.get("diagnostics", {}).get("enabled", False):
         from .diagnostics import BatchDiagnostics
         diagnostics = BatchDiagnostics(run_dir, config)
+        diagnostics.attach(model)
     # END OPTIONAL DIAGNOSTICS
 
     start_epoch = 0
@@ -219,9 +220,13 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
             batch_device = {key: value.to(device) for key, value in batch.items() if isinstance(value, torch.Tensor)}
             # OPTIONAL DIAGNOSTICS
             if diagnostics is not None:
-                diagnostics.before_forward()
+                diagnostics.before_forward(batch_index)
             # END OPTIONAL DIAGNOSTICS
             output = model(x_input.to(device), encoder_mask.to(device))
+            # OPTIONAL DIAGNOSTICS: exclude checkpoint recomputation from hook samples.
+            if diagnostics is not None:
+                diagnostics.after_forward()
+            # END OPTIONAL DIAGNOSTICS
             losses = compute_losses(
                 output,
                 batch_device,
@@ -239,6 +244,10 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
                                            encoder_mask, mask, output, losses, train_loader.dataset)
             # END OPTIONAL DIAGNOSTICS
             optimizer.step()
+            # OPTIONAL DIAGNOSTICS: actual update, with no extra forward/backward.
+            if diagnostics is not None:
+                diagnostics.after_step(model, optimizer, batch_index)
+            # END OPTIONAL DIAGNOSTICS
 
             batch_total = float(losses["total"].detach().cpu())
             batch_reconstruction = float(losses["reconstruction"].detach().cpu())
@@ -333,6 +342,10 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
             if stale >= int(config["optimization"]["early_stopping_patience"]):
                 break
 
+    # OPTIONAL DIAGNOSTICS
+    if diagnostics is not None:
+        diagnostics.close()
+    # END OPTIONAL DIAGNOSTICS
     return {"status": "completed", "best_epoch": best_epoch, "best_validation_loss": best_loss,
             "selection_metric": "valid_total",
             "batch_sampler": batch_sampler_kind,

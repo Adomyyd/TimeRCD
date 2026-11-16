@@ -61,3 +61,30 @@
 - 新P1标识p1_mask_x_normal，配置同名；旧p1_full_x与p2_full_x0实现/源配置已移除，历史run/配置快照不可按新语义解释。旧P1已按本次指令停止，保留产物。用户授权本次通过检查后启动新P1双卡正式训练；不自动启动完整评测或恢复P0诊断。
 - 新P1普通轮末检查点默认含完整RNG/best/stale，可经统一入口恢复到新run；P0保持普通历史语义，诊断/续跑时含完整状态。P1的valid_total含两项重构与有效点CE，不能与P0总loss数值直接比较方法优劣。
 - 文档以当前运行语义为准，历史执行集中实验记录与审计。清理范围是退出的代码/源配置及自己的临时文件，不删除既有run、数据、权重、registry或回归依赖的官方sources。
+
+
+## P1事故重放授权与详细诊断（2026-11-16）
+
+- 原新P1已由用户停止。用户明确授权从epoch23轮末重放epoch24；当前新run p1_epoch24_replay_20261116_153436，总上限25，只运行该轮及原训练验证，不自动完整检测评测或延长训练。运行状态查实际进程/日志与audits/p1_failure_20261116/REPLAY.md。
+- --diagnostic-detailed为可选分频详细观察，独立src/diagnostic_detail.py经OPTIONAL DIAGNOSTICS接入；主循环不额外前后向、不修正梯度。逐batch保留loss/梯度/H范围与RMS/分类GELU哨兵及非有限检查；完整参数/Adam前后与区域统计、逐层激活默认每100批，滚动批次和新事件立即详细采集。CUDA范数/极值在源设备归约，仅传回标量；CPU详细统计。事件保存实际完整输出/梯度、更新前后模型/Adam/RNG，滚动两槽并固定事件前驱；任务梯度分解在离线现场进行。
+- 滚动/事件快照仅作离线batch分析，不能传给只支持轮末的--resume-from；有限升级事件有上限，非有限后续现场仍必须保存。诊断覆盖及限制、测试/启动证据见同目录REPLAY.md，不承诺历史CUDA轨迹逐位一致。
+
+## 诊断效率与记录解释（2026-11-16）
+
+- --diagnostic-detail-interval控制详细统计间隔，默认100，1为每批详细；与console --log-freq及滚动--diagnostic-snapshot-interval独立。不通过降低batch、改采样或关闭异常检查来提速。
+- batches/updates中的observation_level标记light/detailed；轻量行省略区域/参数Adam/实际更新等字段，不把缺字段解释成0。非定期事件含实际完整输出/梯度与前后状态，但此前中间层激活只能离线补查。
+- 当前运行进程仍用已加载旧实现；新代码只对后续启动生效，不因性能修改自动中断、重启或延长现有训练。受控数值与性能证据见audits/p1_failure_20261116/EFFICIENCY.md；短测不证明历史轨迹一致或整轮加速比例。
+
+
+## 审计与测试维护（2026-11-16）
+
+- audits用途与有效依赖以其README和CLEANUP_20261116.md为准；三处sources（patch_20261110、eval_20261112、spike_20261111/sources_cleanup_20261114）仍是回归依赖。历史JSON/报告只代表当时事实，已删除的临时脚本/清单通过cleanup_20261116.json追溯。长控制台日志可无损压缩，核对解压SHA256；不因清理删除实验原始证据。
+- tests当前11份test_模块；早期test_loss_contract/test_sampling_contract已去重，映射见清理记录。退役配置拒绝检查仍须保留；缺必要历史源码应失败，不能静默跳过。测试用法见tests/README.md。
+
+
+## 运行资产清理与新的续训授权（2026-11-16，以此为准）
+
+- 用户确认删除p0_official_spike_diag_continue_20261114、p0_official_spike_diag_r3_20261114、p1_epoch24_replay_20261116_153436整个run；已有删除账本，旧章节的运行/产物可达性描述已失效。两P0各4份权重和完整eval保留。原新P1仅保留best(epoch22)、epoch23/24/27，其余25份权重已删除。详情见audits/run_cleanup_execution_20261116.json。
+- 用户随后明确授权从原P1 epoch23完整模型/Adam/RNG再次训练epoch24及后续，恢复原50轮总上限/patience7，双卡/batch32/official/seed72/分桶50/16-16-0.15/FP32及优化器保持。使用优化后逐batch诊断、详细间隔100、滚动250、最多6有限事件；新run仅保留best/最近2轮/首次事件前驱。授权包括逐轮训练验证，不包括完整检测评测。启动/状态记录见audits/p1_failure_20261116/REPLAY_CONTINUE.md及replay_continue_launch_20261116.json；以实际日志为准。
+
+- 上述续训实际run为p1_epoch24_continue_20261116_210441，tmux p1_epoch24_continue；已核实恢复next_epoch24/best22/stale1及epoch24首100批执行，状态为运行中，后续查run日志。临时维护脚本在本次收尾删除。

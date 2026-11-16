@@ -16,6 +16,7 @@
 | src/losses.py | 重构位置、分类padding策略及明确分母；空集合返回可反传0 |
 | src/parallel.py | 设备校验、DataParallel封装/解封装、并行信息 |
 | src/diagnostics.py | 默认关闭的逐batch观测、首次异常pre-step现场、完整RNG及epoch0精确对照；不参与训练计算 |
+| src/diagnostic_detail.py | 由diagnostics调用的分频详细采集、事件与滚动现场；不开辟第二训练入口 |
 | src/resume.py | 轮末状态校验/恢复、RNG、早停历史兼容及可选权重保留策略；不含训练循环 |
 | src/train.py | 构造训练loader、合成smoke、训练/短程bench、日志、优化器、早停与检查点 |
 | src/evaluate.py | 训练时固定验证M、区域误差及点级指标；不因完整eval改变 |
@@ -23,8 +24,8 @@
 | src/metric_worker.py | 持续复用独立spawn CPU进程；Linux内部官方池fork该小进程，隔离大pickle/GPU；异常传播与关闭 |
 | src/audit.py | 文件/manifest/协议核查与参数量；记录实际padding策略 |
 | src/reporting.py | 只读取eval.json生成列表，不重新训练或评价 |
-| tests/ | 小规模合成行为与回归检查；run_checks.py为测试入口 |
-| audits/ | 不可混作运行代码的来源、差异和验证证据；patch/eval sources被测试读取 |
+| tests/ | 当前11份合成回归模块；run_checks.py为测试入口，职责见tests/README.md |
+| audits/ | 来源、差异与事故/验证证据；三处源码快照被测试读取，索引见audits/README.md |
 | registry/、runs/ | 执行登记与独立产物，保留既有内容 |
 
 维护归档统一放`experiments/_archive/`；历史备份`.backup_bucket_20261110/`与`.backup_spike_20261111/`已于2026-11-12经用户确认清理（共11文件），不再是可用目录；范围与证据见audits/eval_20261112/CODE_REVIEW.md和cleanup_execution.json。数据/manifest/runs旧资产链接保持可达；不再提供experiments根目录旧脚本/规范入口。

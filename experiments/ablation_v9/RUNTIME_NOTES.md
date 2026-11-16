@@ -14,7 +14,7 @@ official先二值化标签，padding成为正常点参与CE；ignore过滤有效
 
 唯一run_experiment.py入口：audit核对数据manifest/协议和参数量；smoke用随机合成batch前后向，不加载400k；train先audit/smoke再正式训练；bench完整加载pickle并更新参数但不存权重/验证；eval从checkpoint读取并校验训练配置，检测合成留出和真实数据；all为audit→smoke→train→eval；report只整理已有eval列表。--max-batches仅限制bench。
 
-参数覆盖在config快照前生效；run-id唯一，不覆盖目录。按模式写config/command/environment/status、registry/audit、train.log/checkpoints/metrics/train.json、bench.json或eval产物。加载完整pickle约数分钟，数据就绪后打印train.log。默认每100batch分别打印观测重构、正常参考、分类、总loss、点数和耗时；P0正常参考显示0且无该头。
+参数覆盖在config快照前生效；run-id唯一，不覆盖目录。按模式写config/command/environment/status、registry/audit、train.log/checkpoints/metrics/train.json、bench.json或eval产物。加载完整pickle约数分钟，数据就绪后打印train.log。默认每100batch分别打印观测重构、正常参考、分类、总loss和耗时；P0正常参考显示0且无该头。
 
 验证保留观测重构各区域误差、P1正常参考selected/full正常/异常/实际变化区域误差、计数与复制基线。变化按X!=X^0，非标签替代。空区域均值0需结合计数解释；重构指标按点统计，total按batch均值，不能混用。
 
@@ -24,7 +24,7 @@ official先二值化标签，padding成为正常点参与CE；ignore过滤有效
 
 新P1普通轮末默认含training_state（模型/AdamW外的完整RNG、best/stale）；P0仅在诊断或resume时记录完整状态。--resume-from只允许轮末到新run，不是预训练权重初始化；条件严格一致，仅epochs/log_freq/diagnostics可变；缺RNG拒绝，r3可兼容同轮独立RNG。--epochs是总轮数上限，早停仍生效。--checkpoint-keep-last N>=2保留新run最近N轮、best及首次事件前驱，删除逐项记账；默认逐轮全留。
 
-诊断默认关闭，train.py OPTIONAL DIAGNOSTICS块可整体移除。--diagnostics每batch记录分项loss（P1含正常参考）、预测/输入/梯度/样本及首次异常更新前现场；不增加前后向/采样/梯度修正。统计在CPU，默认epoch1起total>=10或grad>=1000触发首次保存；有限事件继续，非有限保存后报错。epoch0参考默认报告差异，--diagnostic-stop-on-mismatch才停止。不匹配只能称同配置重跑，不冒充历史事故精确复现。用户暂缓P0诊断，不自动恢复。
+诊断默认关闭，train.py OPTIONAL DIAGNOSTICS块可整体移除。--diagnostics每batch记录分项loss（P1含正常参考）、预测/输入/梯度/样本及首次异常更新前现场；不增加前后向/采样/梯度修正。梯度范数与完整H极值/RMS在源设备归约，仅回传标量，详细区域统计在CPU；默认epoch1起total>=10或grad>=1000触发首次保存；有限事件继续，非有限保存后报错。epoch0参考默认报告差异，--diagnostic-stop-on-mismatch才停止。不匹配只能称同配置重跑，不冒充历史事故精确复现。用户暂缓P0诊断，不自动恢复。
 
 ## 检测评测
 
@@ -38,3 +38,20 @@ mixed_precision、threshold_source仍是记录占位，没有AMP或部署阈值�
 
 
 显存执行说明（2026-11-15）：最长10000点/总batch32的双卡合成检查发现两个完整重构头保留激活会OOM。新P1训练模式对两个重构MLP启用non-reentrant激活检查点，preserve_rng_state=True，反向时重算头部；骨干仍只前向一次，不改变M/目标/权重/batch/FP32，P0执行路径不变。验证/检测不启用重算。CPU检查覆盖输出/梯度/Dropout RNG与普通头计算一致；最长序列完整前后向及AdamW更新已通过，峰值约8.86/8.51GB（十进制）。重算增加计算开销，不将其当作数值等价提速。
+
+
+## P1事故重放诊断补充（2026-11-16）
+
+用户授权从新P1 epoch23轮末恢复，仅运行epoch24（总上限--epochs25），保持模型/AdamW/RNG/双卡/batch32/分桶/seed/lr/mask/损失不变。新run与原run隔离，不自动评测或继续epoch25。--diagnostic-detailed启用src/diagnostic_detail.py，普通训练默认关闭；接入均在OPTIONAL DIAGNOSTICS块，不增加forward/backward或修改梯度。
+
+当前采用分频诊断（2026-11-16效率修订）。batches.jsonl每批保留样本ID/长度/mask种子及计数、分项loss、观测逐样本重构误差、输入/目标/输出范围、完整H极值/RMS、各参数及模块总梯度。CUDA梯度范数采用FP64设备归约并批量回传标量；不复制完整梯度到CPU做常规统计。梯度仍是总loss梯度，不是任务分解。
+
+--diagnostic-detail-interval默认100、必须为正；详细统计在batch%interval==0、滚动快照批次或新异常事件执行，包括X/X0目标能量、区域误差/基线、正常参考逐样本误差、分类混淆计数/概率、H均值、输入/mask摘要、参数/Adam前后统计和实际更新。updates.jsonl轻量行只记录step完成及参数/Adam非有限检查；详细行才有update_by_module/state_after。各行observation_level=light或detailed；省略字段不能解释成0。设interval=1可每批详细统计，但设备归约的实现仍为新版。
+
+原p1_epoch24_replay_20261116_153436已加载旧实现，仍每批详细统计；本次修改不会热更新该进程。旧run快照及其日志语义保留。
+
+定期详细批次中，每个副本的骨干各层/投影/输出头Linear与GELU按时间固定步长抽样最多8位置、所有batch行和通道，记录范围/近零比例/极负比例。非定期批次仅保留分类GELU抽样作为饱和哨兵；阈值在反向后触发时无法补采此前各层激活，activations_complete_for_schedule=false，须离线重放现场获取。抽样统计不代表全张量极值；hook在原forward结束后关闭，跳过activation-checkpoint的反向重算与验证。完整H/输出/输入保存于事件现场，可离线做完整激活检查和任务梯度分解。
+
+--diagnostic-snapshot-interval250保留两份滚动pre-step完整现场，原子替换槽位；事件用硬链接固定最近前驱，后续滚动不覆盖固定前驱。--diagnostic-max-events6限制有限事件；按loss/梯度/H尺度阈值跨十倍等级、分类GELU抽样全零新增原因保存升级事件，非有限证据不受有限事件上限限制。first_event始终保留，后续event_NNN；每个事件pre现场含模型、Adam、完整梯度、前向前/反向后RNG、实际输出、batch/mask/ID和配置，post现场含更新后模型/Adam/RNG。有限事件继续，非有限在观测点保存后报错。
+
+滚动和事件快照是离线batch重放证据，不能直接传给仅支持轮末的--resume-from；恢复轮末仍用checkpoints/epoch_XXXX.pth。每批仍检查loss、梯度、H/输出及更新后的参数/Adam非有限值；定期详细统计检查其余抽样激活。有限事件超过上限或相同严重度持续时仅保留逐batch轻量证据，不反复全量拷贝；每次非有限事件不受上限或已见等级阻挡。观察仍增加计算/磁盘时间，不保证历史CUDA轨迹逐位一致；不得为追求确定性临时切换原训练算法。测试涵盖诊断开关轨迹与实际更新重放，正式启动/现场状态以audits/p1_failure_20261116/REPLAY.md和对应run为准。

@@ -1,0 +1,176 @@
+{
+  "note": "CPU eval-mode synthetic probes, no optimizer step; normal head probe target set to X only to test derivative connectivity, not normal-reference performance",
+  "results": [
+    {
+      "epoch": 23,
+      "layer_activations": {
+        "0": {
+          "rms": 16.687763214111328,
+          "absmax": 155.24119567871094
+        },
+        "1": {
+          "rms": 123.15406799316406,
+          "absmax": 2106.8251953125
+        },
+        "2": {
+          "rms": 174.01358032226562,
+          "absmax": 3045.789794921875
+        },
+        "3": {
+          "rms": 189.61940002441406,
+          "absmax": 3371.950927734375
+        },
+        "4": {
+          "rms": 202.67727661132812,
+          "absmax": 3979.501220703125
+        },
+        "5": {
+          "rms": 200.7119140625,
+          "absmax": 4188.25
+        },
+        "6": {
+          "rms": 199.2521514892578,
+          "absmax": 4243.015625
+        },
+        "7": {
+          "rms": 136.9106903076172,
+          "absmax": 3791.505126953125
+        }
+      },
+      "gradients": {
+        "observation": {
+          "probe_loss": 0.05083303898572922,
+          "dL_dH_norm": 1.8827146050170995e-05,
+          "dL_dH_absmax": 3.529596824591863e-06,
+          "nonzero_elements": 81920
+        },
+        "normal_reference": {
+          "probe_loss": 0.45950108766555786,
+          "dL_dH_norm": 5.936795787420124e-05,
+          "dL_dH_absmax": 1.3843816304870415e-05,
+          "nonzero_elements": 81920
+        },
+        "classification": {
+          "probe_loss": 0.051931191235780716,
+          "dL_dH_norm": 2.396804848103784e-05,
+          "dL_dH_absmax": 3.3397800507373177e-06,
+          "nonzero_elements": 524288
+        }
+      }
+    },
+    {
+      "epoch": 24,
+      "layer_activations": {
+        "0": {
+          "rms": 46.90523147583008,
+          "absmax": 288.2972717285156
+        },
+        "1": {
+          "rms": 108.87551879882812,
+          "absmax": 1426.2481689453125
+        },
+        "2": {
+          "rms": 4207.5400390625,
+          "absmax": 57042.55078125
+        },
+        "3": {
+          "rms": 4006.127685546875,
+          "absmax": 47503.49609375
+        },
+        "4": {
+          "rms": 3924.583984375,
+          "absmax": 31318.734375
+        },
+        "5": {
+          "rms": 4088.49365234375,
+          "absmax": 25991.669921875
+        },
+        "6": {
+          "rms": 4345.56005859375,
+          "absmax": 33114.3359375
+        },
+        "7": {
+          "rms": 4805.6796875,
+          "absmax": 32891.0078125
+        }
+      },
+      "gradients": {
+        "observation": {
+          "probe_loss": 1.1207094192504883,
+          "dL_dH_norm": 3.4513518585299607e-06,
+          "dL_dH_absmax": 5.195169023863855e-07,
+          "nonzero_elements": 13312
+        },
+        "normal_reference": {
+          "probe_loss": 1.0707814693450928,
+          "dL_dH_norm": 0.0,
+          "dL_dH_absmax": 0.0,
+          "nonzero_elements": 0
+        },
+        "classification": {
+          "probe_loss": 0.14599859714508057,
+          "dL_dH_norm": 0.0,
+          "dL_dH_absmax": 0.0,
+          "nonzero_elements": 0
+        }
+      }
+    },
+    {
+      "epoch": 27,
+      "layer_activations": {
+        "0": {
+          "rms": 62.825504302978516,
+          "absmax": 452.94921875
+        },
+        "1": {
+          "rms": 373.0306091308594,
+          "absmax": 9455.6650390625
+        },
+        "2": {
+          "rms": 1674.1817626953125,
+          "absmax": 22238.578125
+        },
+        "3": {
+          "rms": 2947.970947265625,
+          "absmax": 21657.88671875
+        },
+        "4": {
+          "rms": 3167.489013671875,
+          "absmax": 21627.8203125
+        },
+        "5": {
+          "rms": 3890.8779296875,
+          "absmax": 37638.8515625
+        },
+        "6": {
+          "rms": 5092.1376953125,
+          "absmax": 57779.65625
+        },
+        "7": {
+          "rms": 6361.57958984375,
+          "absmax": 62991.765625
+        }
+      },
+      "gradients": {
+        "observation": {
+          "probe_loss": 1.071398377418518,
+          "dL_dH_norm": 0.0,
+          "dL_dH_absmax": 0.0,
+          "nonzero_elements": 0
+        },
+        "normal_reference": {
+          "probe_loss": 1.0705368518829346,
+          "dL_dH_norm": 0.0,
+          "dL_dH_absmax": 0.0,
+          "nonzero_elements": 0
+        },
+        "classification": {
+          "probe_loss": 0.14582610130310059,
+          "dL_dH_norm": 0.0,
+          "dL_dH_absmax": 0.0,
+          "nonzero_elements": 0
+        }
+      }
+    }
+  ]
+}
