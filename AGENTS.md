@@ -8,7 +8,7 @@
 - 文档命令从仓库根目录执行，先激活项目环境，再使用`python`与相对脚本/参数路径。代理实际执行遵循当前会话指定的解释器与连接约束；此类本机设置不写入共享文档。
 - 新实验代码写在`experiments/`；写代码前先说明目录、文件职责及统一入口。
 - 当前v9源配置为总batch32、length_bucket、bucket_multiplier50；配对组必须统一采样器、总batch、种子和并行方式。分桶会改变batch标准化与padding比例，不是数值等价优化；验证仍固定顺序。单卡可通过--batch-size覆盖，但对照组须一致。
-- v9直接使用configs中的四份P0/P1源配置，数据字段采用仓库相对路径；不为迁移另生成本机配置副本。每次运行由入口保存实际配置快照。
+- v9直接使用configs中的四份历史P0/P1源配置及两份official_stable配置，数据字段采用仓库相对路径；不为迁移另生成本机配置副本。每次运行由入口保存实际配置快照。
 - 原流程使用`experiments/original_400k/run_experiment.py`；P0/P1使用`experiments/ablation_v9/run_experiment.py`。不另建重复训练入口。
 - 未获当前任务授权，不启动或恢复正式训练、生成数据、耗时评测，不替换官方权重。历史运行及计划不会自动授权重启。合成接口检查与正式训练必须区分。
 
@@ -66,7 +66,7 @@
 ## P1事故重放授权与详细诊断（2026-11-16）
 
 - 原新P1已由用户停止。用户明确授权从epoch23轮末重放epoch24；当前新run p1_epoch24_replay_20261116_153436，总上限25，只运行该轮及原训练验证，不自动完整检测评测或延长训练。运行状态查实际进程/日志与audits/p1_failure_20261116/REPLAY.md。
-- --diagnostic-detailed为可选分频详细观察，独立src/diagnostic_detail.py经OPTIONAL DIAGNOSTICS接入；主循环不额外前后向、不修正梯度。逐batch保留loss/梯度/H范围与RMS/分类GELU哨兵及非有限检查；完整参数/Adam前后与区域统计、逐层激活默认每100批，滚动批次和新事件立即详细采集。CUDA范数/极值在源设备归约，仅传回标量；CPU详细统计。事件保存实际完整输出/梯度、更新前后模型/Adam/RNG，滚动两槽并固定事件前驱；任务梯度分解在离线现场进行。
+- --diagnostic-detailed为可选分频详细观察，src/diagnostics.py内DetailedObserver经OPTIONAL DIAGNOSTICS接入；主循环不额外前后向、不修正梯度。逐batch保留loss/梯度/H范围与RMS/分类GELU哨兵及非有限检查；完整参数/Adam前后与区域统计、逐层激活默认每100批，滚动批次和新事件立即详细采集。CUDA范数/极值在源设备归约，仅传回标量；CPU详细统计。事件保存实际完整输出/梯度、更新前后模型/Adam/RNG，滚动两槽并固定事件前驱；任务梯度分解在离线现场进行。
 - 滚动/事件快照仅作离线batch分析，不能传给只支持轮末的--resume-from；有限升级事件有上限，非有限后续现场仍必须保存。诊断覆盖及限制、测试/启动证据见同目录REPLAY.md，不承诺历史CUDA轨迹逐位一致。
 
 ## 诊断效率与记录解释（2026-11-16）
@@ -87,4 +87,25 @@
 - 用户确认删除p0_official_spike_diag_continue_20261114、p0_official_spike_diag_r3_20261114、p1_epoch24_replay_20261116_153436整个run；已有删除账本，旧章节的运行/产物可达性描述已失效。两P0各4份权重和完整eval保留。原新P1仅保留best(epoch22)、epoch23/24/27，其余25份权重已删除。详情见audits/run_cleanup_execution_20261116.json。
 - 用户随后明确授权从原P1 epoch23完整模型/Adam/RNG再次训练epoch24及后续，恢复原50轮总上限/patience7，双卡/batch32/official/seed72/分桶50/16-16-0.15/FP32及优化器保持。使用优化后逐batch诊断、详细间隔100、滚动250、最多6有限事件；新run仅保留best/最近2轮/首次事件前驱。授权包括逐轮训练验证，不包括完整检测评测。启动/状态记录见audits/p1_failure_20261116/REPLAY_CONTINUE.md及replay_continue_launch_20261116.json；以实际日志为准。
 
-- 上述续训实际run为p1_epoch24_continue_20261116_210441，tmux p1_epoch24_continue；已核实恢复next_epoch24/best22/stale1及epoch24首100批执行，状态为运行中，后续查run日志。临时维护脚本在本次收尾删除。
+- 用户误中断后授权删除上一续训p1_epoch24_continue_20261116_210441并从原epoch23重来，已删除旧run及对应启动/控制台记录。新的续训run为p1_epoch24_continue_20261116_211434，tmux p1_epoch24_continue，设置沿用上一条授权；实际恢复与首批以replay_continue_launch_20261116.json和日志为准。
+
+- 历史启动已核实进入epoch24；该run现已停止，当前授权以2026-11-17条目为准。
+
+
+## 当前停止状态与事故证据（2026-11-17，以此为准）
+
+- 用户已要求停止P1续训并分析；p1_epoch24_continue_20261116_211434于11:03:36停止，最后epoch32/b11450，最近完整轮31。未经新的明确授权不续训。best仍为epoch27，验证F1是训练验证口径，不能作为官方检测成绩。
+- 真实事件的离线前后向已完成，没有optimizer.step或算法改动。三个关键现场输出/总梯度逐位复现，CPU局部复核支持注意力/门控MLP高增益、局部重构大输出和后期GELU饱和解释；不称已查明最初训练根因或排除全部硬件因素。
+- 证据入口audits/p1_failure_20261116/ANALYSIS_20261117.md（位于experiments/ablation_v9下）；全量106451批、有限6事件及原始资产保留。后续同现场裁剪/lr干预仅为建议，未启动。
+
+## 新的配对训练授权与优化控制（2026-11-17，以此为准）
+
+用户授权加入梯度防护和学习率控制，重新训练P0/P1并保持诊断。两份official_stable源配置独立于四份历史配置；AdamW/wd1e-5、全局L2裁剪5，第1轮5e-5→5e-4，随后固定50轮计划余弦降至5e-5；patience7、双卡DP、batch32、seed72、分桶50及模型/损失不变。阈值5是首轮实验设定，不是由历史日志求得的最优值。
+
+train.py内OptimizationControl属于训练逻辑，不能放入可删除的OPTIONAL DIAGNOSTICS块。诊断仅观察：pre-step现场和gradient_l2保留未裁剪梯度，optimization.jsonl记录裁剪实测后范数/系数/实际lr/更新序号；详细updates追加该控制信息。非有限值在step前保存诊断并停止，不跳过batch。恢复核对固定schedule、每轮步数、next_update；--epochs可缩短本次运行，不能修改lr_schedule.total_epochs或超过其上限。诊断从0开始、detail100/rolling250/max_events12，每批轻量记录。仅best/最近2轮/首次事件前驱保留。
+
+两组依次占用相同双卡，P0正常结束后自动开始P1；任一失败停止队列。只训练及原验证，不自动完整eval。启动与状态以audits/stability_20261117及实际进程为准；旧停止run和事故证据保留。
+
+## src结构整理（2026-11-17，以此为准）
+
+用户要求减少src碎片文件，现9个实现文件加__init__。职责与映射见EXPERIMENT_SPEC及RUNTIME_NOTES。OptimizationControl/轮末恢复在train，优化参数校验在config；两诊断类同处diagnostics。无兼容转发文件；历史审计源码保留不动。训练仍以run_experiment.py统一入口执行，不能因归并新建独立训练循环。

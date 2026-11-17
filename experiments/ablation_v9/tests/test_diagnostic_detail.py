@@ -7,10 +7,10 @@ import pytest
 import torch
 from test_diagnostics import config_for, assert_rng_equal
 from src.models import build_model
-from src.parallel import prepare_model, unwrap_model
+from src.models import prepare_model, unwrap_model
 from src.train import train_model, set_seed, make_batch_inputs
 from src.diagnostics import BatchDiagnostics, compare_states, rng_state
-from src.resume import restore_rng
+from src.train import restore_rng
 from src.losses import compute_losses
 from src.data import Sample, collate_samples
 

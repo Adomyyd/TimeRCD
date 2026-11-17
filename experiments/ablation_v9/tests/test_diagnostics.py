@@ -13,7 +13,7 @@ import torch
 from src.config import load_config
 from src.diagnostics import BatchDiagnostics, compare_states, rng_state
 from src.models import build_model
-from src.parallel import prepare_model
+from src.models import prepare_model
 from src.train import make_batch_inputs, run_smoke, set_seed, train_model
 from src.losses import compute_losses
 from src.data import collate_samples, Sample
@@ -54,12 +54,21 @@ def assert_rng_equal(a, b):
 
 
 @pytest.mark.parametrize("parallel", ["none", "data_parallel"])
-def test_full_loop_observation_is_numerically_inert(tmp_path, parallel):
+def test_full_loop_observation_is_numerically_inert(tmp_path, parallel, monkeypatch):
     if parallel != "none" and torch.cuda.device_count() < 2:
         pytest.skip("two CUDA devices required")
     assert SNAPSHOT.is_file(), "required historical training source snapshot is missing"
     config = config_for(tmp_path, parallel)
-    spec = importlib.util.spec_from_file_location("src._reference_training", SNAPSHOT)
+    import sys
+    import types
+    from src import data, evaluate, losses, models
+    legacy = types.ModuleType("_v9_historical_test")
+    legacy.__path__ = []
+    monkeypatch.setitem(sys.modules, "_v9_historical_test", legacy)
+    for name, module in dict(data=data, evaluate=evaluate, losses=losses,
+                             parallel=models, sampling=data).items():
+        monkeypatch.setitem(sys.modules, "_v9_historical_test." + name, module)
+    spec = importlib.util.spec_from_file_location("_v9_historical_test.train", SNAPSHOT)
     original = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(original)
     results = []
@@ -207,4 +216,4 @@ def test_full_size_two_gpu_observation_is_numerically_inert(tmp_path, monkeypatc
             pickle.dump(rows, handle)
         return config
     monkeypatch.setattr(sys.modules[__name__], "config_for", full_size_config)
-    test_full_loop_observation_is_numerically_inert(tmp_path, "data_parallel")
+    test_full_loop_observation_is_numerically_inert(tmp_path, "data_parallel", monkeypatch)

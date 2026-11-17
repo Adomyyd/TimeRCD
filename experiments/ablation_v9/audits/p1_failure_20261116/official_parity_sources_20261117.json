@@ -1,0 +1,29 @@
+{
+  "official_commit": "ebf4f056b571f7ea90602ef666ae56f7d717ebfe",
+  "files": {
+    "training.py": {
+      "snapshot_sha256": "311bfc8eece430c99a8fc4fac0bcc24b877ec9193f8d3292214611887a238b23",
+      "current_sha256": "2b10b05c2811b5dc07f655c26d380e018cb254497707025be3ec586fa1107f56",
+      "current_bytes_equal_snapshot": false,
+      "local": "training.py",
+      "remote_sha256": "311bfc8eece430c99a8fc4fac0bcc24b877ec9193f8d3292214611887a238b23",
+      "snapshot_equal_remote": true
+    },
+    "models/time_rcd/ts_encoder_bi_bias.py": {
+      "snapshot_sha256": "04f07035dc99940db923c3524a479056b601d192ab937cdc6ca00499962f4c4c",
+      "current_sha256": "04f07035dc99940db923c3524a479056b601d192ab937cdc6ca00499962f4c4c",
+      "current_bytes_equal_snapshot": true,
+      "local": "time_rcd/_core/ts_encoder_bi_bias.py",
+      "remote_sha256": "04f07035dc99940db923c3524a479056b601d192ab937cdc6ca00499962f4c4c",
+      "snapshot_equal_remote": true
+    },
+    "models/time_rcd/time_rcd_config.py": {
+      "snapshot_sha256": "ebfeac0a971dc784d47d9c01a0622ebadaf46f9e41588f37f610d746dce8c967",
+      "current_sha256": "ebfeac0a971dc784d47d9c01a0622ebadaf46f9e41588f37f610d746dce8c967",
+      "current_bytes_equal_snapshot": true,
+      "local": "time_rcd/_core/time_rcd_config.py",
+      "remote_sha256": "ebfeac0a971dc784d47d9c01a0622ebadaf46f9e41588f37f610d746dce8c967",
+      "snapshot_equal_remote": true
+    }
+  }
+}

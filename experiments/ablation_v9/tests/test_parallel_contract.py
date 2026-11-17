@@ -12,7 +12,7 @@ from src.config import load_config, validate_config
 from src.data import Sample, collate_samples
 from src.losses import compute_losses
 from src.models import build_model
-from src.parallel import prepare_model, resolve_device, unwrap_model
+from src.models import prepare_model, resolve_device, unwrap_model
 from src.train import make_batch_inputs, run_smoke, set_seed, train_model
 from run_experiment import apply_runtime_overrides
 import run_experiment as entry

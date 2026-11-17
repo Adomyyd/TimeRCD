@@ -1,0 +1,97 @@
+{
+  "scope": "CPU small synthetic P0 official-padding single-batch parity using official historical class and byte-identical encoder; not full training or multi-GPU equivalence",
+  "official_model_defaults": {
+    "d_model": 512,
+    "d_proj": 256,
+    "patch_size": 4,
+    "num_query_tokens": 1,
+    "num_layers": 8,
+    "num_heads": 8,
+    "d_ff_dropout": 0.1,
+    "use_rope": true,
+    "activation": "gelu",
+    "num_features": 1
+  },
+  "same_seed_official_vs_p0": {
+    "encoder": {
+      "equal_tensors": 101,
+      "different_tensors": 0,
+      "max_abs": 0.0
+    },
+    "reconstruction_head": {
+      "equal_tensors": 3,
+      "different_tensors": 3,
+      "max_abs": 0.24826160073280334
+    },
+    "anomaly_head": {
+      "equal_tensors": 2,
+      "different_tensors": 2,
+      "max_abs": 0.542697548866272
+    }
+  },
+  "same_seed_p0_vs_p1_shared": {
+    "encoder": {
+      "equal_tensors": 101,
+      "different_tensors": 0,
+      "max_abs": 0.0
+    },
+    "reconstruction_head": {
+      "equal_tensors": 6,
+      "different_tensors": 0,
+      "max_abs": 0.0
+    },
+    "anomaly_head": {
+      "equal_tensors": 4,
+      "different_tensors": 0,
+      "max_abs": 0.0
+    }
+  },
+  "same_weights_train_mode": {
+    "hidden_exact": true,
+    "official_losses": [
+      0.9272500276565552,
+      0.9258801341056824,
+      1.8531301021575928
+    ],
+    "v9_losses": [
+      0.9272500276565552,
+      0.9258801341056824,
+      1.8531301021575928
+    ],
+    "rng_after_exact": true,
+    "gradient_comparison": {
+      "encoder": {
+        "equal_tensors": 100,
+        "different_tensors": 0,
+        "max_abs": 0.0
+      },
+      "reconstruction_head": {
+        "equal_tensors": 6,
+        "different_tensors": 0,
+        "max_abs": 0.0
+      },
+      "anomaly_head": {
+        "equal_tensors": 4,
+        "different_tensors": 0,
+        "max_abs": 0.0
+      }
+    },
+    "after_one_adamw_step": {
+      "encoder": {
+        "equal_tensors": 101,
+        "different_tensors": 0,
+        "max_abs": 0.0
+      },
+      "reconstruction_head": {
+        "equal_tensors": 6,
+        "different_tensors": 0,
+        "max_abs": 0.0
+      },
+      "anomaly_head": {
+        "equal_tensors": 4,
+        "different_tensors": 0,
+        "max_abs": 0.0
+      }
+    }
+  }
+}

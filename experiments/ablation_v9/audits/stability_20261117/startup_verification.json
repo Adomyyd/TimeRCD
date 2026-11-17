@@ -1,0 +1,49 @@
+{
+  "checked_local": "2026-11-17T12:58:00.935283",
+  "p0_run": "p0_official_stable_20261117_125330",
+  "p1_run": "p1_official_stable_20261117_125330",
+  "p1_state": "queued_not_started",
+  "p0_status": "training",
+  "completed_updates": 100,
+  "last_update": {
+    "epoch": 0,
+    "batch": 99,
+    "observation_level": "light",
+    "phase": "after_optimizer_step",
+    "nonfinite_state": [],
+    "optimization_control": {
+      "update_index": 99,
+      "learning_rate": [
+        5.375189489641234e-05
+      ],
+      "gradient_l2_before": 1.49069517847852,
+      "clip_max_norm": 5,
+      "clip_coefficient": 1.0,
+      "clipped": false,
+      "finite": true,
+      "phase": "after_gradient_clip_before_optimizer_step",
+      "gradient_l2_after": 1.49069517847852
+    }
+  },
+  "first_optimization": {
+    "epoch": 0,
+    "batch": 0,
+    "update_index": 0,
+    "learning_rate": [
+      5e-05
+    ],
+    "gradient_l2_before": 6.479745869135966,
+    "clip_max_norm": 5,
+    "clip_coefficient": 0.7716350809652412,
+    "clipped": true,
+    "finite": true,
+    "phase": "after_gradient_clip_before_optimizer_step",
+    "gradient_l2_after": 4.9999990642481835
+  },
+  "max_loss_observed": 1.6525640487670898,
+  "max_raw_gradient_observed": 14.46417408986112,
+  "clipped_updates": 16,
+  "source_hashes_match_launch": true,
+  "regression_cases_passed": 124,
+  "temporary_files_removed": true
+}

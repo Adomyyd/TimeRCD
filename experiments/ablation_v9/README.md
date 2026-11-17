@@ -24,23 +24,33 @@ CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
 
 测试只用合成小数据；smoke核对数据/manifest是否就位，不加载完整400k。
 
-## 双卡训练
+## 双卡训练（梯度防护＋学习率控制）
 
-主线沿用P0表现更好的official padding。使用GPU0、1，总batch32、seed72；依次运行，不同时争用两张卡。已完成P0无需因为本次P1改动重跑。
+当前配对实验从头重训P0和P1，使用official padding、双卡、总batch32和seed72。两组统一采用AdamW、全局梯度范数裁剪5；第1轮学习率从5e-5线性预热至5e-4，随后按更新步余弦衰减至第50轮末5e-5；最多50轮，patience7。两份stable配置可直接修改裁剪阈值及lr_schedule，无需生成配置。
+
+建议在tmux内依次执行以下命令，第一组正常结束后再运行第二组，不同时争用两张卡：
 
 ```bash
 CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p0_mask_x_padding_official.json \
-  --run-id "p0_official_dp_$(date +%Y%m%d_%H%M%S)" \
-  --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train
+  --config experiments/ablation_v9/configs/p0_mask_x_official_stable.json \
+  --run-id "p0_official_stable_$(date +%Y%m%d_%H%M%S)" \
+  --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train \
+  --diagnostics --diagnostic-detailed --diagnostic-start-epoch 0 \
+  --diagnostic-detail-interval 100 --diagnostic-snapshot-interval 250 \
+  --diagnostic-max-events 12 --checkpoint-keep-last 2
 
 CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p1_mask_x_normal_padding_official.json \
-  --run-id "p1_mask_normal_official_dp_$(date +%Y%m%d_%H%M%S)" \
-  --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train
+  --config experiments/ablation_v9/configs/p1_mask_x_normal_official_stable.json \
+  --run-id "p1_official_stable_$(date +%Y%m%d_%H%M%S)" \
+  --parallel data_parallel --gpu-ids 0 1 --batch-size 32 --mode train \
+  --diagnostics --diagnostic-detailed --diagnostic-start-epoch 0 \
+  --diagnostic-detail-interval 100 --diagnostic-snapshot-interval 250 \
+  --diagnostic-max-events 12 --checkpoint-keep-last 2
 ```
 
-建议在tmux中执行。P1为保持batch32使用重构头激活检查点降低显存，计算开销会增加。最多50轮、patience7，每100batch打印观测重构、正常参考、异常分类和总loss；加载数据约需数分钟，随后开始训练日志。
+逐batch诊断从epoch0开启；每100批详细统计、每250批保存两槽滚动现场，最多12个有限升级事件；非有限值始终保存现场并停止。每100批打印loss、学习率和裁剪信息。新run只保留best、最近两轮和首次事件前一轮权重。P1重构头使用激活检查点降低显存。数据加载需数分钟。
+
+`optimization.jsonl`记录裁剪前后范数、系数、学习率和更新序号；`diagnostics/batches.jsonl`与事件快照中的梯度始终是裁剪前值；`updates.jsonl`记录实际更新后状态。裁剪限制梯度，不保证前向loss不会出现尖峰。
 
 ## 单卡与padding对照
 
@@ -52,7 +62,7 @@ CUDA_VISIBLE_DEVICES=0 python -u experiments/ablation_v9/run_experiment.py \
   --run-id "p1_mask_normal_single_$(date +%Y%m%d_%H%M%S)" --parallel none --mode train
 ```
 
-保留四份训练配置，无需生成本机副本：
+以下四份配置保留历史固定学习率、无裁剪训练方式；另有上述两份stable配置。所有配置均直接使用，无需生成本机副本：
 
 | 实验 | ignore配置            | official配置                           |
 | ---- | --------------------- | -------------------------------------- |
@@ -100,7 +110,7 @@ CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
   --run-id "p1_resume_$(date +%Y%m%d_%H%M%S)" --epochs 50 --mode train
 ```
 
-源进程须先退出；`--epochs`是总轮数上限，已完成epoch0则从1继续。恢复校验要求训练条件一致；只允许改变轮数上限、日志和诊断设置。早期P0权重缺完整RNG，不能直接用它精确续训。
+源进程须先退出；`--epochs`是总轮数上限，已完成epoch0则从1继续。恢复校验要求训练条件一致；只允许改变运行轮数上限、日志和诊断设置。stable检查点还核对每轮步数和全局更新位置；lr_schedule.total_epochs固定为50，缩短本次--epochs不会压缩原计划，续训也不会重新预热。早期P0权重缺完整RNG，不能直接用它精确续训。
 
 | 参数                               | 用途                                           |
 | ---------------------------------- | ---------------------------------------------- |
@@ -117,3 +127,7 @@ CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
 `bench --max-batches 300`会执行训练更新但不保存模型，用于短程测速；不是smoke。实际只支持FP32，没有AMP/DDP/FSDP或batch中途恢复。
 
 所有产物位于`runs/<run-id>/`，已有目录拒绝覆盖。训练保存实际配置、日志、逐轮/best完整模型及指标；训练验证按各自valid_total选best，P1含额外正常参考项，不能直接横比P0/P1总loss。旧完整输入P1/P2已退役，旧run和配置快照保留为历史，不使用旧命令启动新P1。
+
+## 代码入口
+
+统一入口为run_experiment.py。src按职责整理为9个实现文件：config（配置与审计）、data（数据与遮挡）、models（模型与并行）、losses、train（训练/优化/续训）、diagnostics、evaluate（训练验证）、benchmark_eval（完整评测/汇总）、metric_worker（指标子进程）；另有空的__init__.py。

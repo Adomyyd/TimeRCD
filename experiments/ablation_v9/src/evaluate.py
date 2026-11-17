@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 
 from .data import PairedTimeSeriesDataset, collate_samples
 from .losses import classification_ce, compute_losses
-from .sampling import apply_input_mask, sample_patch_mask
+from .data import apply_input_mask, sample_patch_mask
 
 
 def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -> dict:

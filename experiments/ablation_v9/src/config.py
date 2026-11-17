@@ -1,12 +1,13 @@
 from __future__ import annotations
-
 import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-
-from .parallel import validate_parallel_config
+from .models import validate_parallel_config
 from .losses import validate_classification_padding
+from .data import file_manifest
+from .models import build_model
 
 
 VARIANTS = {"p0_mask_x", "p1_mask_x_normal"}
@@ -137,5 +138,74 @@ def validate_config(raw: dict[str, Any]) -> None:
             value = float(diagnostic.get(key, default))
             if not math.isfinite(value) or value <= 0:
                 raise ValueError(f"diagnostics.{key} must be finite and positive")
+    validate_optimization(raw["optimization"])
     validate_parallel_config(raw)
+
+
+def run_audit(config: ExperimentConfig) -> dict:
+    if not config.data_path.is_file():
+        raise FileNotFoundError(config.data_path)
+    if not config.manifest_path.is_file():
+        raise FileNotFoundError(config.manifest_path)
+
+    manifest = file_manifest(config.data_path, config.manifest_path)
+    declared = manifest["declared"]
+    declared_config = declared.get("config", {})
+    if declared_config.get("is_multivariate") is not False:
+        raise ValueError("Current v9 ablation expects the existing univariate dataset")
+    if declared_config.get("num_features") != 1:
+        raise ValueError("Manifest must declare num_features=1")
+
+    actual_samples = int(declared.get("actual_samples", 0))
+    train_ratio = float(config.raw["split"]["train_ratio"])
+    train_samples = int(actual_samples * train_ratio)
+    test_samples = actual_samples - train_samples
+    if train_samples <= 0 or test_samples <= 0:
+        raise ValueError("train/test split must both be non-empty")
+
+    model = build_model(config.raw)
+    parameter_count = sum(parameter.numel() for parameter in model.parameters())
+    padding_policy = config.raw["loss"].get("classification_padding", "ignore")
+    return {
+        "status": "passed",
+        "experiment_id": config.experiment_id,
+        "data_manifest": manifest,
+        "train_samples": train_samples,
+        "test_samples": test_samples,
+        "parameter_count": parameter_count,
+        "protocol_checks": {
+            "input_mode": config.raw["input"]["input_mode"],
+            "target": config.raw["input"]["target"],
+            "normal_reference_target": "x0" if model.normal_reference_head is not None else None,
+            "normal_reference_weight": float(config.raw["loss"].get("normal_reference_weight", 0)),
+            "encoder_patch_size": model.encoder.patch_size,
+            "mask_patch_size": int(config.raw["input"]["mask_patch_size"]),
+            "mask_ratio": float(config.raw["input"]["mask_ratio"]),
+            "batch_sampler": str(config.raw["optimization"].get("batch_sampler", "sequential")),
+            "batch_size": int(config.raw["optimization"]["batch_size"]),
+            "encoder_token_visible_if_any_point_visible": True,
+            "classification_padding": padding_policy,
+            "classification_uses_valid_mask": padding_policy == "ignore",
+            "padding_label_is_not_used_as_normal": padding_policy == "ignore",
+        },
+    }
+def validate_optimization(options):
+    clip = options.get("gradient_clip_norm")
+    if clip is not None and (not math.isfinite(float(clip)) or float(clip) <= 0):
+        raise ValueError("gradient_clip_norm must be finite and positive")
+    schedule = options.get("lr_schedule")
+    if schedule is None:
+        return
+    if set(schedule) != {"kind", "warmup_epochs", "total_epochs", "min_lr", "start_factor"}:
+        raise ValueError("Invalid lr_schedule fields")
+    if schedule["kind"] != "warmup_cosine":
+        raise ValueError("lr_schedule.kind must be warmup_cosine")
+    peak = float(options["learning_rate"])
+    minimum, factor = float(schedule["min_lr"]), float(schedule["start_factor"])
+    warm, total = int(schedule["warmup_epochs"]), int(schedule["total_epochs"])
+    if not (math.isfinite(peak) and 0 <= minimum <= peak and 0 < factor <= 1):
+        raise ValueError("Invalid schedule learning rates or start_factor")
+    if not (1 <= warm < total and int(options["epochs"]) <= total):
+        raise ValueError("Require 1 <= warmup_epochs < total_epochs and epochs <= total_epochs")
+
 

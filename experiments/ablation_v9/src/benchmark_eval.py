@@ -1,22 +1,24 @@
-"""Detection evaluation; training-time masked validation remains in evaluate.py."""
 from __future__ import annotations
-
 import csv
 import importlib.metadata
 import json
 from time import perf_counter
 from pathlib import Path
 from typing import Any
-
 import numpy as np
 import pandas as pd
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-
 from .data import load_data, load_indices, sha256
-from .parallel import unwrap_model
+from .models import unwrap_model
 from .metric_worker import OfficialMetricWorker
+
+
+"""Detection evaluation; training-time masked validation remains in evaluate.py."""
+
+
+
 
 
 UPSTREAM_COMMIT = "d458549f6962029a5c5241c43a5baa1ec5eccbb2"
@@ -339,3 +341,12 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
     write_json(metrics_dir / "eval.json", result)
     log("Evaluation completed: metrics/eval.json and metrics/per_series.csv")
     return result
+
+
+def write_report(run_dirs: list[Path], output_path: Path) -> None:
+    rows = []
+    for run_dir in run_dirs:
+        metrics_path = run_dir / "metrics" / "eval.json"
+        if metrics_path.is_file():
+            rows.append(json.loads(metrics_path.read_text(encoding="utf-8")))
+    output_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

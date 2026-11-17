@@ -1,6 +1,6 @@
 # v9与原始TimeRCD的差异（Agent）
 
-更新：2026-11-15。当前仅P0/P1。原流程original_400k与v9并列；P0是v9内部基线，不宣称官方全流程逐项复制。历史官方源码回归依赖保留在audits/patch_20261110/sources。
+更新：2026-11-17。当前仅P0/P1。原流程original_400k与v9并列；P0是v9内部基线，不宣称官方全流程逐项复制。历史官方源码回归依赖保留在audits/patch_20261110/sources。
 
 ## 模型与损失
 
@@ -14,11 +14,11 @@
 
 src/models.py正常参考头结构复用原d→4d→4d→1，两隐藏层GELU/Dropout、输出无界Linear，参数独立。新增头在共享参数初始化后构造，保存/恢复CPU RNG，保证同种子原参数初值一致；训练额外Dropout不保证历史随机轨迹一致。forward只接收观测和encoder_mask，同一H供三头，不读X^0/Y，无B/Z/偏差头/双视图。
 
-src/losses.py保留reconstruction为观测误差，新增normal_reference字段及normal_reference_weight；三项按配置加权，空选中集合显式零。config.py只接受p0_mask_x/p1_mask_x_normal；删除旧full-input与normal-only目标分流，旧P1/P2标识拒绝。删除四份旧源配置，保留四份P0/P1×padding配置及独立eval协议；不修改旧run快照。
+src/losses.py保留reconstruction为观测误差，新增normal_reference字段及normal_reference_weight；三项按配置加权，空选中集合显式零。config.py只接受p0_mask_x/p1_mask_x_normal；删除旧full-input与normal-only目标分流，旧P1/P2标识拒绝。删除四份旧源配置，保留四份历史P0/P1×padding配置、新增两份official_stable配置及独立eval协议；不修改旧run快照。
 
 ## 与原官方训练的共同点及工程差异
 
-原历史入口同进程patch/遮挡实际16/16、ratio0.15，非初始默认4；证据见patch审计。重构只在选中位置MSE，分类同次遮挡前向。模型patch线性投影、双向注意力、时间投影和原两头结构保留。官方训练输入标准化但不重新标准化输出；没有新增clip/学习率调度/AMP/尖峰跳过，历史不稳定根因未解决。
+原历史入口同进程patch/遮挡实际16/16、ratio0.15，非初始默认4；证据见patch审计。重构只在选中位置MSE，分类同次遮挡前向。模型patch线性投影、双向注意力、时间投影和原两头结构保留。官方训练输入标准化但不重新标准化输出；历史配置没有clip/学习率调度；新增official_stable配置启用clip和warmup/cosine。未启用AMP或尖峰跳过，不把防护当作已证明历史根因解决。
 
 official复现标签先二值化使padding成为正常点参与CE；ignore先过滤padding再CE。当前主线official，attention和重构仍排除padding。同组两配置仅该字段不同。原训练DistributedSampler/全局随机源与v9仍有差异，历史400k不能单独隔离padding影响。
 
@@ -40,3 +40,14 @@ benchmark_eval/metric_worker对接固定官方d458549及TSB-AD-U，额外统一�
 
 
 显存执行说明（2026-11-15）：最长10000点/总batch32的双卡合成检查发现两个完整重构头保留激活会OOM。新P1训练模式对两个重构MLP启用non-reentrant激活检查点，preserve_rng_state=True，反向时重算头部；骨干仍只前向一次，不改变M/目标/权重/batch/FP32，P0执行路径不变。验证/检测不启用重算。CPU检查覆盖输出/梯度/Dropout RNG与普通头计算一致；最长序列完整前后向及AdamW更新已通过，峰值约8.86/8.51GB（十进制）。重算增加计算开销，不将其当作数值等价提速。
+
+
+## 官方历史源码复核补充（2026-11-17）
+
+本次重新下载官方ebf4f056源码核验：编码器文件与当前逐字节一致。固定相同权重/输入/mask/RNG的CPU单batch检查中，P0原两项loss、全部参数梯度和一次AdamW更新逐位一致；不等于完整训练复现。
+发现原两头初始化顺序差异：官方anomaly_head→reconstruction_head，v9 reconstruction_head→anomaly_head。同seed编码器相同，但5个头部weight张量不同；v9 P0/P1共享初值仍一致。本次未改初始化实现。官方历史入口batch64/DistributedSampler/DDP/全局mask RNG/含padding验证loss选择，与当前总batch32/分桶/DP/独立mask RNG/valid_total选择不同。
+详见audits/p1_failure_20261116/OFFICIAL_PARITY_20261117.md及两份official_parity_*_20261117.json。高增益模块来自官方，不代表本地失稳已证明官方训练同样失稳。
+
+## 新增稳定训练配置（2026-11-17）
+
+原官方与四份历史v9配置仍为固定AdamW lr5e-4、无裁剪。两份*_official_stable.json明确增加总梯度范数上限5和第1轮warmup、后49轮cosine（峰值5e-4，起止5e-5）；当前模型初始化顺序等已核实差异保持。src/train.py在诊断原始梯度现场之后、step之前调用OptimizationControl；bench使用相同控制，smoke仅前后向。合并后的diagnostics增加控制元数据，gradient_l2/现场梯度仍为原始值，post记录增加实际裁剪范数和lr。checkpoint训练状态保存固定计划/每轮步数/更新位置；resume核对后从正确位置继续。新测试和启动证据见audits/stability_20261117。

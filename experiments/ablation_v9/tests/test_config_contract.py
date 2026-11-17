@@ -9,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_current_training_configs_keep_patch_protocol():
     configs = sorted((ROOT / "configs").glob("p[012]_*.json"))
     variants = {"p0_mask_x", "p1_mask_x_normal"}
-    assert {path.stem for path in configs} == variants | {f"{name}_padding_official" for name in variants}
+    assert {path.stem for path in configs} == (variants | {f"{name}_padding_official" for name in variants}
+                                               | {f"{name}_official_stable" for name in variants})
     for path in configs:
         config = load_config(path)
         assert config.raw["model"]["num_features"] == 1

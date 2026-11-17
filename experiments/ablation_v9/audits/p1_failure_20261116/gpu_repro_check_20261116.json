@@ -1,0 +1,451 @@
+{
+  "checked_utc": "2026-11-16T14:31:03.586428+00:00",
+  "run_id": "p1_epoch24_continue_20261116_211434",
+  "scope": "Read-only training/hardware observations; no new GPU workload, no configuration changes.",
+  "driver_version": "535.247.01",
+  "gpus": [
+    {
+      "minor_number": "<minor_number>0</minor_number>\n\t\t",
+      "product_name": "<product_name>NVIDIA GeForce RTX 2080 Ti</product_name>\n\t\t",
+      "performance_state": "<performance_state>P2</performance_state>\n\t\t",
+      "temperature": "<temperature>\n\t\t\t<gpu_temp>83 C</gpu_temp>\n\t\t\t<gpu_temp_tlimit>N/A</gpu_temp_tlimit>\n\t\t\t<gpu_temp_max_threshold>94 C</gpu_temp_max_threshold>\n\t\t\t<gpu_temp_slow_threshold>91 C</gpu_temp_slow_threshold>\n\t\t\t<gpu_temp_max_gpu_threshold>89 C</gpu_temp_max_gpu_threshold>\n\t\t\t<gpu_target_temperature>84 C</gpu_target_temperature>\n\t\t\t<memory_temp>N/A</memory_temp>\n\t\t\t<gpu_temp_max_mem_threshold>N/A</gpu_temp_max_mem_threshold>\n\t\t</temperature>\n\t\t",
+      "gpu_power_readings": "<gpu_power_readings>\n\t\t\t<power_state>P2</power_state>\n\t\t\t<power_draw>249.59 W</power_draw>\n\t\t\t<current_power_limit>250.00 W</current_power_limit>\n\t\t\t<requested_power_limit>250.00 W</requested_power_limit>\n\t\t\t<default_power_limit>250.00 W</default_power_limit>\n\t\t\t<min_power_limit>100.00 W</min_power_limit>\n\t\t\t<max_power_limit>280.00 W</max_power_limit>\n\t\t</gpu_power_readings>\n\t\t",
+      "clocks_event_reasons": "<clocks_event_reasons>\n\t\t\t<clocks_event_reason_gpu_idle>Not Active</clocks_event_reason_gpu_idle>\n\t\t\t<clocks_event_reason_applications_clocks_setting>Not Active</clocks_event_reason_applications_clocks_setting>\n\t\t\t<clocks_event_reason_sw_power_cap>Active</clocks_event_reason_sw_power_cap>\n\t\t\t<clocks_event_reason_hw_slowdown>Not Active</clocks_event_reason_hw_slowdown>\n\t\t\t<clocks_event_reason_hw_thermal_slowdown>Not Active</clocks_event_reason_hw_thermal_slowdown>\n\t\t\t<clocks_event_reason_hw_power_brake_slowdown>Not Active</clocks_event_reason_hw_power_brake_slowdown>\n\t\t\t<clocks_event_reason_sync_boost>Not Active</clocks_event_reason_sync_boost>\n\t\t\t<clocks_event_reason_sw_thermal_slowdown>Not Active</clocks_event_reason_sw_thermal_slowdown>\n\t\t\t<clocks_event_reason_display_clocks_setting>Not Active</clocks_event_reason_display_clocks_setting>\n\t\t</clocks_event_reasons>\n\t\t",
+      "ecc_mode": "<ecc_mode>\n\t\t\t<current_ecc>N/A</current_ecc>\n\t\t\t<pending_ecc>N/A</pending_ecc>\n\t\t</ecc_mode>\n\t\t",
+      "ecc_errors": "<ecc_errors>\n\t\t\t<volatile>\n\t\t\t\t<sram_correctable>N/A</sram_correctable>\n\t\t\t\t<sram_uncorrectable>N/A</sram_uncorrectable>\n\t\t\t\t<dram_correctable>N/A</dram_correctable>\n\t\t\t\t<dram_uncorrectable>N/A</dram_uncorrectable>\n\t\t\t</volatile>\n\t\t\t<aggregate>\n\t\t\t\t<sram_correctable>N/A</sram_correctable>\n\t\t\t\t<sram_uncorrectable>N/A</sram_uncorrectable>\n\t\t\t\t<dram_correctable>N/A</dram_correctable>\n\t\t\t\t<dram_uncorrectable>N/A</dram_uncorrectable>\n\t\t\t</aggregate>\n\t\t</ecc_errors>\n\t\t",
+      "retired_pages": "<retired_pages>\n\t\t\t<multiple_single_bit_retirement>\n\t\t\t\t<retired_count>N/A</retired_count>\n\t\t\t\t<retired_pagelist>N/A</retired_pagelist>\n\t\t\t</multiple_single_bit_retirement>\n\t\t\t<double_bit_retirement>\n\t\t\t\t<retired_count>N/A</retired_count>\n\t\t\t\t<retired_pagelist>N/A</retired_pagelist>\n\t\t\t</double_bit_retirement>\n\t\t\t<pending_blacklist>N/A</pending_blacklist>\n\t\t\t<pending_retirement>N/A</pending_retirement>\n\t\t</retired_pages>\n\t\t",
+      "remapped_rows": "<remapped_rows>N/A</remapped_rows>\n\t\t",
+      "pci": "<pci>\n\t\t\t<pci_bus>1A</pci_bus>\n\t\t\t<pci_device>00</pci_device>\n\t\t\t<pci_domain>0000</pci_domain>\n\t\t\t<pci_device_id>1E0410DE</pci_device_id>\n\t\t\t<pci_bus_id>00000000:1A:00.0</pci_bus_id>\n\t\t\t<pci_sub_system_id>86751043</pci_sub_system_id>\n\t\t\t<pci_gpu_link_info>\n\t\t\t\t<pcie_gen>\n\t\t\t\t\t<max_link_gen>3</max_link_gen>\n\t\t\t\t\t<current_link_gen>3</current_link_gen>\n\t\t\t\t\t<device_current_link_gen>3</device_current_link_gen>\n\t\t\t\t\t<max_device_link_gen>3</max_device_link_gen>\n\t\t\t\t\t<max_host_link_gen>3</max_host_link_gen>\n\t\t\t\t</pcie_gen>\n\t\t\t\t<link_widths>\n\t\t\t\t\t<max_link_width>16x</max_link_width>\n\t\t\t\t\t<current_link_width>8x</current_link_width>\n\t\t\t\t</link_widths>\n\t\t\t</pci_gpu_link_info>\n\t\t\t<pci_bridge_chip>\n\t\t\t\t<bridge_chip_type>N/A</bridge_chip_type>\n\t\t\t\t<bridge_chip_fw>N/A</bridge_chip_fw>\n\t\t\t</pci_bridge_chip>\n\t\t\t<replay_counter>0</replay_counter>\n\t\t\t<replay_rollover_counter>0</replay_rollover_counter>\n\t\t\t<tx_util>6000 KB/s</tx_util>\n\t\t\t<rx_util>21000 KB/s</rx_util>\n\t\t\t<atomic_caps_inbound>N/A</atomic_caps_inbound>\n\t\t\t<atomic_caps_outbound>N/A</atomic_caps_outbound>\n\t\t</pci>\n\t\t",
+      "clocks": "<clocks>\n\t\t\t<graphics_clock>1620 MHz</graphics_clock>\n\t\t\t<sm_clock>1620 MHz</sm_clock>\n\t\t\t<mem_clock>6800 MHz</mem_clock>\n\t\t\t<video_clock>1500 MHz</video_clock>\n\t\t</clocks>\n\t\t",
+      "applications_clocks": "<applications_clocks>\n\t\t\t<graphics_clock>N/A</graphics_clock>\n\t\t\t<mem_clock>N/A</mem_clock>\n\t\t</applications_clocks>\n\t\t",
+      "default_applications_clocks": "<default_applications_clocks>\n\t\t\t<graphics_clock>N/A</graphics_clock>\n\t\t\t<mem_clock>N/A</mem_clock>\n\t\t</default_applications_clocks>\n\t\t",
+      "max_clocks": "<max_clocks>\n\t\t\t<graphics_clock>2100 MHz</graphics_clock>\n\t\t\t<sm_clock>2100 MHz</sm_clock>\n\t\t\t<mem_clock>7000 MHz</mem_clock>\n\t\t\t<video_clock>1950 MHz</video_clock>\n\t\t</max_clocks>\n\t\t",
+      "gpu_reset_status": "<gpu_reset_status>\n\t\t\t<reset_required>No</reset_required>\n\t\t\t<drain_and_reset_recommended>N/A</drain_and_reset_recommended>\n\t\t</gpu_reset_status>\n\t\t"
+    },
+    {
+      "minor_number": "<minor_number>1</minor_number>\n\t\t",
+      "product_name": "<product_name>NVIDIA GeForce RTX 2080 Ti</product_name>\n\t\t",
+      "performance_state": "<performance_state>P2</performance_state>\n\t\t",
+      "temperature": "<temperature>\n\t\t\t<gpu_temp>85 C</gpu_temp>\n\t\t\t<gpu_temp_tlimit>N/A</gpu_temp_tlimit>\n\t\t\t<gpu_temp_max_threshold>94 C</gpu_temp_max_threshold>\n\t\t\t<gpu_temp_slow_threshold>91 C</gpu_temp_slow_threshold>\n\t\t\t<gpu_temp_max_gpu_threshold>89 C</gpu_temp_max_gpu_threshold>\n\t\t\t<gpu_target_temperature>84 C</gpu_target_temperature>\n\t\t\t<memory_temp>N/A</memory_temp>\n\t\t\t<gpu_temp_max_mem_threshold>N/A</gpu_temp_max_mem_threshold>\n\t\t</temperature>\n\t\t",
+      "gpu_power_readings": "<gpu_power_readings>\n\t\t\t<power_state>P2</power_state>\n\t\t\t<power_draw>253.62 W</power_draw>\n\t\t\t<current_power_limit>250.00 W</current_power_limit>\n\t\t\t<requested_power_limit>250.00 W</requested_power_limit>\n\t\t\t<default_power_limit>250.00 W</default_power_limit>\n\t\t\t<min_power_limit>100.00 W</min_power_limit>\n\t\t\t<max_power_limit>280.00 W</max_power_limit>\n\t\t</gpu_power_readings>\n\t\t",
+      "clocks_event_reasons": "<clocks_event_reasons>\n\t\t\t<clocks_event_reason_gpu_idle>Not Active</clocks_event_reason_gpu_idle>\n\t\t\t<clocks_event_reason_applications_clocks_setting>Not Active</clocks_event_reason_applications_clocks_setting>\n\t\t\t<clocks_event_reason_sw_power_cap>Active</clocks_event_reason_sw_power_cap>\n\t\t\t<clocks_event_reason_hw_slowdown>Not Active</clocks_event_reason_hw_slowdown>\n\t\t\t<clocks_event_reason_hw_thermal_slowdown>Not Active</clocks_event_reason_hw_thermal_slowdown>\n\t\t\t<clocks_event_reason_hw_power_brake_slowdown>Not Active</clocks_event_reason_hw_power_brake_slowdown>\n\t\t\t<clocks_event_reason_sync_boost>Not Active</clocks_event_reason_sync_boost>\n\t\t\t<clocks_event_reason_sw_thermal_slowdown>Not Active</clocks_event_reason_sw_thermal_slowdown>\n\t\t\t<clocks_event_reason_display_clocks_setting>Not Active</clocks_event_reason_display_clocks_setting>\n\t\t</clocks_event_reasons>\n\t\t",
+      "ecc_mode": "<ecc_mode>\n\t\t\t<current_ecc>N/A</current_ecc>\n\t\t\t<pending_ecc>N/A</pending_ecc>\n\t\t</ecc_mode>\n\t\t",
+      "ecc_errors": "<ecc_errors>\n\t\t\t<volatile>\n\t\t\t\t<sram_correctable>N/A</sram_correctable>\n\t\t\t\t<sram_uncorrectable>N/A</sram_uncorrectable>\n\t\t\t\t<dram_correctable>N/A</dram_correctable>\n\t\t\t\t<dram_uncorrectable>N/A</dram_uncorrectable>\n\t\t\t</volatile>\n\t\t\t<aggregate>\n\t\t\t\t<sram_correctable>N/A</sram_correctable>\n\t\t\t\t<sram_uncorrectable>N/A</sram_uncorrectable>\n\t\t\t\t<dram_correctable>N/A</dram_correctable>\n\t\t\t\t<dram_uncorrectable>N/A</dram_uncorrectable>\n\t\t\t</aggregate>\n\t\t</ecc_errors>\n\t\t",
+      "retired_pages": "<retired_pages>\n\t\t\t<multiple_single_bit_retirement>\n\t\t\t\t<retired_count>N/A</retired_count>\n\t\t\t\t<retired_pagelist>N/A</retired_pagelist>\n\t\t\t</multiple_single_bit_retirement>\n\t\t\t<double_bit_retirement>\n\t\t\t\t<retired_count>N/A</retired_count>\n\t\t\t\t<retired_pagelist>N/A</retired_pagelist>\n\t\t\t</double_bit_retirement>\n\t\t\t<pending_blacklist>N/A</pending_blacklist>\n\t\t\t<pending_retirement>N/A</pending_retirement>\n\t\t</retired_pages>\n\t\t",
+      "remapped_rows": "<remapped_rows>N/A</remapped_rows>\n\t\t",
+      "pci": "<pci>\n\t\t\t<pci_bus>68</pci_bus>\n\t\t\t<pci_device>00</pci_device>\n\t\t\t<pci_domain>0000</pci_domain>\n\t\t\t<pci_device_id>1E0410DE</pci_device_id>\n\t\t\t<pci_bus_id>00000000:68:00.0</pci_bus_id>\n\t\t\t<pci_sub_system_id>86751043</pci_sub_system_id>\n\t\t\t<pci_gpu_link_info>\n\t\t\t\t<pcie_gen>\n\t\t\t\t\t<max_link_gen>3</max_link_gen>\n\t\t\t\t\t<current_link_gen>3</current_link_gen>\n\t\t\t\t\t<device_current_link_gen>3</device_current_link_gen>\n\t\t\t\t\t<max_device_link_gen>3</max_device_link_gen>\n\t\t\t\t\t<max_host_link_gen>3</max_host_link_gen>\n\t\t\t\t</pcie_gen>\n\t\t\t\t<link_widths>\n\t\t\t\t\t<max_link_width>16x</max_link_width>\n\t\t\t\t\t<current_link_width>16x</current_link_width>\n\t\t\t\t</link_widths>\n\t\t\t</pci_gpu_link_info>\n\t\t\t<pci_bridge_chip>\n\t\t\t\t<bridge_chip_type>N/A</bridge_chip_type>\n\t\t\t\t<bridge_chip_fw>N/A</bridge_chip_fw>\n\t\t\t</pci_bridge_chip>\n\t\t\t<replay_counter>0</replay_counter>\n\t\t\t<replay_rollover_counter>0</replay_rollover_counter>\n\t\t\t<tx_util>5000 KB/s</tx_util>\n\t\t\t<rx_util>34000 KB/s</rx_util>\n\t\t\t<atomic_caps_inbound>N/A</atomic_caps_inbound>\n\t\t\t<atomic_caps_outbound>N/A</atomic_caps_outbound>\n\t\t</pci>\n\t\t",
+      "clocks": "<clocks>\n\t\t\t<graphics_clock>1515 MHz</graphics_clock>\n\t\t\t<sm_clock>1515 MHz</sm_clock>\n\t\t\t<mem_clock>6800 MHz</mem_clock>\n\t\t\t<video_clock>1395 MHz</video_clock>\n\t\t</clocks>\n\t\t",
+      "applications_clocks": "<applications_clocks>\n\t\t\t<graphics_clock>N/A</graphics_clock>\n\t\t\t<mem_clock>N/A</mem_clock>\n\t\t</applications_clocks>\n\t\t",
+      "default_applications_clocks": "<default_applications_clocks>\n\t\t\t<graphics_clock>N/A</graphics_clock>\n\t\t\t<mem_clock>N/A</mem_clock>\n\t\t</default_applications_clocks>\n\t\t",
+      "max_clocks": "<max_clocks>\n\t\t\t<graphics_clock>2100 MHz</graphics_clock>\n\t\t\t<sm_clock>2100 MHz</sm_clock>\n\t\t\t<mem_clock>7000 MHz</mem_clock>\n\t\t\t<video_clock>1950 MHz</video_clock>\n\t\t</max_clocks>\n\t\t",
+      "gpu_reset_status": "<gpu_reset_status>\n\t\t\t<reset_required>No</reset_required>\n\t\t\t<drain_and_reset_recommended>N/A</drain_and_reset_recommended>\n\t\t</gpu_reset_status>\n\t\t"
+    }
+  ],
+  "kernel_logs": {
+    "dmesg": {
+      "exit_code": 1,
+      "stderr": "dmesg: 读取内核缓冲区失败: 不允许的操作\n",
+      "matched_lines": [],
+      "total_lines_returned": 0,
+      "empty_or_no_entries": true
+    },
+    "journal_since_original": {
+      "exit_code": 0,
+      "stderr": "",
+      "matched_lines": [],
+      "total_lines_returned": 3,
+      "empty_or_no_entries": false,
+      "raw_output": "11月 15 00:00:09 omnisky-System-Product-Name kernel: audit: type=1400 audit(1794672009.067:1130): apparmor=\"DENIED\" operation=\"open\" class=\"file\" profile=\"/usr/sbin/cups-browsed\" name=\"/usr/local/lib/libjpeg.so.8\" pid=3054175 comm=\"cups-browsed\" requested_mask=\"r\" denied_mask=\"r\" fsuid=0 ouid=0\n11月 16 00:00:10 omnisky-System-Product-Name kernel: audit: type=1400 audit(1794758410.022:1131): apparmor=\"DENIED\" operation=\"open\" class=\"file\" profile=\"/usr/sbin/cups-browsed\" name=\"/usr/local/lib/libjpeg.so.8\" pid=379661 comm=\"cups-browsed\" requested_mask=\"r\" denied_mask=\"r\" fsuid=0 ouid=0\n11月 16 01:43:43 omnisky-System-Product-Name kernel: loop22: detected capacity change from 0 to 136888\n"
+    }
+  },
+  "run_status": {
+    "run_id": "p1_epoch24_continue_20261116_211434",
+    "mode": "train",
+    "status": "running",
+    "started_utc": "2026-11-16T13:14:36.383145+00:00"
+  },
+  "resume": {
+    "source_run": "p1_mask_normal_official_dp_20261115_015137",
+    "source_checkpoint": "epoch_0023.pth",
+    "checkpoint_sha256": "c13980d970b3fe821ee1ff98c6901cf59e2a0af2cee5e958a5c724de1ae5ce5e",
+    "rng_source": "checkpoint.training_state.rng",
+    "rng_sha256": null,
+    "best_checkpoint_sha256": "6de7323c647126b2688e02ec21f2fa34134356770cfb82107fb03ff91217f3d3",
+    "source_epoch": 23,
+    "next_epoch": 24,
+    "best_loss": 0.1709372573494911,
+    "best_epoch": 22,
+    "stale": 1,
+    "total_epoch_limit": 50,
+    "numerical_limit": "Restores RNG and optimizer; CUDA execution need not be bitwise identical."
+  },
+  "training_log_tail": "75\n  Timing: local=22:10:22 elapsed=3126.2s window=61.0s per_batch=0.6104s samples_per_s=52.4\n  Total Loss: 0.1025\n  Recon Loss: 0.0216\n  Normal Reference Loss: 0.0482\n  Anomaly Loss: 0.0327\nEpoch 24, Batch 7200/11875\n  Timing: local=22:11:15 elapsed=3178.9s window=52.7s per_batch=0.5269s samples_per_s=60.7\n  Total Loss: 0.1519\n  Recon Loss: 0.0443\n  Normal Reference Loss: 0.0611\n  Anomaly Loss: 0.0465\nEpoch 24, Batch 7300/11875\n  Timing: local=22:12:00 elapsed=3223.6s window=44.8s per_batch=0.4475s samples_per_s=71.5\n  Total Loss: 0.2383\n  Recon Loss: 0.0777\n  Normal Reference Loss: 0.0802\n  Anomaly Loss: 0.0804\nEpoch 24, Batch 7400/11875\n  Timing: local=22:12:38 elapsed=3261.8s window=38.1s per_batch=0.3812s samples_per_s=83.9\n  Total Loss: 0.1105\n  Recon Loss: 0.0273\n  Normal Reference Loss: 0.0376\n  Anomaly Loss: 0.0456\nEpoch 24, Batch 7500/11875\n  Timing: local=22:13:22 elapsed=3306.6s window=44.8s per_batch=0.4480s samples_per_s=71.4\n  Total Loss: 0.1338\n  Recon Loss: 0.0402\n  Normal Reference Loss: 0.0370\n  Anomaly Loss: 0.0566\nEpoch 24, Batch 7600/11875\n  Timing: local=22:13:52 elapsed=3335.7s window=29.2s per_batch=0.2916s samples_per_s=109.7\n  Total Loss: 0.2264\n  Recon Loss: 0.0864\n  Normal Reference Loss: 0.0687\n  Anomaly Loss: 0.0713\nEpoch 24, Batch 7700/11875\n  Timing: local=22:14:44 elapsed=3388.4s window=52.6s per_batch=0.5263s samples_per_s=60.8\n  Total Loss: 0.1639\n  Recon Loss: 0.0585\n  Normal Reference Loss: 0.0711\n  Anomaly Loss: 0.0343\nEpoch 24, Batch 7800/11875\n  Timing: local=22:15:32 elapsed=3436.5s window=48.2s per_batch=0.4818s samples_per_s=66.4\n  Total Loss: 0.2469\n  Recon Loss: 0.0930\n  Normal Reference Loss: 0.1017\n  Anomaly Loss: 0.0522\nEpoch 24, Batch 7900/11875\n  Timing: local=22:15:56 elapsed=3460.1s window=23.5s per_batch=0.2351s samples_per_s=136.1\n  Total Loss: 0.2868\n  Recon Loss: 0.0705\n  Normal Reference Loss: 0.1131\n  Anomaly Loss: 0.1031\nEpoch 24, Batch 8000/11875\n  Timing: local=22:16:25 elapsed=3488.9s window=28.8s per_batch=0.2884s samples_per_s=111.0\n  Total Loss: 0.1429\n  Recon Loss: 0.0594\n  Normal Reference Loss: 0.0515\n  Anomaly Loss: 0.0320\nEpoch 24, Batch 8100/11875\n  Timing: local=22:17:23 elapsed=3547.0s window=58.1s per_batch=0.5806s samples_per_s=55.1\n  Total Loss: 0.2557\n  Recon Loss: 0.0952\n  Normal Reference Loss: 0.0995\n  Anomaly Loss: 0.0610\nEpoch 24, Batch 8200/11875\n  Timing: local=22:18:06 elapsed=3590.4s window=43.4s per_batch=0.4340s samples_per_s=73.7\n  Total Loss: 0.1822\n  Recon Loss: 0.0502\n  Normal Reference Loss: 0.0584\n  Anomaly Loss: 0.0736\nEpoch 24, Batch 8300/11875\n  Timing: local=22:19:15 elapsed=3658.7s window=68.3s per_batch=0.6832s samples_per_s=46.8\n  Total Loss: 0.1238\n  Recon Loss: 0.0359\n  Normal Reference Loss: 0.0425\n  Anomaly Loss: 0.0454\nEpoch 24, Batch 8400/11875\n  Timing: local=22:19:55 elapsed=3699.1s window=40.4s per_batch=0.4039s samples_per_s=79.2\n  Total Loss: 0.1316\n  Recon Loss: 0.0502\n  Normal Reference Loss: 0.0554\n  Anomaly Loss: 0.0260\nEpoch 24, Batch 8500/11875\n  Timing: local=22:20:44 elapsed=3747.6s window=48.6s per_batch=0.4855s samples_per_s=65.9\n  Total Loss: 0.1906\n  Recon Loss: 0.0587\n  Normal Reference Loss: 0.0761\n  Anomaly Loss: 0.0558\nEpoch 24, Batch 8600/11875\n  Timing: local=22:21:19 elapsed=3783.0s window=35.4s per_batch=0.3540s samples_per_s=90.4\n  Total Loss: 0.1431\n  Recon Loss: 0.0375\n  Normal Reference Loss: 0.0511\n  Anomaly Loss: 0.0545\nEpoch 24, Batch 8700/11875\n  Timing: local=22:22:03 elapsed=3827.4s window=44.4s per_batch=0.4440s samples_per_s=72.1\n  Total Loss: 0.1250\n  Recon Loss: 0.0375\n  Normal Reference Loss: 0.0413\n  Anomaly Loss: 0.0462\nEpoch 24, Batch 8800/11875\n  Timing: local=22:23:03 elapsed=3886.9s window=59.5s per_batch=0.5952s samples_per_s=53.8\n  Total Loss: 0.2029\n  Recon Loss: 0.0763\n  Normal Reference Loss: 0.0641\n  Anomaly Loss: 0.0626\nEpoch 24, Batch 8900/11875\n  Timing: local=22:23:34 elapsed=3918.5s window=31.6s per_batch=0.3160s samples_per_s=101.3\n  Total Loss: 0.2139\n  Recon Loss: 0.0410\n  Normal Reference Loss: 0.0761\n  Anomaly Loss: 0.0969\nEpoch 24, Batch 9000/11875\n  Timing: local=22:24:16 elapsed=3960.3s window=41.7s per_batch=0.4172s samples_per_s=76.7\n  Total Loss: 0.1544\n  Recon Loss: 0.0502\n  Normal Reference Loss: 0.0624\n  Anomaly Loss: 0.0418\nEpoch 24, Batch 9100/11875\n  Timing: local=22:25:05 elapsed=4009.1s window=48.8s per_batch=0.4884s samples_per_s=65.5\n  Total Loss: 0.1808\n  Recon Loss: 0.0527\n  Normal Reference Loss: 0.0670\n  Anomaly Loss: 0.0611\nEpoch 24, Batch 9200/11875\n  Timing: local=22:25:54 elapsed=4058.5s window=49.4s per_batch=0.4940s samples_per_s=64.8\n  Total Loss: 0.1661\n  Recon Loss: 0.0467\n  Normal Reference Loss: 0.0528\n  Anomaly Loss: 0.0666\nEpoch 24, Batch 9300/11875\n  Timing: local=22:26:58 elapsed=4121.7s window=63.2s per_batch=0.6317s samples_per_s=50.7\n  Total Loss: 0.1535\n  Recon Loss: 0.0521\n  Normal Reference Loss: 0.0496\n  Anomaly Loss: 0.0517\nEpoch 24, Batch 9400/11875\n  Timing: local=22:27:46 elapsed=4170.2s window=48.6s per_batch=0.4857s samples_per_s=65.9\n  Total Loss: 0.1504\n  Recon Loss: 0.0439\n  Normal Reference Loss: 0.0571\n  Anomaly Loss: 0.0494\nEpoch 24, Batch 9500/11875\n  Timing: local=22:28:24 elapsed=4208.4s window=38.1s per_batch=0.3813s samples_per_s=83.9\n  Total Loss: 0.1514\n  Recon Loss: 0.0579\n  Normal Reference Loss: 0.0567\n  Anomaly Loss: 0.0367\nEpoch 24, Batch 9600/11875\n  Timing: local=22:29:16 elapsed=4260.3s window=51.9s per_batch=0.5188s samples_per_s=61.7\n  Total Loss: 0.2124\n  Recon Loss: 0.0462\n  Normal Reference Loss: 0.0511\n  Anomaly Loss: 0.1151\nEpoch 24, Batch 9700/11875\n  Timing: local=22:29:52 elapsed=4296.0s window=35.8s per_batch=0.3579s samples_per_s=89.4\n  Total Loss: 0.1539\n  Recon Loss: 0.0294\n  Normal Reference Loss: 0.0351\n  Anomaly Loss: 0.0893\nEpoch 24, Batch 9800/11875\n  Timing: local=22:30:53 elapsed=4357.2s window=61.1s per_batch=0.6113s samples_per_s=52.3\n  Total Loss: 0.1495\n  Recon Loss: 0.0428\n  Normal Reference Loss: 0.0490\n  Anomaly Loss: 0.0576\n",
+  "environment": {
+    "original": {
+      "created_utc": "2026-11-14T17:51:38.919875+00:00",
+      "python": "3.10.22 (main, Oct 29 2026, 20:33:25) [GCC 14.3.0]",
+      "platform": "Linux-6.2.0-39-generic-x86_64-with-glibc2.35",
+      "torch": "2.5.1+cu121",
+      "cuda_available": true,
+      "cuda_version": "12.1",
+      "gpu": "NVIDIA GeForce RTX 2080 Ti",
+      "requested_device": "cuda",
+      "parallel": "data_parallel",
+      "gpu_ids": [
+        0,
+        1
+      ],
+      "cuda_visible_devices": "0,1",
+      "visible_gpus": [
+        {
+          "id": 0,
+          "name": "NVIDIA GeForce RTX 2080 Ti"
+        },
+        {
+          "id": 1,
+          "name": "NVIDIA GeForce RTX 2080 Ti"
+        }
+      ],
+      "git_revision": "49dfe07b2dc698f3a1a3b91336f0adad2959b6c1"
+    },
+    "current": {
+      "created_utc": "2026-11-16T13:14:36.293341+00:00",
+      "python": "3.10.22 (main, Oct 29 2026, 20:33:25) [GCC 14.3.0]",
+      "platform": "Linux-6.2.0-39-generic-x86_64-with-glibc2.35",
+      "torch": "2.5.1+cu121",
+      "cuda_available": true,
+      "cuda_version": "12.1",
+      "gpu": "NVIDIA GeForce RTX 2080 Ti",
+      "requested_device": "cuda",
+      "parallel": "data_parallel",
+      "gpu_ids": [
+        0,
+        1
+      ],
+      "cuda_visible_devices": "0,1",
+      "visible_gpus": [
+        {
+          "id": 0,
+          "name": "NVIDIA GeForce RTX 2080 Ti"
+        },
+        {
+          "id": 1,
+          "name": "NVIDIA GeForce RTX 2080 Ti"
+        }
+      ],
+      "git_revision": "5c49ab7fbfe5f7def61197c623323e718852b083"
+    }
+  },
+  "process_environment": {
+    "CUDA_VISIBLE_DEVICES": "0,1",
+    "CUBLAS_WORKSPACE_CONFIG": "<unset>",
+    "PYTHONHASHSEED": "<unset>",
+    "NVIDIA_TF32_OVERRIDE": "<unset>",
+    "OMP_NUM_THREADS": "<unset>"
+  },
+  "batch_diagnostics": {
+    "batches.jsonl": {
+      "rows": 9822,
+      "levels": {
+        "detailed": 119,
+        "light": 9703
+      },
+      "trigger_rows": 0,
+      "nonfinite_state_rows": 0,
+      "max_total_loss": [
+        0.5857816934585571,
+        [
+          24,
+          1676
+        ]
+      ],
+      "max_gradient_l2": [
+        16.397399670817215,
+        [
+          24,
+          8162
+        ]
+      ],
+      "first_sampled": [
+        {
+          "epoch": 24,
+          "batch": 0,
+          "loss": {
+            "total": 0.29334917664527893,
+            "reconstruction": 0.10783857852220535,
+            "classification": 0.06995581835508347,
+            "normal_reference": 0.11555477231740952
+          },
+          "gradient_l2": 1.7906621885176912
+        },
+        {
+          "epoch": 24,
+          "batch": 100,
+          "loss": {
+            "total": 0.13042524456977844,
+            "reconstruction": 0.030453259125351906,
+            "classification": 0.05890285596251488,
+            "normal_reference": 0.04106912389397621
+          },
+          "gradient_l2": 3.0099901014734134
+        },
+        {
+          "epoch": 24,
+          "batch": 200,
+          "loss": {
+            "total": 0.254591166973114,
+            "reconstruction": 0.07180429995059967,
+            "classification": 0.10298097133636475,
+            "normal_reference": 0.07980591058731079
+          },
+          "gradient_l2": 1.6007503625092854
+        },
+        {
+          "epoch": 24,
+          "batch": 300,
+          "loss": {
+            "total": 0.17913998663425446,
+            "reconstruction": 0.04081946611404419,
+            "classification": 0.07707906514406204,
+            "normal_reference": 0.06124145910143852
+          },
+          "gradient_l2": 3.5530047751685303
+        }
+      ],
+      "latest": {
+        "epoch": 24,
+        "batch": 9821,
+        "loss": {
+          "total": 0.14589153230190277,
+          "reconstruction": 0.04040515795350075,
+          "classification": 0.0591081865131855,
+          "normal_reference": 0.04637818783521652
+        },
+        "gradient_l2": 1.5244000296524145,
+        "triggers": []
+      }
+    },
+    "updates.jsonl": {
+      "rows": 9822,
+      "levels": {
+        "detailed": 119,
+        "light": 9703
+      },
+      "trigger_rows": 0,
+      "nonfinite_state_rows": 0,
+      "max_total_loss": null,
+      "max_gradient_l2": null,
+      "first_sampled": [
+        {
+          "epoch": 24,
+          "batch": 0,
+          "loss": null,
+          "gradient_l2": null
+        },
+        {
+          "epoch": 24,
+          "batch": 100,
+          "loss": null,
+          "gradient_l2": null
+        },
+        {
+          "epoch": 24,
+          "batch": 200,
+          "loss": null,
+          "gradient_l2": null
+        },
+        {
+          "epoch": 24,
+          "batch": 300,
+          "loss": null,
+          "gradient_l2": null
+        }
+      ],
+      "latest": {
+        "epoch": 24,
+        "batch": 9821,
+        "loss": null,
+        "gradient_l2": null,
+        "triggers": null
+      }
+    }
+  },
+  "code_references": [
+    {
+      "file": "experiments/ablation_v9/run_experiment.py",
+      "line": 28,
+      "text": "from src.parallel import prepare_model, unwrap_model\nfrom src.reporting import write_report\nfrom src.train import benchmark, run_smoke, set_seed, train_model\n\n\ndef parse_args() -> argparse.Namespace:"
+    },
+    {
+      "file": "experiments/ablation_v9/run_experiment.py",
+      "line": 261,
+      "text": "        if args.mode == \"bench\":\n            model = load_model(config)\n            benchmark(model, config.raw, run_dir, args.max_batches)\n            status[\"status\"] = \"completed\"\n            status[\"completed_utc\"] = utc_now()\n            write_json(run_dir / \"status.json\", status)"
+    },
+    {
+      "file": "experiments/ablation_v9/run_experiment.py",
+      "line": 269,
+      "text": "\n        if args.mode in {\"eval\", \"all\"}:\n            from src.benchmark_eval import DEFAULT_PROTOCOL, load_protocol, real_targets\n            # Check evaluation dependencies before all-mode can start training.\n            from evaluation.metrics import get_metrics, get_metrics_optimized\n            from utils.slidingWindows import find_length_rank"
+    },
+    {
+      "file": "experiments/ablation_v9/run_experiment.py",
+      "line": 287,
+      "text": "\n        if args.mode in {\"eval\", \"all\"}:\n            from src.benchmark_eval import evaluate_benchmarks, verify_checkpoint_config\n            checkpoint = Path(args.checkpoint) if args.mode == \"eval\" else run_dir / \"checkpoints\" / \"best.pth\"\n            if not checkpoint.is_file():\n                raise FileNotFoundError(f\"Checkpoint not found: {checkpoint}\")"
+    },
+    {
+      "file": "experiments/ablation_v9/run_experiment.py",
+      "line": 301,
+      "text": "            set_seed(protocol[\"seed\"])\n            torch.set_num_threads(protocol[\"cpu_threads\"])\n            evaluate_benchmarks(model, config.raw, run_dir, checkpoint, protocol,\n                                checkpoint_epoch=checkpoint_epoch,\n                                max_synthetic=getattr(args, \"eval_max_synthetic\", None),\n                                max_real=getattr(args, \"eval_max_real\", None))"
+    },
+    {
+      "file": "experiments/ablation_v9/src/resume.py",
+      "line": 42,
+      "text": "\n\ndef restore_rng(state):\n    states = state[\"torch_cuda\"]\n    count = torch.cuda.device_count() if torch.cuda.is_available() else 0\n    if len(states) != count:"
+    },
+    {
+      "file": "experiments/ablation_v9/src/parallel.py",
+      "line": 53,
+      "text": "    if config[\"runtime\"].get(\"parallel\", \"none\") == \"data_parallel\":\n        ids = config[\"runtime\"][\"gpu_ids\"]\n        return nn.DataParallel(model, device_ids=ids, output_device=ids[0], dim=0)\n    return model\n\n"
+    },
+    {
+      "file": "experiments/ablation_v9/src/parallel.py",
+      "line": 58,
+      "text": "\ndef unwrap_model(model: nn.Module) -> nn.Module:\n    return model.module if isinstance(model, nn.DataParallel) else model\n\n\ndef parallel_record(model: nn.Module, config: dict) -> dict:"
+    },
+    {
+      "file": "experiments/ablation_v9/src/parallel.py",
+      "line": 64,
+      "text": "    return {\n        \"parallel\": config[\"runtime\"].get(\"parallel\", \"none\"),\n        \"gpu_ids\": list(model.device_ids) if isinstance(model, nn.DataParallel) else [],\n        \"primary_device\": str(next(model.parameters()).device),\n        \"global_batch_size\": int(config[\"optimization\"][\"batch_size\"]),\n    }"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 29,
+      "text": "    random.seed(seed)\n    np.random.seed(seed)\n    torch.manual_seed(seed)\n    if torch.cuda.is_available():\n        torch.cuda.manual_seed_all(seed)\n        torch.backends.cudnn.deterministic = True"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 31,
+      "text": "    torch.manual_seed(seed)\n    if torch.cuda.is_available():\n        torch.cuda.manual_seed_all(seed)\n        torch.backends.cudnn.deterministic = True\n        torch.backends.cudnn.benchmark = False\n"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 32,
+      "text": "    if torch.cuda.is_available():\n        torch.cuda.manual_seed_all(seed)\n        torch.backends.cudnn.deterministic = True\n        torch.backends.cudnn.benchmark = False\n\n"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 33,
+      "text": "        torch.cuda.manual_seed_all(seed)\n        torch.backends.cudnn.deterministic = True\n        torch.backends.cudnn.benchmark = False\n\n\ndef _device(config: dict) -> torch.device:"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 54,
+      "text": "def run_smoke(model, config: dict) -> dict:\n    device = next(model.parameters()).device\n    gpu_count = len(model.device_ids) if isinstance(model, torch.nn.DataParallel) else 1\n    batch_size = min(max(2, gpu_count), int(config[\"optimization\"][\"batch_size\"]))\n    length = 320\n    batch = {"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 64,
+      "text": "    }\n    batch[\"y\"][:, 120:136] = 1\n    generator = torch.Generator(device=\"cpu\").manual_seed(int(config[\"runtime\"][\"seed\"]))\n    x_input, encoder_mask, mask = make_batch_inputs(batch, config, generator)\n    output = model(x_input.to(device), encoder_mask.to(device))\n    batch_device = {key: value.to(device) for key, value in batch.items() if isinstance(value, torch.Tensor)}"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 182,
+      "text": "    start_epoch = 0\n    if resume_from is not None:\n        from .resume import restore_training, restore_rng\n        restored = restore_training(resume_from, model, optimizer, config, run_dir)\n        start_epoch = int(restored[\"next_epoch\"])\n        best_loss = float(restored[\"best_loss\"])"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 189,
+      "text": "        stale = int(restored[\"stale\"])\n        # Restore AFTER model/optimizer/loader/diagnostic setup, immediately before iteration.\n        restore_rng(restored[\"rng\"])\n        del restored\n        message = f\"Resumed: next_epoch={start_epoch} best_epoch={best_epoch} stale={stale}\\n\"\n        print(message, end=\"\", flush=True)"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 216,
+      "text": "        for batch_index, batch in enumerate(train_loader):\n            optimizer.zero_grad(set_to_none=True)\n            generator = torch.Generator(device=\"cpu\").manual_seed(\n                int(config[\"runtime\"][\"seed\"]) + epoch * 1000003 + batch_index\n            )\n            x_input, encoder_mask, mask = make_batch_inputs(batch, config, generator)"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 361,
+      "text": "\n\ndef benchmark(model, config: dict, run_dir: Path, max_batches: int, warmup: int = 20) -> dict:\n    \"\"\"Measure throughput on the configured device; no validation, no checkpoints.\"\"\"\n    set_seed(int(config[\"runtime\"][\"seed\"]))\n    device = _device(config)"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 394,
+      "text": "            break\n        optimizer.zero_grad(set_to_none=True)\n        generator = torch.Generator(device=\"cpu\").manual_seed(\n            int(config[\"runtime\"][\"seed\"]) + batch_index\n        )\n        x_input, encoder_mask, mask = make_batch_inputs(batch, config, generator)"
+    },
+    {
+      "file": "time_rcd/_core/ts_encoder_bi_bias.py",
+      "line": 155,
+      "text": "            # for param in self.binary_attention_bias.parameters():\n            #     param.requires_grad = False\n            y = F.scaled_dot_product_attention(\n                Q_rot, K_rot, V,\n                attn_mask=attn_mask,\n                is_causal=False  # Non-causal attention for encoder"
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "stdout": " M AGENTS.md\n M experiments/ablation_v9/audits/p1_failure_20261116/REPLAY_CONTINUE.md\n M experiments/ablation_v9/audits/p1_failure_20261116/replay_continue_launch_20261116.json\n M experiments/ablation_v9/registry/experiments.jsonl\n M \"\\345\\256\\236\\351\\252\\214\\350\\256\\260\\345\\275\\225.md\"\n?? experiments/ablation_v9/.gpu_check_20261116/\n",
+    "stderr": ""
+  },
+  "original_to_current_code_diff": "diff --git a/experiments/ablation_v9/src/losses.py b/experiments/ablation_v9/src/losses.py\nindex e2411e6..bb48f1a 100644\n--- a/experiments/ablation_v9/src/losses.py\n+++ b/experiments/ablation_v9/src/losses.py\n@@ -40,9 +40,18 @@ def classification_ce(logits: torch.Tensor, labels: torch.Tensor, valid: torch.T\n \n \n def compute_losses(output, batch, target: str, reconstruction_weight: float, classification_weight: float,\n-                   reconstruction_mask: torch.Tensor, classification_padding: str = \"ignore\"):\n-    reconstruction_target = batch[\"x0\"] if target == \"x0\" else batch[\"x\"]\n-    recon_loss, recon_count = masked_mse(output[\"reconstruction\"], reconstruction_target, reconstruction_mask)\n+                   reconstruction_mask: torch.Tensor, classification_padding: str = \"ignore\",\n+                   normal_reference_weight: float = 1.0):\n+    if target != \"x\":\n+        raise ValueError(\"Observation reconstruction target must be x; old P1/P2 are retired\")\n+    active = reconstruction_mask & batch[\"valid\"]\n+    recon_loss, recon_count = masked_mse(output[\"reconstruction\"], batch[\"x\"], active)\n     cls_loss, cls_count = classification_ce(output[\"logits\"], batch[\"y\"], batch[\"valid\"], classification_padding)\n     total = reconstruction_weight * recon_loss + classification_weight * cls_loss\n-    return {\"total\": total, \"reconstruction\": recon_loss, \"classification\": cls_loss, \"reconstruction_count\": recon_count, \"classification_count\": cls_count}\n+    normal_loss, normal_count = recon_loss.new_zeros(()), 0\n+    if \"normal_reference\" in output:\n+        normal_loss, normal_count = masked_mse(output[\"normal_reference\"], batch[\"x0\"], active)\n+        total = total + normal_reference_weight * normal_loss\n+    return {\"total\": total, \"reconstruction\": recon_loss, \"classification\": cls_loss,\n+            \"normal_reference\": normal_loss, \"normal_reference_count\": normal_count,\n+            \"reconstruction_count\": recon_count, \"classification_count\": cls_count}\ndiff --git a/experiments/ablation_v9/src/models.py b/experiments/ablation_v9/src/models.py\nindex 820a2be..b5ff395 100644\n--- a/experiments/ablation_v9/src/models.py\n+++ b/experiments/ablation_v9/src/models.py\n@@ -2,6 +2,7 @@ from __future__ import annotations\n \n import torch\n import torch.nn as nn\n+from torch.utils.checkpoint import checkpoint\n \n from time_rcd._core.ts_encoder_bi_bias import TimeSeriesEncoder\n \n@@ -38,6 +39,21 @@ class AblationPretrainModel(nn.Module):\n             nn.Linear(d_proj // 2, 2),\n         )\n         self._init_heads()\n+        self.normal_reference_head = None\n+        if config[\"experiment_id\"] == \"p1_mask_x_normal\":\n+            # Preserve P0's shared parameter initialization and CPU RNG position.\n+            with torch.random.fork_rng(devices=[]):\n+                self.normal_reference_head = nn.Sequential(\n+                    nn.Linear(d_proj, d_proj * 4), nn.GELU(),\n+                    nn.Dropout(float(config[\"model\"][\"dropout\"])),\n+                    nn.Linear(d_proj * 4, d_proj * 4), nn.GELU(),\n+                    nn.Dropout(float(config[\"model\"][\"dropout\"])),\n+                    nn.Linear(d_proj * 4, 1),\n+                )\n+                for layer in self.normal_reference_head:\n+                    if isinstance(layer, nn.Linear):\n+                        nn.init.xavier_normal_(layer.weight)\n+                        nn.init.zeros_(layer.bias)\n \n     def _init_heads(self):\n         for module in (self.reconstruction_head, self.anomaly_head):\n@@ -48,9 +64,23 @@ class AblationPretrainModel(nn.Module):\n \n     def forward(self, x: torch.Tensor, encoder_mask: torch.Tensor) -> dict[str, torch.Tensor]:\n         h = self.encoder(x, encoder_mask)\n-        reconstruction = self.reconstruction_head(h).squeeze(-1)\n+        # Two full-length MLP heads otherwise retain twice the large activations.\n+        # Recompute P1 heads in backward, preserving their dropout RNG state.\n+        checkpoint_heads = self.normal_reference_head is not None and self.training and torch.is_grad_enabled()\n+        if checkpoint_heads:\n+            reconstruction = checkpoint(self.reconstruction_head, h, use_reentrant=False,\n+                                        preserve_rng_state=True).squeeze(-1)\n+        else:\n+            reconstruction = self.reconstruction_head(h).squeeze(-1)\n         logits = self.anomaly_head(h).mean(dim=-2)\n-        return {\"h\": h, \"reconstruction\": reconstruction, \"logits\": logits}\n+        output = {\"h\": h, \"reconstruction\": reconstruction, \"logits\": logits}\n+        if self.normal_reference_head is not None:\n+            if checkpoint_heads:\n+                output[\"normal_reference\"] = checkpoint(self.normal_reference_head, h, use_reentrant=False,\n+                                                        preserve_rng_state=True).squeeze(-1)\n+            else:\n+                output[\"normal_reference\"] = self.normal_reference_head(h).squeeze(-1)\n+        return output\n \n \n def build_model(config):\ndiff --git a/experiments/ablation_v9/src/resume.py b/experiments/ablation_v9/src/resume.py\nnew file mode 100644\nindex 0000000..5a99cbe\n--- /dev/null\n+++ b/experiments/ablation_v9/src/resume.py\n@@ -0,0 +1,157 @@\n+\"\"\"Epoch-boundary continuation and bounded checkpoint retention.\n+\n+Training remains in train.py; this module only validates/restores saved state.\n+\"\"\"\n+from __future__ import annotations\n+\n+import copy\n+import hashlib\n+import json\n+import math\n+import random\n+import re\n+import shutil\n+from pathlib import Path\n+\n+import numpy as np\n+import torch\n+\n+from .parallel import unwrap_model\n+\n+\n+def _sha256(path):\n+    digest = hashlib.sha256()\n+    with Path(path).open(\"rb\") as handle:\n+        for block in iter(lambda: handle.read(8 * 1024 * 1024), b\"\"):\n+            digest.update(block)\n+    return digest.hexdigest()\n+\n+\n+def verify_resume_config(previous, current):\n+    def comparable(config):\n+        value = copy.deepcopy(config)\n+        value.pop(\"diagnostics\", None)\n+        for field in (\"epochs\", \"log_freq\"):\n+            value[\"optimization\"].pop(field, None)\n+        return value\n+    if comparable(previous) != comparable(current):\n+        raise ValueError(\"Resume requires identical data/split/model/input/loss/optimizer/sampler/runtime; \"\n+                         \"only epochs, log_freq and diagnostics may differ\")\n+\n+\n+def restore_rng(state):\n+    states = state[\"torch_cuda\"]\n+    count = torch.cuda.device_count() if torch.cuda.is_available() else 0\n+    if len(states) != count:\n+        raise ValueError(f\"Saved CUDA RNG count {len(states)} differs from current {count}\")\n+    random.setstate(state[\"python\"])\n+    np.random.set_state(state[\"numpy\"])\n+    torch.set_rng_state(state[\"torch_cpu\"].cpu())\n+    if states:\n+        torch.cuda.set_rng_state_all([item.cpu() for item in states])\n+\n+\n+def checkpoint_training_state(epoch, validation_loss, best_loss, best_epoch, stale):\n+    state = {\n+        \"python\": random.getstate(), \"numpy\": np.random.get_state(),\n+        \"torch_cpu\": torch.get_rng_state().clone(),\n+        \"torch_cuda\": [item.clone() for item in torch.cuda.get_rng_state_all()]\n+        if torch.cuda.is_available() else [],\n+    }\n+    improved = validation_loss < best_loss\n+    return {\n+        \"next_epoch\": epoch + 1,\n+        \"best_loss\": validation_loss if improved else best_loss,\n+        \"best_epoch\": epoch if improved else best_epoch,\n+        \"stale\": 0 if improved else stale + 1,\n+        \"rng\": state,\n+    }\n+\n+\n+def restore_training(checkpoint_path, model, optimizer, config, run_dir):\n+    checkpoint_path = Path(checkpoint_path).resolve()\n+    source_run = checkpoint_path.parent.parent\n+    payload = torch.load(checkpoint_path, map_location=\"cpu\", weights_only=False)\n+    verify_resume_config(payload[\"config\"], config)\n+    epoch = int(payload[\"epoch\"])\n+    start_epoch = epoch + 1\n+    if start_epoch >= int(config[\"optimization\"][\"epochs\"]):\n+        raise ValueError(\"epochs is the TOTAL epoch limit and must exceed the resumed next epoch\")\n+    state = payload.get(\"training_state\")\n+    rng_path = None\n+    if state is None:\n+        # Compatibility with the diagnostic run created before resume existed.\n+        # Its epoch RNG was captured after validation and before best serialization.\n+        rng_path = source_run / \"diagnostics\" / f\"rng_after_epoch_{epoch:04d}.pth\"\n+        if not rng_path.is_file():\n+            raise ValueError(\"Checkpoint has no complete RNG; matching epoch diagnostic RNG is required\")\n+        history = {\n+            int(e): float(loss) for e, loss in re.findall(\n+                r\"^epoch=(\\d+) train_loss=\\S+ validation_loss=(\\S+)\",\n+                (source_run / \"train.log\").read_text(), re.M\n+            )\n+        }\n+        if set(range(epoch + 1)) - set(history):\n+            raise ValueError(\"Legacy resume requires complete epoch history for early stopping\")\n+        best_payload = torch.load(source_run / \"checkpoints/best.pth\",\n+                                  map_location=\"cpu\", weights_only=False)\n+        best_epoch = int(best_payload[\"epoch\"])\n+        if best_epoch > epoch:\n+            raise ValueError(\"Legacy resume requires the latest completed source checkpoint\")\n+        best_loss = float(best_payload[\"validation\"][\"valid_total\"])\n+        # Verify the history-selected best agrees despite its eight-decimal rounding.\n+        if abs(history[best_epoch] - min(history[e] for e in range(epoch + 1))) > 1e-7:\n+            raise ValueError(\"Source best checkpoint conflicts with validation history\")\n+        state = {\n+            \"next_epoch\": start_epoch, \"best_loss\": best_loss, \"best_epoch\": best_epoch,\n+            \"stale\": epoch - best_epoch,\n+            \"rng\": torch.load(rng_path, map_location=\"cpu\", weights_only=False),\n+        }\n+        del best_payload\n+    if int(state[\"next_epoch\"]) != start_epoch:\n+        raise ValueError(\"Checkpoint epoch and training_state.next_epoch disagree\")\n+    if not math.isfinite(float(state[\"best_loss\"])):\n+        raise ValueError(\"Resume requires a finite best validation loss\")\n+    if int(state[\"stale\"]) >= int(config[\"optimization\"][\"early_stopping_patience\"]):\n+        raise ValueError(\"Source already reached early stopping; continuation would change that rule\")\n+    source_best = source_run / \"checkpoints/best.pth\"\n+    best_payload = torch.load(source_best, map_location=\"cpu\", weights_only=False)\n+    if int(best_payload[\"epoch\"]) != int(state[\"best_epoch\"]):\n+        raise ValueError(\"Source best.pth does not match saved early-stopping state\")\n+    del best_payload\n+    unwrap_model(model).load_state_dict(payload[\"model_state_dict\"])\n+    optimizer.load_state_dict(payload[\"optimizer_state_dict\"])\n+    destination = Path(run_dir) / \"checkpoints/best.pth\"\n+    shutil.copyfile(source_best, destination)\n+    provenance = {\n+        \"source_run\": source_run.name, \"source_checkpoint\": checkpoint_path.name,\n+        \"checkpoint_sha256\": _sha256(checkpoint_path),\n+        \"rng_source\": \"checkpoint.training_state.rng\" if rng_path is None else rng_path.name,\n+        \"rng_sha256\": None if rng_path is None else _sha256(rng_path),\n+        \"best_checkpoint_sha256\": _sha256(source_best),\n+        \"source_epoch\": epoch, \"next_epoch\": start_epoch,\n+        \"best_loss\": state[\"best_loss\"], \"best_epoch\": state[\"best_epoch\"], \"stale\": state[\"stale\"],\n+        \"total_epoch_limit\": int(config[\"optimization\"][\"epochs\"]),\n+        \"numerical_limit\": \"Restores RNG and optimizer; CUDA execution need not be bitwise identical.\",\n+    }\n+    (Path(run_dir) / \"resume.json\").write_text(json.dumps(provenance, indent=2) + \"\\n\")\n+    return state\n+\n+\n+def prune_epoch_checkpoints(run_dir, keep_last):\n+    if keep_last is None:\n+        return\n+    run_dir = Path(run_dir)\n+    files = sorted((run_dir / \"checkpoints\").glob(\"epoch_*.pth\"))\n+    retained = set(files[-int(keep_last):])\n+    event = run_dir / \"diagnostics/first_event.json\"\n+    if event.exists():\n+        epoch = int(json.loads(event.read_text())[\"epoch\"])\n+        retained.add(run_dir / \"checkpoints\" / f\"epoch_{epoch - 1:04d}.pth\")\n+    for path in files:\n+        if path not in retained:\n+            size = path.stat().st_size\n+            path.unlink()\n+            with (run_dir / \"checkpoint_retention.jsonl\").open(\"a\") as handle:\n+                handle.write(json.dumps({\"removed\": path.name, \"bytes\": size,\n+                                         \"keep_last\": keep_last}) + \"\\n\")\ndiff --git a/experiments/ablation_v9/src/train.py b/experiments/ablation_v9/src/train.py\nindex 4c1feb3..0f61fec 100644\n--- a/experiments/ablation_v9/src/train.py\n+++ b/experiments/ablation_v9/src/train.py\n@@ -44,12 +44,8 @@ def make_batch_inputs(batch, config: dict, generator: torch.Generator):\n         float(config[\"input\"][\"mask_ratio\"]),\n         generator,\n     )\n-    if config[\"input\"][\"input_mode\"] == \"masked_x\":\n-        x_input = apply_input_mask(batch[\"x\"], mask)\n-        encoder_mask = batch[\"valid\"] & ~mask\n-    else:\n-        x_input = batch[\"x\"]\n-        encoder_mask = batch[\"valid\"]\n+    x_input = apply_input_mask(batch[\"x\"], mask)\n+    encoder_mask = batch[\"valid\"] & ~mask\n     return x_input, encoder_mask, mask\n \n \n@@ -77,6 +73,7 @@ def run_smoke(model, config: dict) -> dict:\n         float(config[\"loss\"][\"classification_weight\"]),\n         mask.to(device),\n         classification_padding=config[\"loss\"].get(\"classification_padding\", \"ignore\"),\n+        normal_reference_weight=float(config[\"loss\"].get(\"normal_reference_weight\", 0)),\n     )\n     losses[\"total\"].backward()\n     return {\n@@ -125,7 +122,8 @@ def _build_train_loader(config: dict, train_indices: list[int]):\n     return loader, kind, None\n \n \n-def train_model(model, config: dict, run_dir: Path) -> dict:\n+def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None = None,\n+                checkpoint_keep_last: int | None = None) -> dict:\n     set_seed(int(config[\"runtime\"][\"seed\"]))\n     device = _device(config)\n     data_start = time.time()\n@@ -149,6 +147,9 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n         f\"Parallel settings: {parallel_record(model, config)}\\n\"\n         f\"Loss settings: classification_padding={config['loss'].get('classification_padding', 'ignore')}, \"\n         f\"checkpoint_selection=valid_total\\n\"\n+        f\"Loss weights: observation={config['loss']['reconstruction_weight']}, \"\n+        f\"normal_reference={config['loss'].get('normal_reference_weight', 0)}, \"\n+        f\"classification={config['loss']['classification_weight']}\\n\"\n         f\"Patch settings: encoder_patch_size={unwrap_model(model).encoder.patch_size}, \"\n         f\"mask_patch_size={int(config['input']['mask_patch_size'])}, \"\n         f\"mask_ratio={float(config['input']['mask_ratio'])}, \"\n@@ -168,15 +169,44 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n     stale = 0\n     run_start = time.time()\n \n-    for epoch in range(int(config[\"optimization\"][\"epochs\"])):\n+    # OPTIONAL DIAGNOSTICS: remove this block and the other marked blocks freely.\n+    diagnostics = None\n+    if config.get(\"diagnostics\", {}).get(\"enabled\", False):\n+        from .diagnostics import BatchDiagnostics\n+        diagnostics = BatchDiagnostics(run_dir, config)\n+        diagnostics.attach(model)\n+    # END OPTIONAL DIAGNOSTICS\n+\n+    start_epoch = 0\n+    if resume_from is not None:\n+        from .resume import restore_training, restore_rng\n+        restored = restore_training(resume_from, model, optimizer, config, run_dir)\n+        start_epoch = int(restored[\"next_epoch\"])\n+        best_loss = float(restored[\"best_loss\"])\n+        best_epoch = int(restored[\"best_epoch\"])\n+        stale = int(restored[\"stale\"])\n+        # Restore AFTER model/optimizer/loader/diagnostic setup, immediately before iteration.\n+        restore_rng(restored[\"rng\"])\n+        del restored\n+        message = f\"Resumed: next_epoch={start_epoch} best_epoch={best_epoch} stale={stale}\\n\"\n+        print(message, end=\"\", flush=True)\n+        with log_path.open(\"a\", encoding=\"utf-8\") as handle:\n+            handle.write(message)\n+\n+    for epoch in range(start_epoch, int(config[\"optimization\"][\"epochs\"])):\n         model.train()\n         epoch_start = time.time()\n         last_log_time = epoch_start\n         last_log_batch = 0\n         if batch_sampler is not None:\n             batch_sampler.set_epoch(epoch)\n+        # OPTIONAL DIAGNOSTICS\n+        if diagnostics is not None:\n+            diagnostics.begin_epoch(epoch, batch_sampler, train_indices)\n+        # END OPTIONAL DIAGNOSTICS\n         total = 0.0\n         total_reconstruction = 0.0\n+        total_normal_reference = 0.0\n         total_classification = 0.0\n         batches = 0\n         padded_points = 0\n@@ -188,7 +218,15 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n             )\n             x_input, encoder_mask, mask = make_batch_inputs(batch, config, generator)\n             batch_device = {key: value.to(device) for key, value in batch.items() if isinstance(value, torch.Tensor)}\n+            # OPTIONAL DIAGNOSTICS\n+            if diagnostics is not None:\n+                diagnostics.before_forward(batch_index)\n+            # END OPTIONAL DIAGNOSTICS\n             output = model(x_input.to(device), encoder_mask.to(device))\n+            # OPTIONAL DIAGNOSTICS: exclude checkpoint recomputation from hook samples.\n+            if diagnostics is not None:\n+                diagnostics.after_forward()\n+            # END OPTIONAL DIAGNOSTICS\n             losses = compute_losses(\n                 output,\n                 batch_device,\n@@ -197,15 +235,27 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n                 float(config[\"loss\"][\"classification_weight\"]),\n                 mask.to(device),\n                 classification_padding=config[\"loss\"].get(\"classification_padding\", \"ignore\"),\n+                normal_reference_weight=float(config[\"loss\"].get(\"normal_reference_weight\", 0)),\n             )\n             losses[\"total\"].backward()\n+            # OPTIONAL DIAGNOSTICS: observe gradients and snapshot BEFORE the update.\n+            if diagnostics is not None:\n+                diagnostics.after_backward(model, optimizer, batch_index, batch, x_input,\n+                                           encoder_mask, mask, output, losses, train_loader.dataset)\n+            # END OPTIONAL DIAGNOSTICS\n             optimizer.step()\n+            # OPTIONAL DIAGNOSTICS: actual update, with no extra forward/backward.\n+            if diagnostics is not None:\n+                diagnostics.after_step(model, optimizer, batch_index)\n+            # END OPTIONAL DIAGNOSTICS\n \n             batch_total = float(losses[\"total\"].detach().cpu())\n             batch_reconstruction = float(losses[\"reconstruction\"].detach().cpu())\n             batch_classification = float(losses[\"classification\"].detach().cpu())\n+            batch_normal_reference = float(losses[\"normal_reference\"].detach().cpu())\n             total += batch_total\n             total_reconstruction += batch_reconstruction\n+            total_normal_reference += batch_normal_reference\n             total_classification += batch_classification\n             batches += 1\n             padded_points += int((~batch[\"valid\"]).sum())\n@@ -223,10 +273,8 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n                     f\"samples_per_s={seen * len(batch['valid']) / max(1e-9, window):.1f}\\n\"\n                     f\"  Total Loss: {batch_total:.4f}\\n\"\n                     f\"  Recon Loss: {batch_reconstruction:.4f}\\n\"\n+                    f\"  Normal Reference Loss: {batch_normal_reference:.4f}\\n\"\n                     f\"  Anomaly Loss: {batch_classification:.4f}\\n\"\n-                    f\"  Classification points: loss={losses['classification_count']}, \"\n-                    f\"valid={int((batch['valid'] & (batch['y'] >= 0)).sum())}, \"\n-                    f\"padding={int((~batch['valid']).sum())}\\n\"\n                 )\n                 print(batch_log, end=\"\", flush=True)\n                 with log_path.open(\"a\", encoding=\"utf-8\") as handle:\n@@ -236,6 +284,7 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n \n         average_total = total / max(1, batches)\n         average_reconstruction = total_reconstruction / max(1, batches)\n+        average_normal_reference = total_normal_reference / max(1, batches)\n         average_classification = total_classification / max(1, batches)\n         padding_fraction = padded_points / max(1, padded_points + valid_points)\n         epoch_seconds = time.time() - epoch_start\n@@ -248,7 +297,11 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n             f\"Epoch {epoch} completed:\\n\"\n             f\"  Average Total Loss: {average_total:.4f}\\n\"\n             f\"  Average Recon Loss: {average_reconstruction:.4f}\\n\"\n+            f\"  Average Normal Reference Loss: {average_normal_reference:.4f}\\n\"\n             f\"  Average Anomaly Loss: {average_classification:.4f}\\n\"\n+            f\"  Validation Recon Loss: {float(validation.get('reconstruction', 0)):.4f}\\n\"\n+            f\"  Validation Normal Reference Loss: {float(validation.get('normal_reference', 0)):.4f}\\n\"\n+            f\"  Validation Anomaly Loss (valid): {float(validation.get('valid_classification', 0)):.4f}\\n\"\n             f\"  Validation Objective Loss: {float(validation['total']):.4f}\\n\"\n             f\"  Validation Valid Total Loss (selection): {validation_loss:.4f}\\n\"\n             f\"  Padding Fraction: {padding_fraction:.4f}\\n\"\n@@ -266,7 +319,19 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n             \"validation\": validation,\n             \"config\": config,\n         }\n+        if (config[\"experiment_id\"] == \"p1_mask_x_normal\"\n+                or config.get(\"diagnostics\", {}).get(\"enabled\", False) or resume_from is not None):\n+            from .resume import checkpoint_training_state\n+            checkpoint[\"training_state\"] = checkpoint_training_state(\n+                epoch, validation_loss, best_loss, best_epoch, stale)\n         torch.save(checkpoint, checkpoint_dir / f\"epoch_{epoch:04d}.pth\")\n+        if checkpoint_keep_last is not None:\n+            from .resume import prune_epoch_checkpoints\n+            prune_epoch_checkpoints(run_dir, checkpoint_keep_last)\n+        # OPTIONAL DIAGNOSTICS\n+        if diagnostics is not None:\n+            diagnostics.end_epoch(epoch, checkpoint_dir / f\"epoch_{epoch:04d}.pth\")\n+        # END OPTIONAL DIAGNOSTICS\n         if validation_loss < best_loss:\n             best_loss = validation_loss\n             best_epoch = epoch\n@@ -277,6 +342,10 @@ def train_model(model, config: dict, run_dir: Path) -> dict:\n             if stale >= int(config[\"optimization\"][\"early_stopping_patience\"]):\n                 break\n \n+    # OPTIONAL DIAGNOSTICS\n+    if diagnostics is not None:\n+        diagnostics.close()\n+    # END OPTIONAL DIAGNOSTICS\n     return {\"status\": \"completed\", \"best_epoch\": best_epoch, \"best_validation_loss\": best_loss,\n             \"selection_metric\": \"valid_total\",\n             \"batch_sampler\": batch_sampler_kind,\n@@ -343,6 +412,7 @@ def benchmark(model, config: dict, run_dir: Path, max_batches: int, warmup: int\n             float(config[\"loss\"][\"classification_weight\"]),\n             mask.to(device),\n             classification_padding=config[\"loss\"].get(\"classification_padding\", \"ignore\"),\n+            normal_reference_weight=float(config[\"loss\"].get(\"normal_reference_weight\", 0)),\n         )\n         losses[\"total\"].backward()\n         optimizer.step()\n",
+  "original_epoch24_first_sampled_total_loss": {
+    "0": 0.2933,
+    "100": 0.1304,
+    "200": 0.2539,
+    "300": 0.1772
+  },
+  "determinism_search": [
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 32,
+      "text": "        torch.backends.cudnn.deterministic = True"
+    },
+    {
+      "file": "experiments/ablation_v9/src/train.py",
+      "line": 33,
+      "text": "        torch.backends.cudnn.benchmark = False"
+    },
+    {
+      "file": "time_rcd/_core/full_reconstruction.py",
+      "line": 213,
+      "text": "        torch.backends.cudnn.deterministic = True"
+    },
+    {
+      "file": "time_rcd/_core/full_reconstruction.py",
+      "line": 214,
+      "text": "        torch.backends.cudnn.benchmark = False"
+    }
+  ],
+  "historical_git_diff_limitation": "Original environment git_revision excludes any uncommitted launch changes; the diff is not evidence that the originally loaded P1 architecture differed.",
+  "official_source_checks": {
+    "pytorch": {
+      "url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.5.1/docs/source/notes/randomness.rst",
+      "retrieved": true,
+      "excerpts": {
+        "torch.use_deterministic_algorithms": "led with :code:`torch.backends.cudnn.benchmark = True`. Note that this setting is different from the :code:`torch.backends.cudnn.deterministic` setting discussed below. Avoiding nondeterministic algorithms .................................... :meth:`torch.use_deterministic_algorithms` lets you configure PyTorch to use deterministic algorithms instead of nondeterministic ones where available, and to throw an error if an operation is known to be nondeterministic (and without a deterministic alternative). Please check the documentation for :meth:`torch.use_deterministic_algorithms()` for a full list of affected operations. If an operation does not act correctly according to the documentation, or if you need a deterministic implementation of an operation that does not have one, please submit an issue: ` `_ For example, running the nondeterministic CUDA implementation of :meth:`torch.Tensor.index_add_` will throw an error:: >>> import torch >>> torch.use_deterministic_algorithms(True) >>> torch.randn(2, 2).cuda().index_add_(0, torch.tensor",
+        "CUBLAS_WORKSPACE_CONFIG": " 2, 2).cuda()) tensor([[[ 1.1900, -2.3409], [ 0.4796, 0.8003]], [[ 0.1509, 1.8027], [ 0.0333, -1.1444]]], device='cuda:0') Furthermore, if you are using CUDA tensors, and your CUDA version is 10.2 or greater, you should set the environment variable `CUBLAS_WORKSPACE_CONFIG` according to CUDA documentation: ` `_ CUDA convolution determinism ---------------------------- While disabling CUDA convolution benchmarking (discussed above) ensures that CUDA selects the same algorithm each time an application is run, that algorithm itself may be nondeterministic, unless either :code:`torch.use_deterministic_algorithms(True)` or :code:`torch.backends.cudnn.deterministic = True` is set. The latter setting controls only this behavior, unlike :meth:`torch.use_deterministic_algorithms` which will make other PyTorch operations behave deterministically, too. CUDA RNN and LSTM ----------------- In some versions of CUDA, RNNs and LSTM networks may have non-deterministic behavior. See :meth:`torch.nn.RNN` and :meth:`torch.nn.LSTM` for details and workaro",
+        "completely reproducible": ".. _reproducibility: Reproducibility =============== Completely reproducible results are not guaranteed across PyTorch releases, individual commits, or different platforms. Furthermore, results may not be reproducible between CPU and GPU executions, even when using identical seeds. However, there are some steps you can take to limit the number of sources of nondeterministic behavior for a specific platform, device, and PyTorch release. First, you can control sources of randomness that can cause multiple executions of your application to behave differently. Second, you can configure PyTorch to avoid using nondeterministic algorithms for some operations, so that multiple calls to those operations, given the same inputs, will produce the same result. .. warning:: Deterministic operations are often slower than nondeterministic operations, so sin",
+        "cuDNN": "consistently as well. If you are using any other libraries that use random number generators, refer to the documentation for those libraries to see how to set consistent seeds for them. CUDA convolution benchmarking ----------------------------- The cuDNN library, used by CUDA convolution operations, can be a source of nondeterminism across multiple executions of an application. When a cuDNN convolution is called with a new set of size parameters, an optional feature can run multiple convolution algorithms, benchmarking them to find the fastest one. Then, the fastest algorithm will be used consistently during the rest of the process for the corresponding set of size parameters. Due to benchmarking noise and different hardware, the benchmark may select different algorithms on subsequent runs, even on the same machine. Disabling the benchmarking feature with :code:`torch.backends.cudnn.benchmark = False` causes cuDNN to deterministically select an algorithm, possibly at the cost of reduced performance. However, if you do not need reprod"
+      }
+    },
+    "nvidia_smi": {
+      "url": "https://docs.nvidia.com/deploy/nvidia-smi/index.html",
+      "retrieved": true,
+      "excerpts": {
+        "SW Power Cap": "e. Application Clocks Setting This option is deprecated and will be removed in a future CUDA release. GPU clocks are limited by applications clocks setting. E.g. can be changed using nvidia-smi --applications-clocks=&lt;Desired Clock Freq in MHz&gt; SW Power Cap SW Power Scaling algorithm is reducing the clocks below requested clocks because the GPU is consuming too much power. E.g. SW power cap limit can be changed with nvidia-smi --power-limit=&lt;Power Limit Value in W&gt; HW Slowdown This option will be removed a future CUDA release. HW Slowdown is engaged, reducing the core clocks by a factor of 2 or more. It is active if either HW Thermal Slowdown or HW Power Brake are active. HW Thermal Slowdown HW Thermal Slowdowns are reducing the core clocks by a factor of 2 or more due to temperature being too high. HW Power Brake External Power Brake Assertion is triggered (e.g. by the system power supply). Sync Boost This GPU has been added to a Sync boost group with nvidia-smi or DCGM in order to maximize performance per watt. All GPUs w",
+        "N/A": "an appear as one MPS device entry. The displayed handles, indices, and UUIDs belong to this process-local MPS namespace. Supported identity, memory, locality, P2P, and accounting-mode fields are reported from MPS. Unsupported fields are displayed as N/A when the command can continue. Commands that require unsupported event, topology, reset, setter, or other physical-management APIs are not available. Multiple locality domains can share their physical parent's PCI bus ID. The standard summary can display that shared bus ID, but --query-gpu=pci.* fields are N/A because their extended PCI query is not supported in this restricted view. Use a UUID or NVML index with -i to select a specific locality domain. Looping with -l is not supported because the event APIs used by nvidia-smi are outside the restricted MPS API subset. Forking a process after it has initialized the MPS view is also unsupported. OPTIONS GENERAL OPTIONS -h, --help Print usage information and exit. --version Print version information and exit. LIST OPTIONS -L, --list-gpus",
+        "SW Thermal Slowdown": "DCGM in order to maximize performance per watt. All GPUs will be limited by the frequency which can be achieved by the slowest GPU. Look at the throttle reasons for other GPUs in the system to see why those GPUs are holding this one at lower clocks. SW Thermal Slowdown SW Thermal capping algorithm is reducing clocks below requested clocks because GPU temperature is higher than Max Operating Temp Display Clock Setting This field will be removed in a future CUDA release. GPU clocks are limited by current setting of Display clocks. Only supported on Volta devices. Board Limit The board limit (operating) policy is currently the limiting factor for GPU clocks. Reliability The reliability policy is currently the limiting factor for GPU clocks. Clock Event Reasons Counters Counters, in microseconds, for the amount of time factors have been reducing the frequency of clocks. SW Power Capping Amount of time SW Power Scaling algorithm has reduced the clocks below requested clocks because the GPU was consuming too much power. Sync Boost Group Amo"
+      }
+    },
+    "xid": {
+      "url": "https://docs.nvidia.com/deploy/xid-errors/index.html",
+      "retrieved": true,
+      "excerpts": {}
+    }
+  },
+  "interpretation": {
+    "hardware_fault": "Possible but not established; incomplete kernel access and ECC N/A cannot exclude silent faults.",
+    "trajectory": "Original and current differ by printed precision at batch200; first differing operation is unknown.",
+    "not_executed": [
+      "No GPU stress test",
+      "No added training",
+      "No change to training code/config",
+      "No interruption"
+    ]
+  }
+}

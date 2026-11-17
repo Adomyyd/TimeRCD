@@ -11,7 +11,7 @@ import torch
 
 from src.config import load_config
 from src.evaluate import _make_eval_inputs
-from src.sampling import apply_input_mask, sample_patch_mask
+from src.data import apply_input_mask, sample_patch_mask
 from src.models import build_model
 from src.train import make_batch_inputs, run_smoke, set_seed
 

@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "p0_mask_x",
+    "sequence_length": 10000,
+    "batch_size": 32,
+    "seconds": 4.759867280721664,
+    "peak_memory_bytes": [
+      8822081536,
+      8481224192
+    ],
+    "loss": 1.6825605630874634,
+    "optimization": {
+      "update_index": 0,
+      "learning_rate": [
+        5e-05
+      ],
+      "gradient_l2_before": 9.527910208333743,
+      "clip_max_norm": 5,
+      "clip_coefficient": 0.5247739919770315,
+      "clipped": true,
+      "finite": true,
+      "phase": "after_gradient_clip_before_optimizer_step",
+      "gradient_l2_after": 4.999999704689553
+    },
+    "rolling_snapshot": true
+  },
+  {
+    "variant": "p1_mask_x_normal",
+    "sequence_length": 10000,
+    "batch_size": 32,
+    "seconds": 3.604172833263874,
+    "peak_memory_bytes": [
+      8864494592,
+      8516121088
+    ],
+    "loss": 2.4796767234802246,
+    "optimization": {
+      "update_index": 0,
+      "learning_rate": [
+        5e-05
+      ],
+      "gradient_l2_before": 10.166597725104952,
+      "clip_max_norm": 5,
+      "clip_coefficient": 0.49180656532191247,
+      "clipped": true,
+      "finite": true,
+      "phase": "after_gradient_clip_before_optimizer_step",
+      "gradient_l2_after": 4.999999533153076
+    },
+    "rolling_snapshot": true
+  }
+]

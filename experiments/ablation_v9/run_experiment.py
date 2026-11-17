@@ -20,11 +20,10 @@ if str(HERE) not in sys.path:
 
 import torch
 
-from src.audit import run_audit
+from src.config import run_audit
 from src.config import ExperimentConfig, load_config, validate_config
 from src.models import build_model
-from src.parallel import prepare_model, unwrap_model
-from src.reporting import write_report
+from src.models import prepare_model, unwrap_model
 from src.train import benchmark, run_smoke, set_seed, train_model
 
 
@@ -304,6 +303,7 @@ def run_one(args: argparse.Namespace) -> None:
                                 max_real=getattr(args, "eval_max_real", None))
 
         if args.mode == "report":
+            from src.benchmark_eval import write_report
             run_dirs = sorted(path for path in (HERE / "runs").iterdir() if path.is_dir())
             write_report(run_dirs, run_dir / "metrics" / "report.json")
 

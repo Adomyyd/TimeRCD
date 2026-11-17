@@ -21,3 +21,7 @@ python experiments/ablation_v9/tests/run_checks.py
 `conftest.py` 设置导入路径；`run_checks.py` 仅启动此测试套件。
 
 测试依赖的三处历史源码见 `../audits/README.md`，迁移时须一并保留。`test_loss_contract.py` 和 `test_sampling_contract.py` 已于2026-11-16合并去重，覆盖映射见 `../audits/cleanup_20261116.json`。退役 P1/P2 名称的拒绝测试仍有用，用于防止旧配置被误用。
+
+## 优化控制回归（2026-11-17）
+
+test_optimization.py：warmup/cosine端点及固定horizon、clip方向/范数、非有限拒绝step、关闭路径、两份配对配置一致性，以及P0/P1在CPU和双卡上的完整小数据训练、逐batch原始梯度与post记录、轮末连续/恢复模型和Adam状态一致性。双卡检查要求两张可用CUDA设备。仍通过run_checks.py统一运行。

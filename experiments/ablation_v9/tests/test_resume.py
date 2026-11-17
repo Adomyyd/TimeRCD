@@ -8,8 +8,8 @@ import torch
 
 from src.diagnostics import compare_states, rng_state
 from src.models import build_model
-from src.parallel import prepare_model
-from src.resume import prune_epoch_checkpoints, verify_resume_config
+from src.models import prepare_model
+from src.train import prune_epoch_checkpoints, verify_resume_config
 from src.train import run_smoke, set_seed, train_model
 from test_diagnostics import config_for, assert_rng_equal
 

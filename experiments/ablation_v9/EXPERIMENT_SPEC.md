@@ -8,25 +8,20 @@
 
 | 位置 | 职责 |
 |---|---|
-| configs/ | 四份P0/P1 × ignore/official训练JSON，另有eval_official.json统一检测评测协议 |
-| src/config.py | 读取配置，校验当前schema/变体/关键数值/并行/padding；缺省padding为ignore并写入生效配置 |
-| src/data.py | 读取配对数据、随机划分、长度缓存/分桶采样器、全batch标准化与补齐 |
-| src/sampling.py | 依据有效长度生成M，应用输入置零 |
-| src/models.py | 骨干、观测重构/异常头，以及P1独立正常参考头；一次前向，不读取监督 |
-| src/losses.py | 重构位置、分类padding策略及明确分母；空集合返回可反传0 |
-| src/parallel.py | 设备校验、DataParallel封装/解封装、并行信息 |
-| src/diagnostics.py | 默认关闭的逐batch观测、首次异常pre-step现场、完整RNG及epoch0精确对照；不参与训练计算 |
-| src/diagnostic_detail.py | 由diagnostics调用的分频详细采集、事件与滚动现场；不开辟第二训练入口 |
-| src/resume.py | 轮末状态校验/恢复、RNG、早停历史兼容及可选权重保留策略；不含训练循环 |
-| src/train.py | 构造训练loader、合成smoke、训练/短程bench、日志、优化器、早停与检查点 |
-| src/evaluate.py | 训练时固定验证M、区域误差及点级指标；不因完整eval改变 |
-| src/benchmark_eval.py | 合成留出/官方TSB-AD-U统一检测推理、指标调度、清单/汇总及分阶段计时 |
-| src/metric_worker.py | 持续复用独立spawn CPU进程；Linux内部官方池fork该小进程，隔离大pickle/GPU；异常传播与关闭 |
-| src/audit.py | 文件/manifest/协议核查与参数量；记录实际padding策略 |
-| src/reporting.py | 只读取eval.json生成列表，不重新训练或评价 |
-| tests/ | 当前11份合成回归模块；run_checks.py为测试入口，职责见tests/README.md |
-| audits/ | 来源、差异与事故/验证证据；三处源码快照被测试读取，索引见audits/README.md |
-| registry/、runs/ | 执行登记与独立产物，保留既有内容 |
+| configs/ | 四份历史训练配置、两份official_stable配置及eval_official.json |
+| src/config.py | schema/数值校验及启动数据协议审计 |
+| src/data.py | 数据读取、划分、标准化、分桶及遮挡采样 |
+| src/models.py | 模型、设备选择与DataParallel封装 |
+| src/losses.py | 训练目标、padding策略与损失分母 |
+| src/train.py | 训练/smoke/bench、OptimizationControl、轮末恢复及权重保留 |
+| src/diagnostics.py | BatchDiagnostics与DetailedObserver；逐批/分频统计与事件现场 |
+| src/evaluate.py | 训练期间固定验证 |
+| src/benchmark_eval.py | 完整检测评测与已有结果汇总 |
+| src/metric_worker.py | 独立指标子进程，避免继承大训练数据/GPU状态 |
+| tests/ | 12份回归模块；统一run_checks.py入口 |
+| audits/ | 历史数值回归依赖及执行证据 |
+| runs/ | 每次实验配置、日志、权重、指标与诊断 |
+| registry/ | 运行登记 |
 
 维护归档统一放`experiments/_archive/`；历史备份`.backup_bucket_20261110/`与`.backup_spike_20261111/`已于2026-11-12经用户确认清理（共11文件），不再是可用目录；范围与证据见audits/eval_20261112/CODE_REVIEW.md和cleanup_execution.json。数据/manifest/runs旧资产链接保持可达；不再提供experiments根目录旧脚本/规范入口。
 
@@ -46,7 +41,7 @@
 
 主方法比较固定相同padding策略；padding比较固定P组、初始化、数据划分/顺序、种子、标准化、M、总batch、优化器、设备和预算。历史400k有重排/随机源等差异，不能单独承担padding因果对照。
 
-默认数据只读共用original_400k/data，不重新生成。四份源配置使用仓库相对数据路径，从仓库根目录直接读取，不另生成本机配置副本。当前split为随机95/5 seed42，尚未审计背景分组隔离。X与X^0用全batch观测X的同一均值/标准差变换，padding后不另改变统计；X^0和Y不得进入编码器。分桶只处理train_indices对应的子集局部位置，每轮set_epoch，无重复/遗漏，尾批保留；不改变split。分桶改变batch标准化坐标、SGD顺序及padding量，所有对照同步；同epoch相对历史batch16不等于同更新步数。
+默认数据只读共用original_400k/data，不重新生成。全部源配置使用仓库相对数据路径，从仓库根目录直接读取，不另生成本机配置副本。当前split为随机95/5 seed42，尚未审计背景分组隔离。X与X^0用全batch观测X的同一均值/标准差变换，padding后不另改变统计；X^0和Y不得进入编码器。分桶只处理train_indices对应的子集局部位置，每轮set_epoch，无重复/遗漏，尾批保留；不改变split。分桶改变batch标准化坐标、SGD顺序及padding量，所有对照同步；同epoch相对历史batch16不等于同更新步数。
 
 ## 3. 并行与损失
 
@@ -92,7 +87,7 @@ evaluate.py保留训练验证的区域误差/复制基线与点级指标；eval/
 
 用户明确授权延长P0诊断。统一入口新增train专用--resume-from和--checkpoint-keep-last，恢复到新run，不原地改源run或尝试给正在运行的range改上限。总epochs默认配置/CLI指定，恢复必须小于总上限；数据/split/model/input/loss/optimizer/sampler/runtime严格一致，仅epochs/log_freq/diagnostics可变。
 
-新P1普通检查点也含training_state；以下为P0诊断时期实现记录，用户现已暂缓该诊断。src/resume.py恢复模型、AdamW、完整RNG及best/stale；setup/smoke之后、训练迭代前恢复RNG，采样按绝对epoch。诊断或续跑检查点写training_state；旧r3按同轮RNG及完整日志和best兼容恢复。缺完整RNG、配置冲突或已满足早停均拒绝。best复制到新run维持历史选择；已完成epoch1后从2继续，上限50仍允许原patience7早停。
+新P1普通检查点也含training_state；以下为P0诊断时期实现记录，用户现已暂缓该诊断。src/train.py恢复模型、AdamW、完整RNG及best/stale；setup/smoke之后、训练迭代前恢复RNG，采样按绝对epoch。诊断或续跑检查点写training_state；旧r3按同轮RNG及完整日志和best兼容恢复。缺完整RNG、配置冲突或已满足早停均拒绝。best复制到新run维持历史选择；已完成epoch1后从2继续，上限50仍允许原patience7早停。
 
 可选保留策略只作用新run：最近N>=2轮、best、首次事件前驱；每次删除记账，首次现场独立保留。普通训练默认逐轮全留。6项恢复/配置/保留检查通过（含CPU和双卡）；全套CPU98 passed、10 GPU项跳过。并发正式训练时整套GPU测试有1项因显存不足失败，107通过；不是数值回归成功，不重复争抢生产GPU。详情见audits/spike_20261114/resume_verification.json。
 
@@ -102,3 +97,7 @@ evaluate.py保留训练验证的区域误差/复制基线与点级指标；eval/
 
 
 显存执行说明（2026-11-15）：最长10000点/总batch32的双卡合成检查发现两个完整重构头保留激活会OOM。新P1训练模式对两个重构MLP启用non-reentrant激活检查点，preserve_rng_state=True，反向时重算头部；骨干仍只前向一次，不改变M/目标/权重/batch/FP32，P0执行路径不变。验证/检测不启用重算。CPU检查覆盖输出/梯度/Dropout RNG与普通头计算一致；最长序列完整前后向及AdamW更新已通过，峰值约8.86/8.51GB（十进制）。重算增加计算开销，不将其当作数值等价提速。
+
+## 共同优化控制（2026-11-17）
+
+新增src/train.py和两份official_stable配置，由同一run_experiment.py执行。保留四份历史配置；不改模型/损失/初始化/采样。控制项、诊断字段、固定horizon与恢复规则见RUNTIME_NOTES。tests/test_optimization.py覆盖裁剪方向/非有限拒绝、关闭路径、调度端点、固定计划恢复，以及P0/P1 CPU与双卡完整小数据训练/诊断/恢复。新控制逻辑独立于可移除诊断块。当前授权为两组从头配对训练及原验证，非完整检测评测。

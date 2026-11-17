@@ -4,7 +4,7 @@
 
 ## 配置和计算路径
 
-四份源配置为P0/P1各ignore/official；另有eval_official.json。P1标识p1_mask_x_normal，两种实验都在make_batch_inputs生成M后将X置零并传V&~M。P0只输出h/reconstruction/logits；P1额外normal_reference。X^0/Y仅作监督，两MSE均M∩V，首轮L=L_x+L_n+L_cls。观测与正常参考使用相同X统计坐标；不重新标准化预测。
+源配置含四份历史P0/P1各ignore/official，新增两份official_stable；另有eval_official.json。P1标识p1_mask_x_normal，两种实验都在make_batch_inputs生成M后将X置零并传V&~M。P0只输出h/reconstruction/logits；P1额外normal_reference。X^0/Y仅作监督，两MSE均M∩V，首轮L=L_x+L_n+L_cls。观测与正常参考使用相同X统计坐标；不重新标准化预测。
 
 P1正常头在P0共享参数初始化后构造并保存/恢复CPU RNG；原共享初值一致，额外Dropout会改变运行随机轨迹。独立从头训练，未加载已完成P0或旧P1。数据380000/20000随机划分seed42，运行seed72，length_bucket50、batch32、11875步/轮，AdamW5e-4/wd1e-5、FP32、50轮/patience7。分桶改变统计与顺序，非数值等价加速。
 
@@ -22,7 +22,7 @@ official先二值化标签，padding成为正常点参与CE；ignore过滤有效
 
 单进程DataParallel按batch分完整序列；标准化/padding/M先于scatter，全batch输出gather后CE/MSE，保存无module.完整模型。设备相对于CUDA_VISIBLE_DEVICES。不同设备/归约/dropout不保证逐位一致，无DDP/FSDP/AMP。
 
-新P1普通轮末默认含training_state（模型/AdamW外的完整RNG、best/stale）；P0仅在诊断或resume时记录完整状态。--resume-from只允许轮末到新run，不是预训练权重初始化；条件严格一致，仅epochs/log_freq/diagnostics可变；缺RNG拒绝，r3可兼容同轮独立RNG。--epochs是总轮数上限，早停仍生效。--checkpoint-keep-last N>=2保留新run最近N轮、best及首次事件前驱，删除逐项记账；默认逐轮全留。
+新P1普通轮末默认含training_state（模型/AdamW外的完整RNG、best/stale）；P0在诊断、resume或优化控制开启时记录完整状态。--resume-from只允许轮末到新run，不是预训练权重初始化；条件严格一致，仅epochs/log_freq/diagnostics可变；缺RNG拒绝，r3可兼容同轮独立RNG。--epochs是总轮数上限，早停仍生效。--checkpoint-keep-last N>=2保留新run最近N轮、best及首次事件前驱，删除逐项记账；默认逐轮全留。
 
 诊断默认关闭，train.py OPTIONAL DIAGNOSTICS块可整体移除。--diagnostics每batch记录分项loss（P1含正常参考）、预测/输入/梯度/样本及首次异常更新前现场；不增加前后向/采样/梯度修正。梯度范数与完整H极值/RMS在源设备归约，仅回传标量，详细区域统计在CPU；默认epoch1起total>=10或grad>=1000触发首次保存；有限事件继续，非有限保存后报错。epoch0参考默认报告差异，--diagnostic-stop-on-mismatch才停止。不匹配只能称同配置重跑，不冒充历史事故精确复现。用户暂缓P0诊断，不自动恢复。
 
@@ -42,7 +42,7 @@ mixed_precision、threshold_source仍是记录占位，没有AMP或部署阈值�
 
 ## P1事故重放诊断补充（2026-11-16）
 
-用户授权从新P1 epoch23轮末恢复，仅运行epoch24（总上限--epochs25），保持模型/AdamW/RNG/双卡/batch32/分桶/seed/lr/mask/损失不变。新run与原run隔离，不自动评测或继续epoch25。--diagnostic-detailed启用src/diagnostic_detail.py，普通训练默认关闭；接入均在OPTIONAL DIAGNOSTICS块，不增加forward/backward或修改梯度。
+用户授权从新P1 epoch23轮末恢复，仅运行epoch24（总上限--epochs25），保持模型/AdamW/RNG/双卡/batch32/分桶/seed/lr/mask/损失不变。新run与原run隔离，不自动评测或继续epoch25。--diagnostic-detailed启用src/diagnostics.py，普通训练默认关闭；接入均在OPTIONAL DIAGNOSTICS块，不增加forward/backward或修改梯度。
 
 当前采用分频诊断（2026-11-16效率修订）。batches.jsonl每批保留样本ID/长度/mask种子及计数、分项loss、观测逐样本重构误差、输入/目标/输出范围、完整H极值/RMS、各参数及模块总梯度。CUDA梯度范数采用FP64设备归约并批量回传标量；不复制完整梯度到CPU做常规统计。梯度仍是总loss梯度，不是任务分解。
 
@@ -55,3 +55,15 @@ mixed_precision、threshold_source仍是记录占位，没有AMP或部署阈值�
 --diagnostic-snapshot-interval250保留两份滚动pre-step完整现场，原子替换槽位；事件用硬链接固定最近前驱，后续滚动不覆盖固定前驱。--diagnostic-max-events6限制有限事件；按loss/梯度/H尺度阈值跨十倍等级、分类GELU抽样全零新增原因保存升级事件，非有限证据不受有限事件上限限制。first_event始终保留，后续event_NNN；每个事件pre现场含模型、Adam、完整梯度、前向前/反向后RNG、实际输出、batch/mask/ID和配置，post现场含更新后模型/Adam/RNG。有限事件继续，非有限在观测点保存后报错。
 
 滚动和事件快照是离线batch重放证据，不能直接传给仅支持轮末的--resume-from；恢复轮末仍用checkpoints/epoch_XXXX.pth。每批仍检查loss、梯度、H/输出及更新后的参数/Adam非有限值；定期详细统计检查其余抽样激活。有限事件超过上限或相同严重度持续时仅保留逐batch轻量证据，不反复全量拷贝；每次非有限事件不受上限或已见等级阻挡。观察仍增加计算/磁盘时间，不保证历史CUDA轨迹逐位一致；不得为追求确定性临时切换原训练算法。测试涵盖诊断开关轨迹与实际更新重放，正式启动/现场状态以audits/p1_failure_20261116/REPLAY.md和对应run为准。
+
+## 可选优化控制（2026-11-17）
+
+src/train.py被train和bench共同调用。历史配置缺gradient_clip_norm/lr_schedule时无数值干预；smoke仍仅前后向，不能代替优化器集成测试。stable配置：clip5，warmup_epochs1，total_epochs50，min_lr5e-5，start_factor0.1，learning_rate5e-4。0基更新u=e*len(loader)+batch；首步为start_factor*peak，预热最后一步为peak，最后计划更新为min_lr。early stopping可提前结束；--epochs不改变调度horizon。
+
+顺序为设当前lr→forward/backward→测原始梯度→诊断pre-clip现场→全局同系数裁剪→optimization.jsonl→AdamW.step→诊断post-step。原始梯度范数FP64设备归约并与诊断共用；裁剪后再次实测，不额外forward/backward。optimization.jsonl阶段明确为step前，是否完成更新须交叉核对updates.jsonl。非有限原始loss/梯度拒绝step；诊断开启时先保存证据。training_state.optimization_control保存next_update/steps_per_epoch及固定策略，恢复不重置预热。
+
+当前两组诊断从epoch0开始，基本记录每批、详细100、两槽rolling250、有限升级事件12。事件有上限，不承诺保存每次尖峰完整现场；非有限事件不受上限约束。日志每100批，独立于诊断频率。两组fresh/official/DP双卡/batch32/seed72按P0→P1顺序运行；失败停止队列。固定计划和裁剪值为实验初始选择，不代表最佳参数。
+
+## 模块合并映射（2026-11-17）
+
+src从17个Python文件（含__init__）减为10个：sampling→data，parallel→models，optimization/resume→train，diagnostic_detail→diagnostics，audit→config，reporting→benchmark_eval。优化参数validate_optimization归config，其余控制类归train。旧转发文件已删除；入口CLI与run产物格式不因搬迁改变。历史审计源码不改写，回归测试用隔离命名空间解析历史相对导入。历史settings.json的源码文件名/hash仍代表当时布局。新布局以EXPERIMENT_SPEC职责表为准，结构映射证据见audits/stability_20261117/structure_mapping.json。
