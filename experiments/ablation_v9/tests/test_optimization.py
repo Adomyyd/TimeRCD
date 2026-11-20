@@ -86,6 +86,10 @@ def test_stable_training_diagnostics_and_resume(tmp_path, variant, parallel):
         train_model(m, cfg, path, resume_from=resume)
         return path
     full = run("full", config)
+    text = (full / "train.log").read_text()
+    for label in ("  Normal Reference Loss:", "  Average Normal Reference Loss:",
+                  "  Validation Normal Reference Loss:", "normal_reference="):
+        assert (label in text) == (variant == "p1_mask_x_normal")
     short = copy.deepcopy(config)
     short["optimization"]["epochs"] = 2
     partial = run("partial", short)

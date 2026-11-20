@@ -1,53 +1,17 @@
-# v9与原始TimeRCD的差异（Agent）
+# v9 与原始 TimeRCD 的差异
 
-更新：2026-11-17。当前仅P0/P1。原流程original_400k与v9并列；P0是v9内部基线，不宣称官方全流程逐项复制。历史官方源码回归依赖保留在audits/patch_20261110/sources。
+v9 的 P0 用作内部基线。新 P1 在 `src/models.py` 增加独立正常参考头，在 `src/losses.py` 增加同一有效遮挡位置上的配对正常 MSE。观测遮挡重构、异常分类与检测打分路径照旧。P0/P1 共享参数初值相同，P1 多出的 Dropout 会改变训练随机轨迹。模型细节见[方法设计](../../方法设计.md)。
 
-## 模型与损失
-
-| 项目 | P0 | 新P1 |
+| 方面 | 所审计的官方训练 | v9 |
 |---|---|---|
-| 输入/attention | X选中块置零，V&~M | 与P0相同 |
-| 骨干/原头 | 原TimeSeriesEncoder、观测重构MLP和异常分类MLP | 全部保留，新增独立正常参考MLP |
-| 重构目标 | M∩V上预测X | 同集合分别预测X和X^0 |
-| 首轮loss | L_x+L_cls | L_x+L_n+L_cls |
-| 检测推理 | 完整X，异常头概率/logit | 相同，不执行重构头 |
+| 编码器与原两头 | TimeSeriesEncoder、观测重构 MLP、异常分类 MLP | 编码器源码一致，原头结构和损失公式一致。P1 训练重构头启用激活检查点。 |
+| patch 与训练目标 | 历史入口实际 patch 16、遮挡块 16、比例 0.15。输出在标准化目标坐标上直接求误差。 | 同样使用 16/16/0.15，两个 patch 参数独立。P1 正常目标沿用观测的 batch 统计量。 |
+| 原头初始化 | 分类头先于重构头 | 重构头先于分类头。相同种子下编码器一致，5 个头部权重张量不同。 |
+| 采样与并行 | batch 64、DistributedSampler、DDP、全局 mask RNG | 总 batch 32、长度分桶、单进程 DataParallel、独立 mask RNG。原 400k 本地路线另用 batch 16。 |
+| 分类 padding | 先二值化标签，padding 进入正常类 | `official` 保留该行为；`ignore` 排除分类 padding。注意力与重构两模式均排除 padding。 |
+| 验证与优化 | 含 padding 的验证损失选权重，固定 AdamW 学习率 | 各组按自身 `valid_total` 选 best。四份历史配置固定学习率，稳定配对另加裁剪、预热和余弦衰减。 |
+| 运行与评测 | 原流程脚本和官方检测协议 | 统一入口，按 run 保存快照、日志、权重及诊断。检测固定官方协议并统一报告合成留出与真实数据。 |
 
-src/models.py正常参考头结构复用原d→4d→4d→1，两隐藏层GELU/Dropout、输出无界Linear，参数独立。新增头在共享参数初始化后构造，保存/恢复CPU RNG，保证同种子原参数初值一致；训练额外Dropout不保证历史随机轨迹一致。forward只接收观测和encoder_mask，同一H供三头，不读X^0/Y，无B/Z/偏差头/双视图。
+官方编码器字节比对与对齐权重、输入、mask、RNG 的 CPU 单步检查均已有证据。对齐条件下 P0 的原两项 loss、梯度及一次 AdamW 更新逐位一致。结论适用于受控单步。来源见[官方对齐复核](audits/p1_failure_20261116/OFFICIAL_PARITY_20261117.md)和[遮挡审计](audits/patch_20261110/REPORT.md)。
 
-src/losses.py保留reconstruction为观测误差，新增normal_reference字段及normal_reference_weight；三项按配置加权，空选中集合显式零。config.py只接受p0_mask_x/p1_mask_x_normal；删除旧full-input与normal-only目标分流，旧P1/P2标识拒绝。删除四份旧源配置，保留四份历史P0/P1×padding配置、新增两份official_stable配置及独立eval协议；不修改旧run快照。
-
-## 与原官方训练的共同点及工程差异
-
-原历史入口同进程patch/遮挡实际16/16、ratio0.15，非初始默认4；证据见patch审计。重构只在选中位置MSE，分类同次遮挡前向。模型patch线性投影、双向注意力、时间投影和原两头结构保留。官方训练输入标准化但不重新标准化输出；历史配置没有clip/学习率调度；新增official_stable配置启用clip和warmup/cosine。未启用AMP或尖峰跳过，不把防护当作已证明历史根因解决。
-
-official复现标签先二值化使padding成为正常点参与CE；ignore先过滤padding再CE。当前主线official，attention和重构仍排除padding。同组两配置仅该字段不同。原训练DistributedSampler/全局随机源与v9仍有差异，历史400k不能单独隔离padding影响。
-
-v9随机95/5 seed42、运行seed72、分桶batch32、bucket_multiplier50；原400k历史batch16及顺序/步数不同。分桶改变同批统计、padding与更新顺序，不只是加速。训练X/X^0共同使用观测batch统计，推理沿用官方逐序列标准化。背景分组与生成器配对语义未完全审计。
-
-## 日志、选择与状态
-
-训练每100batch报告总loss、观测重构、正常参考和异常分类，P1验证额外报告分区域/实际变化及复制基线；P0原输出和参数键保持兼容，正常参考日志为0。各组按自身valid_total选best和patience7早停，P1多含L_n，数值不可跨组直接判断方法优劣，需共同检测协议与实际预算。
-
-单进程DataParallel分batch、gather后全batch损失，完整未封装checkpoint；与官方多进程路径非逐项一致。统一入口负责run身份、快照、status/registry、audit与失败传播。新P1普通轮末默认保存完整RNG/best/stale；P0保留诊断/续跑时完整状态的历史语义。src/resume只做轮末恢复与保留策略，无训练循环；不把源检查点当新组预训练初始化。
-
-可选诊断独立、默认关闭，不改变损失/梯度或增加采样/前后向；P1新增正常参考loss/预测/误差观测。P0历史事故缺RNG，不保证重现；用户已暂缓。
-
-## 评测与历史
-
-benchmark_eval/metric_worker对接固定官方d458549及TSB-AD-U，额外统一合成留出评价。F1 oracle、两种分数、逐序列/组宏平均及NaN规则见RUNTIME_NOTES；不改变公式来加速。进程优化让持有大pickle的父进程复用小CPU worker，相关source是数值回归依赖，不能清理。两个P0配对评测已完成，RESULTS保留原数值。
-
-旧full-input P1已停止并保留run，不计为新P1；旧P2配置和未使用分流退出当前实现。新代码、退役配置与文档差异/检查/清理证据在audits/p1_20261115。旧日期审计代表历史，不回填新语义、不沿用旧测试数充当本次验证。
-
-
-显存执行说明（2026-11-15）：最长10000点/总batch32的双卡合成检查发现两个完整重构头保留激活会OOM。新P1训练模式对两个重构MLP启用non-reentrant激活检查点，preserve_rng_state=True，反向时重算头部；骨干仍只前向一次，不改变M/目标/权重/batch/FP32，P0执行路径不变。验证/检测不启用重算。CPU检查覆盖输出/梯度/Dropout RNG与普通头计算一致；最长序列完整前后向及AdamW更新已通过，峰值约8.86/8.51GB（十进制）。重算增加计算开销，不将其当作数值等价提速。
-
-
-## 官方历史源码复核补充（2026-11-17）
-
-本次重新下载官方ebf4f056源码核验：编码器文件与当前逐字节一致。固定相同权重/输入/mask/RNG的CPU单batch检查中，P0原两项loss、全部参数梯度和一次AdamW更新逐位一致；不等于完整训练复现。
-发现原两头初始化顺序差异：官方anomaly_head→reconstruction_head，v9 reconstruction_head→anomaly_head。同seed编码器相同，但5个头部weight张量不同；v9 P0/P1共享初值仍一致。本次未改初始化实现。官方历史入口batch64/DistributedSampler/DDP/全局mask RNG/含padding验证loss选择，与当前总batch32/分桶/DP/独立mask RNG/valid_total选择不同。
-详见audits/p1_failure_20261116/OFFICIAL_PARITY_20261117.md及两份official_parity_*_20261117.json。高增益模块来自官方，不代表本地失稳已证明官方训练同样失稳。
-
-## 新增稳定训练配置（2026-11-17）
-
-原官方与四份历史v9配置仍为固定AdamW lr5e-4、无裁剪。两份*_official_stable.json明确增加总梯度范数上限5和第1轮warmup、后49轮cosine（峰值5e-4，起止5e-5）；当前模型初始化顺序等已核实差异保持。src/train.py在诊断原始梯度现场之后、step之前调用OptimizationControl；bench使用相同控制，smoke仅前后向。合并后的diagnostics增加控制元数据，gradient_l2/现场梯度仍为原始值，post记录增加实际裁剪范数和lr。checkpoint训练状态保存固定计划/每轮步数/更新位置；resume核对后从正确位置继续。新测试和启动证据见audits/stability_20261117。
+运行、恢复与评测细节见[运行说明](RUNTIME_NOTES.md)。旧 P1/P2 方案只用于历史追溯，见 [P1 改版审计](audits/p1_20261115/REPORT.md)。

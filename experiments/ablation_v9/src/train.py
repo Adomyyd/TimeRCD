@@ -126,6 +126,10 @@ def _build_train_loader(config: dict, train_indices: list[int]):
     return loader, kind, None
 
 
+def _normal_reference_log(label: str, value: float, enabled: bool) -> str:
+    return f"  {label}: {value:.4f}\n" if enabled else ""
+
+
 def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None = None,
                 checkpoint_keep_last: int | None = None) -> dict:
     set_seed(int(config["runtime"]["seed"]))
@@ -148,12 +152,17 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     log_path = run_dir / "train.log"
     log_freq = int(config["optimization"]["log_freq"])
+    has_normal_reference = config["experiment_id"] == "p1_mask_x_normal"
+    normal_weight_log = (
+        f"normal_reference={config['loss']['normal_reference_weight']}, "
+        if has_normal_reference else ""
+    )
     patch_log = (
         f"Parallel settings: {parallel_record(model, config)}\n"
         f"Loss settings: classification_padding={config['loss'].get('classification_padding', 'ignore')}, "
         f"checkpoint_selection=valid_total\n"
         f"Loss weights: observation={config['loss']['reconstruction_weight']}, "
-        f"normal_reference={config['loss'].get('normal_reference_weight', 0)}, "
+        f"{normal_weight_log}"
         f"classification={config['loss']['classification_weight']}\n"
         f"Patch settings: encoder_patch_size={unwrap_model(model).encoder.patch_size}, "
         f"mask_patch_size={int(config['input']['mask_patch_size'])}, "
@@ -289,7 +298,7 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
                     f"  Gradient Control: {applied_control}\n"
                     f"  Total Loss: {batch_total:.4f}\n"
                     f"  Recon Loss: {batch_reconstruction:.4f}\n"
-                    f"  Normal Reference Loss: {batch_normal_reference:.4f}\n"
+                    f"{_normal_reference_log('Normal Reference Loss', batch_normal_reference, has_normal_reference)}"
                     f"  Anomaly Loss: {batch_classification:.4f}\n"
                 )
                 print(batch_log, end="", flush=True)
@@ -313,10 +322,10 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
             f"Epoch {epoch} completed:\n"
             f"  Average Total Loss: {average_total:.4f}\n"
             f"  Average Recon Loss: {average_reconstruction:.4f}\n"
-            f"  Average Normal Reference Loss: {average_normal_reference:.4f}\n"
+            f"{_normal_reference_log('Average Normal Reference Loss', average_normal_reference, has_normal_reference)}"
             f"  Average Anomaly Loss: {average_classification:.4f}\n"
             f"  Validation Recon Loss: {float(validation.get('reconstruction', 0)):.4f}\n"
-            f"  Validation Normal Reference Loss: {float(validation.get('normal_reference', 0)):.4f}\n"
+            f"{_normal_reference_log('Validation Normal Reference Loss', float(validation.get('normal_reference', 0)), has_normal_reference)}"
             f"  Validation Anomaly Loss (valid): {float(validation.get('valid_classification', 0)):.4f}\n"
             f"  Validation Objective Loss: {float(validation['total']):.4f}\n"
             f"  Validation Valid Total Loss (selection): {validation_loss:.4f}\n"

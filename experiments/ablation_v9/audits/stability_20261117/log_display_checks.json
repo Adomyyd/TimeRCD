@@ -1,0 +1,11 @@
+{
+  "passed": 4,
+  "deselected": 120,
+  "seconds": 8.38,
+  "command": "tests/run_checks.py -k stable_training_diagnostics_and_resume",
+  "coverage": [
+    "P0/P1 CPU and dual GPU",
+    "batch/epoch/validation log visibility",
+    "optimizer/RNG resume"
+  ]
+}

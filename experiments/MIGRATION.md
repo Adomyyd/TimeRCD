@@ -1,76 +1,17 @@
 # 跨机器实验迁移
 
-受众：Agent。保存跨机器迁移约束、资产定位与配置核查步骤；面向用户的完整准备及执行命令集中在两路线README中，不要求用户阅读本文才能操作。
+命令从仓库根目录执行。使用目标机器已有的项目环境，推荐 Python 3.10 和与驱动兼容的 PyTorch/CUDA。面向读者的安装和命令见[实验 README](README.md)。
 
-本文所有文件位置均相对于仓库根目录，命令也在该目录执行。使用目标机器已激活的项目环境，示例中的`python`指该环境的解释器。GPU按目标机器的可见编号选择，不绑定型号或主机名。
+| 资产 | 仓库相对位置 |
+|---|---|
+| 共用 400k 数据及同名 manifest，约 39 GB | `experiments/original_400k/data/` |
+| 原流程 run、检查点及原日志 | `experiments/original_400k/runs/time_rcd_400k_20261108/` |
+| v9 运行快照、轮末检查点及日志 | `experiments/ablation_v9/runs/` |
+| 官方单变量、多变量权重 | `best_model/` |
+| 正式评测数据 | `datasets/TSB-AD-U/`，完整 700 条、11 组 |
 
-## 环境与资产
+数据、权重和运行产物需单独传输。使用真实目录并按 manifest 核对文件身份。原始配置快照和日志保留历史位置及环境信息。v9 源配置中的数据路径相对于仓库根目录，直接使用已有 JSON。若改变数据位置，对各组统一修改源配置中的 `data.path` 和 `data.manifest_path`；为既有权重做评测时先核对匹配配置和检查点的数据身份。
 
-建议使用Python 3.10及与目标驱动兼容的PyTorch/CUDA；安装方法见根README与Tutorial。迁移后记录实际软件版本与GPU环境，不能将另一台机器上的测试通过视为本机验证完成。
+迁移代码时保留 [三处审计源码依赖](ablation_v9/audits/README.md)。先运行[回归检查及 smoke](ablation_v9/README.md#准备与检查)。双卡测试跳过时需另行验证目标机器的并行能力。更改设备或训练 batch 后，按同一条件重做配对。
 
-Git代码仓库不包含训练数据、官方权重和完整检查点，须通过自己的文件传输方式单独准备：
-
-| 资产 | 仓库相对位置 | 用途 |
-|---|---|---|
-| 400k数据及同名manifest | experiments/original_400k/data/ | 两路线只读共用；约39GB，避免重复复制 |
-| 原流程续训检查点 | experiments/original_400k/runs/time_rcd_400k_20261108/checkpoints/ | 保留latest/best及其原始日志、配置 |
-| v9现有检查点与日志 | experiments/ablation_v9/runs/ | 只迁移实际存在的run；旧P0目录本次未找到，不能假设可恢复；eval可加载完整模型，无resume |
-| 官方单变量/多变量权重 | best_model/ | 官方推理或原流程对比 |
-| 原流程外部检测数据 | datasets/TSB-AD-U/ | 原流程compare与v9 eval/all需要，smoke不需要 |
-
-历史符号链接和历史JSON中的位置只是原环境记录。新机器使用上表真实目录；不要依赖旧链接，也不要为迁移修改历史配置快照或重生成一份不同的400k数据。manifest中的旧位置字段不影响数据内容身份，应结合文件大小和已有校验值核对。大型文件校验按实际需要单独执行。
-
-## v9配置与路径
-
-直接使用`experiments/ablation_v9/configs/`中的四份历史P0/P1训练JSON及两份official_stable训练JSON，不生成本机副本；完整检测评测另用同目录eval_official.json。源配置的数据和manifest字段使用仓库相对路径，数据准备在上表目录即可跨机器使用。
-
-配置读取器将相对数据路径解释为**进程工作目录**下的位置，而非配置文件所在目录，所有命令必须从仓库根目录执行。数据确需另存时，对相关组统一修改`data.path`和`data.manifest_path`，保留实验超参一致；优先沿用约定目录。
-
-每次运行会在独立run下保存实际配置快照。当前源配置的修订不会改写已有run，旧快照中的历史位置保留原文。
-
-## 先检查，再运行
-
-先安装项目与合成检查依赖，再运行无需真实训练数据的回归：
-
-```bash
-python -m pip install . pytest -r experiments/ablation_v9/requirements-eval.txt
-python experiments/ablation_v9/tests/run_checks.py
-python experiments/original_400k/run_experiment.py --help
-python experiments/ablation_v9/run_experiment.py --help
-```
-
-只有一张可见CUDA卡时，真实双GPU测试会跳过；其余通过不代表已验证本机双卡。以下smoke会核对数据文件和manifest，但不加载完整400k pickle；run-id必须未使用过：
-
-```bash
-CUDA_VISIBLE_DEVICES=0 python experiments/ablation_v9/run_experiment.py \
-  --config experiments/ablation_v9/configs/p0_mask_x.json \
-  --run-id p0_portable_seed072_smoke --mode smoke
-```
-
-确认检查通过后，由操作者按v9 README选择正式命令、独立run-id与相应源配置。双卡仍通过同一入口增加`--parallel data_parallel --gpu-ids 0 1`，同时设置`CUDA_VISIBLE_DEVICES=0,1`；batch_size是总batch。更换设备不保证dropout、浮点计算与训练轨迹逐位相同；对照组应固定设备、软件、并行方式和预算。
-
-## 原流程恢复
-
-原流程根据脚本位置定位仓库、数据和run目录，不依赖原挂载位置。将原run及检查点放回上表位置后，以下命令按既有默认latest恢复；它会开始正式训练，不能当作环境测试：
-
-```bash
-python experiments/original_400k/run_experiment.py --mode train
-```
-
-当前原流程入口固定使用本机物理GPU0，并会覆盖外部可见卡设置；此限制与GPU型号无关。恢复不包含完整RNG/早停历史，不能承诺逐位等价。v9没有恢复训练接口：复制权重后可按匹配配置执行eval，不能用原流程入口恢复v9模型。
-
-## 发布与历史证据
-
-共享文档使用相对路径；机器连接、解释器安装位置等由各自环境管理。原始日志、JSON、diff和XML是历史证据，可能带有当时的环境元数据，不能通过改写它们伪造为另一台机器的结果。原始产物保持原文；当前P0/P1源配置的数据字段已改为仓库相对位置，其他设置保持不变。文档版审计报告及归档说明已做路径整理，旧文档摘要对应旧版本。
-
-## 当前配置能力与资产核查
-
-源JSON总batch32、length_bucket50；单卡README例子显式覆盖batch16，双卡保持32。迁移不自动调整batch/采样器，不将不同设置混成配对结果。mixed_precision字段目前不启用AMP；threshold_source不执行阈值拟合。bench会读完整数据并进行优化器更新，不能代替smoke。短程测速摘要、旧run缺失和历史启动事实见根实验记录第12节；P0 official完成与ignore启动快照见第13–14节。
-
-原流程compare额外依赖pandas、scipy、statsmodels、scikit-learn、matplotlib、seaborn和tqdm；仅pip install .不足以覆盖这些实验依赖。生成器依赖见dataset_gen/requirements.txt。原流程CLI自定义--resume要求本机规范化后的检查点位置；默认latest命令无需额外路径。不要把历史源脚本的路径限制迁移到v9的相对配置用法。
-
-## 2026-11-12统一评测与代码审查
-
-v9 eval/all要求完整TSB-AD-U清单（11类700条）；协议、依赖和完整命令见v9 README。迁移训练run的config.json与完整检查点后使用统一入口eval；路径变化时对传入配置和checkpoint内历史data.path的核对需明确处理，不以编辑原checkpoint伪造新来源。完整合成pickle仍会读取；子集参数只减少逐序列评测，不减少加载内存。P0 ignore已由用户启动，不重复启动。
-
-已检查v9活动代码、隐藏备份和审计来源；具体清理范围与保留理由见ablation_v9/audits/eval_20261112/CODE_REVIEW.md。用户确认后已删除两隐藏备份目录内11文件及三处无用代码；当前已无这两个备份目录，两个占位配置字段保留；迁移时仍以实际存在文件为准。官方来源与回归依赖必须随代码迁移，不能只复制src/tests后遗漏audits/sources。
+v9 可用 `--resume-from` 从含完整训练状态的轮末检查点恢复到新 run，按原配置、数据与并行条件恢复。历史缺 RNG 权重可评测，其训练轨迹无法精确续接。原流程恢复复用原 run，默认从 latest 继续，当前入口固定使用物理 GPU 0，旧续训缺完整 RNG 和早停状态。两条路线分别使用自己的入口和检查点。[v9 续训](ablation_v9/README.md#续训)、[原流程恢复](original_400k/README.md#恢复训练)
