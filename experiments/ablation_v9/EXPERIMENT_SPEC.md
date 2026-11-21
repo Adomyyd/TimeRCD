@@ -26,6 +26,6 @@
 
 从仓库根目录用源 JSON 执行。入口校验顶层配置和关键字段组合，保存 CLI 覆盖后的快照，拒绝覆盖已有 run。子对象校验尚未覆盖全部未知键。`mixed_precision` 和 `threshold_source` 是记录字段。
 
-- 验证保留模式损失和过滤分类 padding 后的 `valid_total`；后者用于各组选 best/早停。P1 的 `valid_total` 含正常参考项。外部检测比较统一使用正式评测，合成子集和官方 oracle F1 分别标清。
+- 验证保留模式损失和过滤分类 padding 后的 `valid_total`；后者用于各组选 best/早停。P1 的 `valid_total` 含正常参考项。外部检测比较统一使用正式评测，记录是否使用 `--eval-real-only`、各域样本数及官方 oracle F1。
 - 可选诊断保持在 `OPTIONAL DIAGNOSTICS` 块；学习率调度、裁剪和非有限拒绝属于优化路径。报告短测、受控重放及正式轨迹时须标明范围。
 - 未完成背景分组隔离、密度和事件分层、上下文干预、多种子及容量匹配。保留用于回归的三处历史源码。证据和当前测试入口见[审计索引](audits/README.md)与[测试说明](tests/README.md)。

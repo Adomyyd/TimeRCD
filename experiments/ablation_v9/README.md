@@ -58,17 +58,21 @@ CUDA_VISIBLE_DEVICES=0 python -u experiments/ablation_v9/run_experiment.py \
 
 ## 评测已有模型
 
-准备训练数据和完整 `datasets/TSB-AD-U/`。把 `trained_run` 设为训练目录名。以下命令评测固定 200 条合成留出和全部 700 条真实序列，计算官方 16 项指标。移除 `--eval-max-synthetic 200` 可评测全部合成留出。
+稳定版对照评测 TSB-AD-U 全部 700 条真实序列。准备 `datasets/TSB-AD-U/`、两组训练目录及各自的 best 权重，保留训练配置引用的数据与 manifest。以下命令从仓库根目录依次评测两组。
 
 ```bash
-trained_run=p0_official_dp_20261111_003608
-CUDA_VISIBLE_DEVICES=0,1 python experiments/ablation_v9/run_experiment.py \
-  --config "experiments/ablation_v9/runs/$trained_run/config.json" \
-  --checkpoint "experiments/ablation_v9/runs/$trained_run/checkpoints/best.pth" \
-  --eval-config experiments/ablation_v9/configs/eval_official.json \
-  --run-id "${trained_run}_eval_s200_r700_$(date +%Y%m%d_%H%M%S)" \
-  --parallel data_parallel --gpu-ids 0 1 --eval-max-synthetic 200 --mode eval
+v9=experiments/ablation_v9
+for trained_run in p0_official_stable_20261117_130401 p1_official_stable_20261117_130401; do
+  CUDA_VISIBLE_DEVICES=0,1 python -u "$v9/run_experiment.py" \
+    --config "$v9/runs/$trained_run/config.json" \
+    --checkpoint "$v9/runs/$trained_run/checkpoints/best.pth" \
+    --eval-config "$v9/configs/eval_official.json" \
+    --run-id "${trained_run}_eval_real700_$(date +%Y%m%d_%H%M%S)" \
+    --parallel data_parallel --gpu-ids 0 1 --eval-real-only --mode eval || break
+done
 ```
+
+历史 padding 对照同时评测 200 条合成留出和全部真实序列。复用该范围时，将 `--eval-real-only` 换成 `--eval-max-synthetic 200`，并相应修改 run 名。
 
 指标写入新 run 的 `metrics/eval.json`、`per_series.csv` 及分组、分域 CSV。合成留出参与选 best，官方 F1 使用测试标签搜索阈值。NaN 保留在逐序列结果中，汇总记录有效数。
 

@@ -10,7 +10,7 @@ v9 的 P0 用作内部基线。新 P1 在 `src/models.py` 增加独立正常参�
 | 采样与并行 | batch 64、DistributedSampler、DDP、全局 mask RNG | 总 batch 32、长度分桶、单进程 DataParallel、独立 mask RNG。原 400k 本地路线另用 batch 16。 |
 | 分类 padding | 先二值化标签，padding 进入正常类 | `official` 保留该行为；`ignore` 排除分类 padding。注意力与重构两模式均排除 padding。 |
 | 验证与优化 | 含 padding 的验证损失选权重，固定 AdamW 学习率 | 各组按自身 `valid_total` 选 best。四份历史配置固定学习率，稳定配对另加裁剪、预热和余弦衰减。 |
-| 运行与评测 | 原流程脚本和官方检测协议 | 统一入口，按 run 保存快照、日志、权重及诊断。检测固定官方协议并统一报告合成留出与真实数据。 |
+| 运行与评测 | 原流程脚本和官方检测协议 | 统一入口，按 run 保存快照、日志、权重及诊断。检测固定官方协议，支持单独评测真实数据或同时评测合成留出与真实数据。 |
 
 官方编码器字节比对与对齐权重、输入、mask、RNG 的 CPU 单步检查均已有证据。对齐条件下 P0 的原两项 loss、梯度及一次 AdamW 更新逐位一致。结论适用于受控单步。来源见[官方对齐复核](audits/p1_failure_20261116/OFFICIAL_PARITY_20261117.md)和[遮挡审计](audits/patch_20261110/REPORT.md)。
 

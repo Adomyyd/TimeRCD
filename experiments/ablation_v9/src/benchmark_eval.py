@@ -212,7 +212,7 @@ def summarize(rows: list[dict]) -> dict:
 
 def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoint: Path,
                         protocol: dict, *, checkpoint_epoch: int,
-                        max_synthetic: int | None = None, max_real: int | None = None) -> dict:
+                        max_synthetic: int | None = None, max_real: int | None = None, real_only: bool = False) -> dict:
     from utils.slidingWindows import find_length_rank
 
     for limit in (max_synthetic, max_real):
@@ -228,16 +228,18 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
             handle.write(message + "\n")
 
     targets = real_targets(protocol["real_data_dir"])
-    log(f"Preparing evaluation: {len(targets)} real series; loading synthetic pickle and reproducing held-out split")
-    preparation_started = perf_counter()
-    _, held_out = load_indices(config["data"]["path"], float(config["split"]["train_ratio"]), int(config["split"]["seed"]))
-    log(f"Synthetic data and split ready in {perf_counter() - preparation_started:.3f}s")
-    if not held_out:
-        raise ValueError("Empty synthetic held-out split")
+    held_out = []
+    if not real_only:
+        log(f"Preparing evaluation: {len(targets)} real series; loading synthetic pickle and reproducing held-out split")
+        _, held_out = load_indices(config["data"]["path"], float(config["split"]["train_ratio"]), int(config["split"]["seed"]))
+        if not held_out:
+            raise ValueError("Empty synthetic held-out split")
+    elif max_synthetic is not None:
+        raise ValueError("A synthetic limit cannot be combined with real_only")
     all_synthetic_count, all_real_count = len(held_out), len(targets)
     selected_indices = held_out[:max_synthetic]
     targets = targets[:max_real]
-    full = len(selected_indices) == all_synthetic_count and len(targets) == all_real_count
+    full = not real_only and len(selected_indices) == all_synthetic_count and len(targets) == all_real_count
     write_json(metrics_dir / "synthetic_indices.json", selected_indices)
     repo = Path(__file__).resolve().parents[3]
     source_paths = ("main.py", "HP_list.py", "models/TimeRCD.py", "utils/dataset.py", "utils/slidingWindows.py",
@@ -247,7 +249,7 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
         "f1_t_n_splits": 800, "f1_t_chunk_size": 25, "seed": 2024,
     }.items())
     manifest = {
-        "protocol": protocol, "upstream_commit": UPSTREAM_COMMIT,
+        "protocol": protocol, "upstream_commit": UPSTREAM_COMMIT, "real_only": real_only,
         "metric_execution": {"backend": "persistent_spawn_cpu_worker", "workers": 1,
                              "reason": "avoid forking the inference process and full synthetic cache"},
         "official_default_parameters": official_defaults,
@@ -255,7 +257,7 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
         "source_sha256": {p: sha256(repo / p) for p in source_paths},
         "dependency_versions": {name: importlib.metadata.version(name) for name in
                                 ("torch", "numpy", "pandas", "scikit-learn", "scipy", "statsmodels", "tqdm")},
-        "synthetic_available": all_synthetic_count, "synthetic_selected": len(selected_indices),
+        "synthetic_available": None if real_only else all_synthetic_count, "synthetic_selected": len(selected_indices),
         "real_available": all_real_count, "real_selected": len(targets), "full_benchmark": full,
         "synthetic_indices_sha256": sha256(metrics_dir / "synthetic_indices.json"),
         "real_files": [{"group": group, "filename": path.name, "sha256": sha256(path)} for group, path in targets],
@@ -268,7 +270,7 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
     }
     write_json(run_dir / "evaluation_manifest.json", manifest)
     scorer = detection_model(model)
-    raw = load_data(config["data"]["path"])
+    raw = None if real_only else load_data(config["data"]["path"])
     rows: list[dict] = []
     fields = ["domain", "group", "series_id", "score_kind", "points", "anomaly_points", "sliding_window", "train_index", *METRIC_KEYS]
     score_dir = run_dir / "scores"
@@ -328,6 +330,8 @@ def evaluate_benchmarks(model: nn.Module, config: dict, run_dir: Path, checkpoin
     result = {"status": "completed", "full_benchmark": full, "protocol_id": protocol["protocol_id"],
               "official_default_parameters": official_defaults,
               "checkpoint_epoch": checkpoint_epoch, "summaries": summarize(rows)}
+    if real_only:
+        del result["summaries"]["synthetic"]
     group_rows, domain_rows = [], []
     for domain, score_summaries in result["summaries"].items():
         for score_kind, summary in score_summaries.items():

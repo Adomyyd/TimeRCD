@@ -61,6 +61,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--diagnostic-grad-threshold", type=float, default=1000.0)
     parser.add_argument("--diagnostic-start-epoch", type=int, default=1)
     parser.add_argument("--checkpoint", help="Checkpoint path for eval mode")
+    parser.add_argument("--eval-real-only", action="store_true", help="Evaluate TSB-AD-U without scoring synthetic samples")
     parser.add_argument("--eval-config", default=str(HERE / "configs" / "eval_official.json"),
                         help="Detection evaluation protocol (synthetic held-out + official TSB-AD-U)")
     parser.add_argument("--eval-max-synthetic", type=int, default=None,
@@ -72,6 +73,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gpu-ids", type=int, nargs="+", default=None,
                         help="Visible CUDA device ids for data_parallel; first id gathers outputs")
     args = parser.parse_args()
+    if args.eval_real_only and (args.mode != "eval" or args.eval_max_synthetic is not None):
+        parser.error("--eval-real-only requires eval mode and no synthetic limit")
     if args.resume_from and args.mode != "train":
         parser.error("--resume-from requires --mode train")
     if args.resume_from and not Path(args.resume_from).is_file():
@@ -299,6 +302,7 @@ def run_one(args: argparse.Namespace) -> None:
             torch.set_num_threads(protocol["cpu_threads"])
             evaluate_benchmarks(model, config.raw, run_dir, checkpoint, protocol,
                                 checkpoint_epoch=checkpoint_epoch,
+                                real_only=getattr(args, "eval_real_only", False),
                                 max_synthetic=getattr(args, "eval_max_synthetic", None),
                                 max_real=getattr(args, "eval_max_real", None))
 

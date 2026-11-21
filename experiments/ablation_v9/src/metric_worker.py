@@ -17,11 +17,10 @@ def _initialize_worker(seed: int, cpu_threads: int) -> None:
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.set_num_threads(cpu_threads)
-    # Spawn isolates the large parent, but would also make every official inner
-    # pool spawn/import dependencies again. Linux inner pools can safely fork
-    # this small CPU-only process, matching the official Linux execution path.
+    # A separate fork server avoids inheriting locks from concurrent metric threads.
     if sys.platform.startswith("linux"):
-        multiprocessing.set_start_method("fork", force=True)
+        multiprocessing.set_forkserver_preload(["evaluation.metrics"])
+        multiprocessing.set_start_method("forkserver", force=True)
 
 
 def _worker_info() -> dict:
