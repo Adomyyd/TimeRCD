@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch.utils.checkpoint import checkpoint
 from time_rcd._core.ts_encoder_bi_bias import TimeSeriesEncoder
-from torch import nn
+from .losses import NORMAL_REFERENCE_VARIANTS
 
 
 class AblationPretrainModel(nn.Module):
@@ -39,7 +39,7 @@ class AblationPretrainModel(nn.Module):
         )
         self._init_heads()
         self.normal_reference_head = None
-        if config["experiment_id"] == "p1_mask_x_normal":
+        if config["experiment_id"] in NORMAL_REFERENCE_VARIANTS:
             # Preserve P0's shared parameter initialization and CPU RNG position.
             with torch.random.fork_rng(devices=[]):
                 self.normal_reference_head = nn.Sequential(

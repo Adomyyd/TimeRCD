@@ -85,9 +85,11 @@ def test_normal_task_reaches_encoder_and_only_its_own_head(tmp_path):
     assert all(p.grad is None for p in model.anomaly_head.parameters())
 
 
-def test_new_p1_training_validation_checkpoint_and_detection(tmp_path):
+@pytest.mark.parametrize("variant", ["p1_mask_x_normal", "p2_mask_x_normal_anomaly_patch"])
+def test_reference_training_validation_checkpoint_and_detection(tmp_path, variant):
     from src.benchmark_eval import detection_model
     c = new_config(tmp_path)
+    c['experiment_id'] = variant
     c['optimization']['epochs'] = 1
     set_seed(72)
     model = build_model(c)
@@ -163,3 +165,32 @@ def test_retired_variants_cannot_silently_run_as_new_p1(tmp_path, variant):
     c['experiment_id'] = variant
     with pytest.raises(ValueError, match='Unsupported'):
         validate_config(c)
+
+
+def test_p2_averages_only_selected_points_in_anomalous_encoder_patches():
+    # Two rows with different anomaly locations, a partial final patch and a padding label.
+    y = torch.tensor([[0, 1, 0, 0, 0], [0, 0, 0, 1, 1]])
+    valid = torch.ones_like(y, dtype=torch.bool)
+    valid[1, 3] = False
+    selected = valid.clone()
+    selected[0, 1] = False
+    x = torch.zeros(2, 5, 1)
+    batch = dict(x=x, x0=x, y=y, valid=valid)
+    pred = torch.arange(1., 11.).reshape_as(x).requires_grad_()
+    output = dict(reconstruction=x, logits=torch.zeros(2, 5, 2), normal_reference=pred)
+    def loss():
+        return compute_losses(output, batch, "x", 1, 1, selected, "official", normal_reference_patch_size=2)
+    result = loss()
+    assert result["reconstruction_count"] == 8 and result["classification_count"] == 10
+    assert result["normal_reference_count"] == 2
+    assert result["normal_reference"].item() == (1 + 100) / 2
+    result["normal_reference"].backward()
+    expected_grad = torch.zeros_like(pred)
+    expected_grad[0, 0], expected_grad[1, 4] = 1, 10
+    torch.testing.assert_close(pred.grad, expected_grad)
+    y.zero_()
+    pred.grad = None
+    empty = loss()
+    assert empty["normal_reference_count"] == empty["normal_reference"].item() == 0
+    empty["normal_reference"].backward()
+    assert torch.equal(pred.grad, torch.zeros_like(pred))

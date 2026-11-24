@@ -1,6 +1,0 @@
-{
-  "pid": 1653399,
-  "time": "2026-11-17T11:03:36",
-  "command": "/home/omnisky/anaconda3/envs/time-rcd/bin/python3 -u /diskA/YYD/TimeRCD/experiments/ablation_v9/run_experiment.py --config /diskA/YYD/TimeRCD/experiments/ablation_v9/runs/p1_mask_normal_official_dp_20261115_015137/config.json --resume-from /diskA/YYD/TimeRCD/experiments/ablation_v9/runs/p1_mask_normal_official_dp_20261115_015137/checkpoints/epoch_0023.pth --run-id p1_epoch24_continue_20261116_211434 --epochs 50 --log-freq 100 --mode train --diagnostics --diagnostic-detailed --diagnostic-detail-interval 100 --diagnostic-start-epoch 24 --diagnostic-loss-threshold 1 --diagnostic-grad-threshold 1000 --diagnostic-snapshot-interval 250 --diagnostic-max-events 6 --checkpoint-keep-last 2 ",
-  "exited": true
-}

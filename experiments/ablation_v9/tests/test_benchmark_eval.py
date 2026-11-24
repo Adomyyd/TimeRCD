@@ -292,7 +292,7 @@ def test_spawn_worker_reuses_process_preserves_metrics_and_propagates_errors(pro
             assert worker.info["cuda_initialized"] is False
             assert worker.info["cpu_threads"] == protocol["cpu_threads"]
             if sys.platform.startswith("linux"):
-                assert worker.info["inner_start_method"] == "fork"
+                assert worker.info["inner_start_method"] == "forkserver"
             actual_probability = worker.compute(probability, labels, 5)
             with pytest.raises(ValueError, match="aligned"):
                 worker.compute(probability[:-1], labels, 5)

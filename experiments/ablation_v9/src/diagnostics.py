@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from .models import unwrap_model
+from .losses import normal_reference_mask, reference_patch_size
 import os
 import threading
 
@@ -234,10 +235,12 @@ class BatchDiagnostics:
             "logits": tensor_stats(output["logits"]),
             "masked_squared_error": tensor_stats(errors[mask]),
         }
+        reference_mask = None
         if "normal_reference" in output:
+            reference_mask = normal_reference_mask(batch, mask & batch["valid"], reference_patch_size(self.config))
             statistics["normal_reference_prediction"] = tensor_stats(output["normal_reference"])
             reference_errors = (output["normal_reference"].detach().cpu() - batch["x0"]).square()
-            statistics["normal_reference_masked_squared_error"] = tensor_stats(reference_errors[mask])
+            statistics["normal_reference_masked_squared_error"] = tensor_stats(reference_errors[reference_mask])
         nonfinite = (not all(math.isfinite(v) for v in loss_values.values())
                      or not math.isfinite(grad_norm)
                      or any(s["nonfinite"] for s in statistics.values()))
@@ -262,7 +265,7 @@ class BatchDiagnostics:
             detailed = (self.detail.scheduled(batch_index)
                         or self.detail.wants_event(candidate) or nonfinite)
             detail_record = self.detail.observe(
-                model, optimizer, batch, mask, output, grad_norms, detailed=detailed)
+                model, optimizer, batch, mask, output, grad_norms, reference_mask=reference_mask, detailed=detailed)
             reasons.extend(r for r in self.detail.extra_triggers
                            if (eligible or r == "nonfinite") and r not in reasons)
             nonfinite = nonfinite or "nonfinite" in reasons
@@ -275,6 +278,7 @@ class BatchDiagnostics:
             "per_sample_masked_mse": per_sample_reconstruction,
             "raw_mean": raw.mean(dim=0).tolist(), "raw_std_plus_eps": (raw.std(dim=0) + 1e-4).tolist(),
             "mask_seed": int(self.config["runtime"]["seed"]) + self.epoch * 1000003 + batch_index,
+            "normal_reference_count": losses.get("normal_reference_count", 0),
             "mask_count": int(mask.sum()), "classification_count": int(losses["classification_count"]),
             "valid_points": int(batch["valid"].sum()), "padding_points": int((~batch["valid"]).sum()),
             "tensor_stats": statistics, "gradient_l2": grad_norm,
@@ -448,7 +452,7 @@ class DetailedObserver:
             handle.remove()
         self.handles.clear()
 
-    def observe(self, model, optimizer, batch, mask, output, grad_norms, *, detailed=True):
+    def observe(self, model, optimizer, batch, mask, output, grad_norms, *, reference_mask=None, detailed=True):
         self.extra_triggers = []
         groups = {}
         for name, norm in grad_norms.items():
@@ -509,7 +513,7 @@ class DetailedObserver:
         reference_errors = (normal_pred-x0).square() if normal_pred is not None else None
         return dict(**common, hidden_moments=hidden, regions=stats, classification=cls,
                     per_sample_normal_reference_mse=[
-                        float(reference_errors[i][active[i]].mean()) if active[i].any() else None
+                        float(reference_errors[i][reference_mask[i]].mean()) if reference_mask[i].any() else None
                         for i in range(len(x))] if reference_errors is not None else None,
                     state_before=self.before_state,
                     batch_sha256={k:digest_tensor(batch[k]) for k in ("x","x0","y","valid")},

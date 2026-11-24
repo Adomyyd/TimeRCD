@@ -16,7 +16,7 @@ from .data import (
     sample_lengths,
 )
 from .evaluate import evaluate_model
-from .losses import compute_losses
+from .losses import compute_losses, reference_patch_size, NORMAL_REFERENCE_VARIANTS
 from .models import parallel_record, resolve_device, unwrap_model
 from .data import apply_input_mask, sample_patch_mask
 import copy
@@ -78,6 +78,7 @@ def run_smoke(model, config: dict) -> dict:
         mask.to(device),
         classification_padding=config["loss"].get("classification_padding", "ignore"),
         normal_reference_weight=float(config["loss"].get("normal_reference_weight", 0)),
+        normal_reference_patch_size=reference_patch_size(config),
     )
     losses["total"].backward()
     return {
@@ -152,7 +153,7 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     log_path = run_dir / "train.log"
     log_freq = int(config["optimization"]["log_freq"])
-    has_normal_reference = config["experiment_id"] == "p1_mask_x_normal"
+    has_normal_reference = config["experiment_id"] in NORMAL_REFERENCE_VARIANTS
     normal_weight_log = (
         f"normal_reference={config['loss']['normal_reference_weight']}, "
         if has_normal_reference else ""
@@ -253,6 +254,7 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
                 mask.to(device),
                 classification_padding=config["loss"].get("classification_padding", "ignore"),
                 normal_reference_weight=float(config["loss"].get("normal_reference_weight", 0)),
+                normal_reference_patch_size=reference_patch_size(config),
             )
             losses["total"].backward()
             optimization_record, raw_norms = control.inspect(unwrap_model(model), losses["total"])
@@ -344,7 +346,7 @@ def train_model(model, config: dict, run_dir: Path, *, resume_from: Path | None 
             "validation": validation,
             "config": config,
         }
-        if (config["experiment_id"] == "p1_mask_x_normal"
+        if (config["experiment_id"] in NORMAL_REFERENCE_VARIANTS
                 or config.get("diagnostics", {}).get("enabled", False) or resume_from is not None or control.enabled):
             checkpoint["training_state"] = checkpoint_training_state(
                 epoch, validation_loss, best_loss, best_epoch, stale)
@@ -440,6 +442,7 @@ def benchmark(model, config: dict, run_dir: Path, max_batches: int, warmup: int 
             mask.to(device),
             classification_padding=config["loss"].get("classification_padding", "ignore"),
             normal_reference_weight=float(config["loss"].get("normal_reference_weight", 0)),
+            normal_reference_patch_size=reference_patch_size(config),
         )
         losses["total"].backward()
         optimization_record, _ = control.inspect(unwrap_model(model), losses["total"])

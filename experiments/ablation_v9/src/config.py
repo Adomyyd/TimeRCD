@@ -5,12 +5,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from .models import validate_parallel_config
-from .losses import validate_classification_padding
+from .losses import NORMAL_REFERENCE_VARIANTS, reference_patch_size, validate_classification_padding
 from .data import file_manifest
 from .models import build_model
 
 
-VARIANTS = {"p0_mask_x", "p1_mask_x_normal"}
+VARIANTS = {"p0_mask_x"} | NORMAL_REFERENCE_VARIANTS
 BATCH_SAMPLERS = {"sequential", "length_bucket"}
 
 
@@ -69,10 +69,7 @@ def validate_config(raw: dict[str, Any]) -> None:
     if experiment_id not in VARIANTS:
         raise ValueError(f"Unsupported experiment_id: {experiment_id}")
     input_cfg = raw["input"]
-    expected = {
-        "p0_mask_x": {"input_mode": "masked_x", "target": "x"},
-        "p1_mask_x_normal": {"input_mode": "masked_x", "target": "x"},
-    }[experiment_id]
+    expected = {"input_mode": "masked_x", "target": "x"}
     for key, value in expected.items():
         if input_cfg.get(key) != value:
             raise ValueError(f"{experiment_id}: input.{key} must be {value!r}")
@@ -92,8 +89,8 @@ def validate_config(raw: dict[str, Any]) -> None:
     weights = [float(raw["loss"][key]) for key in ("reconstruction_weight", "classification_weight")] + [normal_weight]
     if not all(math.isfinite(w) and w >= 0 for w in weights):
         raise ValueError("loss weights must be finite and non-negative")
-    if experiment_id == "p1_mask_x_normal" and normal_weight <= 0:
-        raise ValueError("P1 requires positive loss.normal_reference_weight")
+    if experiment_id in NORMAL_REFERENCE_VARIANTS and normal_weight <= 0:
+        raise ValueError(f"{experiment_id} requires positive loss.normal_reference_weight")
     if experiment_id == "p0_mask_x" and normal_weight != 0:
         raise ValueError("P0 has no normal reference head")
     validate_classification_padding(raw["loss"].get("classification_padding", "ignore"))
@@ -176,6 +173,7 @@ def run_audit(config: ExperimentConfig) -> dict:
         "protocol_checks": {
             "input_mode": config.raw["input"]["input_mode"],
             "target": config.raw["input"]["target"],
+            "normal_reference_anomaly_patch_size": reference_patch_size(config.raw),
             "normal_reference_target": "x0" if model.normal_reference_head is not None else None,
             "normal_reference_weight": float(config.raw["loss"].get("normal_reference_weight", 0)),
             "encoder_patch_size": model.encoder.patch_size,

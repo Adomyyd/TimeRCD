@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from .data import PairedTimeSeriesDataset, collate_samples
-from .losses import classification_ce, compute_losses
+from .losses import classification_ce, compute_losses, reference_patch_size, NORMAL_REFERENCE_VARIANTS
 from .data import apply_input_mask, sample_patch_mask
 
 
@@ -72,6 +72,7 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
                 mask.to(device),
                 classification_padding=config["loss"].get("classification_padding", "ignore"),
                 normal_reference_weight=float(config["loss"].get("normal_reference_weight", 0)),
+                normal_reference_patch_size=reference_patch_size(config),
             )
             sums["total"] += float(losses["total"])
             sums["reconstruction"] += float(losses["reconstruction"])
@@ -178,7 +179,7 @@ def evaluate_model(model, config: dict, dataset_path: str, indices: list[int]) -
         "classification_f1": f1,
         **counts,
     }
-    if config["experiment_id"] == "p1_mask_x_normal":
+    if config["experiment_id"] in NORMAL_REFERENCE_VARIANTS:
         result["normal_reference"] = sums["normal_reference"] / max(1, counts["batches"])
         for region in ("selected_normal", "selected_anomalous", "full_normal", "full_anomalous"):
             result["normal_reference_" + region] = reference_sums[region] / max(1, counts[region + "_points"])

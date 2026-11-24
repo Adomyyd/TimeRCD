@@ -13,4 +13,4 @@
 
 首跑中断后从 epoch 10 恢复，于 2026-11-10 停于 epoch 12/batch 2100。epoch 11 平均总 loss 155.5050、重构 155.4366、分类 0.0685、验证总 loss 0.0948。日志间隔未捕捉具体异常批次，根因未定。按保存逻辑，latest 为 epoch 11，best 为本次续训的 epoch 10。见[停止报告](audits/stop_20261110/REPORT.md)。
 
-`data/`、`runs/time_rcd_400k_20261108/` 分别保留数据和运行资产。旧 `migrations/` 及一次性停止脚本已归档，见[归档索引](../_archive/20261110_cleanup/README.md)。本路线 `compare` 与 v9 合成加真实的统一评测是两个入口，详见 [v9 运行说明](../ablation_v9/RUNTIME_NOTES.md)。
+`data/`、`runs/time_rcd_400k_20261108/` 分别保留数据和运行资产。旧 `migrations/` 及一次性停止脚本已归档，原 `20261110_cleanup/` 目录已打包为 `experiments/_archive/20261110_cleanup.tar.gz`，见[归档说明](../_archive/README.md)。本路线 `compare` 与 v9 合成加真实的统一评测是两个入口，详见 [v9 运行说明](../ablation_v9/RUNTIME_NOTES.md)。

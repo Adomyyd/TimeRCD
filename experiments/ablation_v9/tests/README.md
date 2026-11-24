@@ -20,7 +20,7 @@ python experiments/ablation_v9/tests/run_checks.py
 
 `conftest.py` 设置导入路径；`run_checks.py` 仅启动此测试套件。
 
-测试依赖的三处历史源码见 `../audits/README.md`，迁移时须一并保留。`test_loss_contract.py` 和 `test_sampling_contract.py` 已于2026-11-16合并去重，覆盖映射见 `../audits/cleanup_20261116.json`。退役 P1/P2 名称的拒绝测试仍有用，用于防止旧配置被误用。
+测试依赖的三处历史源码见 `../audits/README.md`，迁移时须一并保留。`test_loss_contract.py` 和 `test_sampling_contract.py` 已于 2026-11-16 合并去重，覆盖映射见归档包 `experiments/_archive/audits_history_20261110_20261121.tar.gz` 内的 `cleanup_20261116.json`。退役 P1/P2 名称的拒绝测试仍有用，用于防止旧配置被误用。
 
 ## 优化控制回归（2026-11-17）
 

@@ -1,0 +1,806 @@
+{
+  "timestamp_utc": "2026-11-24T14:52:04Z",
+  "bytes_before": 93511460189,
+  "caches_removed": [
+    {
+      "path": ".pytest_cache",
+      "bytes": 19886
+    },
+    {
+      "path": "__pycache__",
+      "bytes": 41709
+    },
+    {
+      "path": "dataset_gen/src/__pycache__",
+      "bytes": 95827
+    },
+    {
+      "path": "evaluation/__pycache__",
+      "bytes": 58562
+    },
+    {
+      "path": "evaluation/affiliation/__pycache__",
+      "bytes": 31209
+    },
+    {
+      "path": "experiments/ablation_v9/__pycache__",
+      "bytes": 13181
+    },
+    {
+      "path": "experiments/ablation_v9/src/__pycache__",
+      "bytes": 143202
+    },
+    {
+      "path": "experiments/ablation_v9/tests/__pycache__",
+      "bytes": 180041
+    },
+    {
+      "path": "models/__pycache__",
+      "bytes": 15155
+    },
+    {
+      "path": "time_rcd/__pycache__",
+      "bytes": 11769
+    },
+    {
+      "path": "time_rcd/_core/__pycache__",
+      "bytes": 27402
+    },
+    {
+      "path": "utils/__pycache__",
+      "bytes": 11279
+    }
+  ],
+  "tmp_removed": [
+    "/tmp/pytest-of-omnisky",
+    "/tmp/torchinductor_omnisky",
+    "/tmp/pymp-00kq83t5",
+    "/tmp/pymp-045kxr0m",
+    "/tmp/pymp-0sgcb00t",
+    "/tmp/pymp-217ch7yj",
+    "/tmp/pymp-29yuzlb4",
+    "/tmp/pymp-2_re960t",
+    "/tmp/pymp-2b2ag6gi",
+    "/tmp/pymp-2g2zn6vg",
+    "/tmp/pymp-2gyphxuo",
+    "/tmp/pymp-2z0h_p2x",
+    "/tmp/pymp-33hyf3i4",
+    "/tmp/pymp-37itb829",
+    "/tmp/pymp-3ag4ssas",
+    "/tmp/pymp-4eoxan_o",
+    "/tmp/pymp-59z37mxm",
+    "/tmp/pymp-5i2gg9u5",
+    "/tmp/pymp-5j8zdnbo",
+    "/tmp/pymp-5lgv5luq",
+    "/tmp/pymp-5uc15ynl",
+    "/tmp/pymp-5wl2d3hj",
+    "/tmp/pymp-62r40e4y",
+    "/tmp/pymp-64sr2l5r",
+    "/tmp/pymp-66_ay_6k",
+    "/tmp/pymp-6c7rj536",
+    "/tmp/pymp-6gem5z3l",
+    "/tmp/pymp-74inyxjn",
+    "/tmp/pymp-799jf09h",
+    "/tmp/pymp-7__lj15x",
+    "/tmp/pymp-815ixbay",
+    "/tmp/pymp-81yzeyr7",
+    "/tmp/pymp-83u7oc42",
+    "/tmp/pymp-8wld54yh",
+    "/tmp/pymp-98nnns9q",
+    "/tmp/pymp-9avpip2l",
+    "/tmp/pymp-9bptq83u",
+    "/tmp/pymp-9dhj5q_r",
+    "/tmp/pymp-9emcqnay",
+    "/tmp/pymp-_27wycr1",
+    "/tmp/pymp-_kybs0mx",
+    "/tmp/pymp-_nh3kzr0",
+    "/tmp/pymp-_npkl56i",
+    "/tmp/pymp-_skopywe",
+    "/tmp/pymp-a8dym7kn",
+    "/tmp/pymp-adnz1qxx",
+    "/tmp/pymp-agl7fm3q",
+    "/tmp/pymp-ak9rohx3",
+    "/tmp/pymp-aptqkn4d",
+    "/tmp/pymp-aqu_64ny",
+    "/tmp/pymp-b0y4gqwv",
+    "/tmp/pymp-bgyw0tgn",
+    "/tmp/pymp-bvomoyep",
+    "/tmp/pymp-c76im395",
+    "/tmp/pymp-csnk_2_u",
+    "/tmp/pymp-dkhdovxg",
+    "/tmp/pymp-do7p5spy",
+    "/tmp/pymp-dr3f0g7x",
+    "/tmp/pymp-e5etrqx_",
+    "/tmp/pymp-eyqi880k",
+    "/tmp/pymp-f4ee_t4i",
+    "/tmp/pymp-f85thct1",
+    "/tmp/pymp-fg6mu_m2",
+    "/tmp/pymp-gkd1o4jj",
+    "/tmp/pymp-gzene3l4",
+    "/tmp/pymp-h60esre9",
+    "/tmp/pymp-hacipmf3",
+    "/tmp/pymp-hdjojb7s",
+    "/tmp/pymp-hoa8hfor",
+    "/tmp/pymp-i4o91cm9",
+    "/tmp/pymp-i4xl09eb",
+    "/tmp/pymp-i8bheo9x",
+    "/tmp/pymp-ilfdcqdk",
+    "/tmp/pymp-iu7x4x3p",
+    "/tmp/pymp-j9vt1i0m",
+    "/tmp/pymp-jbmjb9rd",
+    "/tmp/pymp-jhgn8630",
+    "/tmp/pymp-kd33u0n9",
+    "/tmp/pymp-ke2nemng",
+    "/tmp/pymp-kft1tb81",
+    "/tmp/pymp-kipnleio",
+    "/tmp/pymp-knz2436m",
+    "/tmp/pymp-l0fkjei3",
+    "/tmp/pymp-l8u4u_o2",
+    "/tmp/pymp-la_6_pvd",
+    "/tmp/pymp-lmrc1yrw",
+    "/tmp/pymp-lqpli51v",
+    "/tmp/pymp-lvipxyq9",
+    "/tmp/pymp-lx987qzm",
+    "/tmp/pymp-m5q0eufa",
+    "/tmp/pymp-mfqefse7",
+    "/tmp/pymp-mj88oql0",
+    "/tmp/pymp-mkvebitt",
+    "/tmp/pymp-mxigpojq",
+    "/tmp/pymp-n1wv9fz5",
+    "/tmp/pymp-n8eb98je",
+    "/tmp/pymp-nec5uw1a",
+    "/tmp/pymp-nfu4ko1t",
+    "/tmp/pymp-njn8lbzo",
+    "/tmp/pymp-njrnvrnt",
+    "/tmp/pymp-nue_cdpe",
+    "/tmp/pymp-o97kf1o8",
+    "/tmp/pymp-oj1oebcp",
+    "/tmp/pymp-ojofdlsg",
+    "/tmp/pymp-omxpfk1c",
+    "/tmp/pymp-omzok1li",
+    "/tmp/pymp-on2boit7",
+    "/tmp/pymp-pajil86c",
+    "/tmp/pymp-przuvreh",
+    "/tmp/pymp-q484lxcx",
+    "/tmp/pymp-q_1knb4a",
+    "/tmp/pymp-qd2_07mo",
+    "/tmp/pymp-qi6dmqrb",
+    "/tmp/pymp-qnm4vehg",
+    "/tmp/pymp-qp_dqxli",
+    "/tmp/pymp-razt3492",
+    "/tmp/pymp-rkevzice",
+    "/tmp/pymp-rnk0wu0y",
+    "/tmp/pymp-rrdzedh6",
+    "/tmp/pymp-ruchfoww",
+    "/tmp/pymp-s11e_t8u",
+    "/tmp/pymp-s8mocfu5",
+    "/tmp/pymp-se6n3h27",
+    "/tmp/pymp-sgi7vw_v",
+    "/tmp/pymp-syxr6fsn",
+    "/tmp/pymp-taf8vzz3",
+    "/tmp/pymp-tg7ft1oi",
+    "/tmp/pymp-tlynx3oa",
+    "/tmp/pymp-u1b021im",
+    "/tmp/pymp-uez5nueu",
+    "/tmp/pymp-ug_3d5p2",
+    "/tmp/pymp-uk2r0sh7",
+    "/tmp/pymp-unujup14",
+    "/tmp/pymp-v41ezeg_",
+    "/tmp/pymp-vhbek446",
+    "/tmp/pymp-vx4vqz39",
+    "/tmp/pymp-w0wtux__",
+    "/tmp/pymp-w76pgi8c",
+    "/tmp/pymp-wdtn7x8u",
+    "/tmp/pymp-wendaveo",
+    "/tmp/pymp-wn3wmnei",
+    "/tmp/pymp-wnei12xu",
+    "/tmp/pymp-wtsfmap8",
+    "/tmp/pymp-x16oj9b8",
+    "/tmp/pymp-xsv4_67h",
+    "/tmp/pymp-y73y0der",
+    "/tmp/pymp-yb2ski4o",
+    "/tmp/pymp-yjisrfgh",
+    "/tmp/pymp-ym5yk8l8",
+    "/tmp/pymp-yqw3rq46",
+    "/tmp/pymp-z7l1t4ia"
+  ],
+  "gzipped_logs": [
+    {
+      "path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/diagnostics/batches.jsonl",
+      "gz_path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/diagnostics/batches.jsonl.gz",
+      "bytes_before": 4583045353,
+      "bytes_after": 879760191,
+      "sha256_uncompressed": "87ab1e9455a8bea2f4e932f80f4d235072eb90e7328f1da3c8050d74ee10c67f",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/diagnostics/updates.jsonl",
+      "gz_path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/diagnostics/updates.jsonl.gz",
+      "bytes_before": 150813121,
+      "bytes_after": 14091506,
+      "sha256_uncompressed": "6bb67d4b4077c05dc4a16d505f16d6aa5219ced1780a3e24e8dffdb8b82b931f",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/optimization.jsonl",
+      "gz_path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/optimization.jsonl.gz",
+      "bytes_before": 99833513,
+      "bytes_after": 9657309,
+      "sha256_uncompressed": "0050a7345f4174fdd6c42f6262d846b02b3ae145123f5e732af3d6aee26eeb75",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/batches.jsonl",
+      "gz_path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/batches.jsonl.gz",
+      "bytes_before": 5564086929,
+      "bytes_after": 1080979794,
+      "sha256_uncompressed": "c2c6f2874a13b0554c071f0d92e77eb5c6e73524cb6b03eb307974c1d2906995",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/updates.jsonl",
+      "gz_path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/updates.jsonl.gz",
+      "bytes_before": 174382135,
+      "bytes_after": 16586229,
+      "sha256_uncompressed": "753317b06f924cee6360f93f09fd848ef17f8a13dfa7bd4584cc1791d40f7987",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/optimization.jsonl",
+      "gz_path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/optimization.jsonl.gz",
+      "bytes_before": 114512805,
+      "bytes_after": 11112541,
+      "sha256_uncompressed": "3775d7a82d1d719b57c432774f487c375d3522dab75ac0b60d831aa3be1220ed",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p2_official_stable_20261121_2320/optimization.jsonl",
+      "gz_path": "experiments/ablation_v9/runs/p2_official_stable_20261121_2320/optimization.jsonl.gz",
+      "bytes_before": 151353291,
+      "bytes_after": 15087294,
+      "sha256_uncompressed": "705853dc1ac34c3769f8ba07967d1c5454cd20e54a7ce1c90c305c642fc5d335",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/audits/context_ablation_20261121/real_rows.json",
+      "gz_path": "experiments/ablation_v9/audits/context_ablation_20261121/real_rows.json.gz",
+      "bytes_before": 1919852,
+      "bytes_after": 311020,
+      "sha256_uncompressed": "0b8031376309bd4d4b13a75aeeb34d184c420314928006dbd2834c90727ae20a",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/audits/context_ablation_20261121/synthetic_rows.json",
+      "gz_path": "experiments/ablation_v9/audits/context_ablation_20261121/synthetic_rows.json.gz",
+      "bytes_before": 1287515,
+      "bytes_after": 247836,
+      "sha256_uncompressed": "35067a5e99a3d4ef5dc8911f96ab04a47e0d1b6b7942734d58db29ef5b9bcff0",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/audits/frozen_classifier_20261121/real_rows.json",
+      "gz_path": "experiments/ablation_v9/audits/frozen_classifier_20261121/real_rows.json.gz",
+      "bytes_before": 1199277,
+      "bytes_after": 140669,
+      "sha256_uncompressed": "ae4fe6ed61fcbd3099234b815e5bf463bd9ec5126e23a9b77813981f9b3fd7d8",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/audits/frozen_classifier_20261121/synthetic_rows.json",
+      "gz_path": "experiments/ablation_v9/audits/frozen_classifier_20261121/synthetic_rows.json.gz",
+      "bytes_before": 712473,
+      "bytes_after": 85503,
+      "sha256_uncompressed": "7f265a56f950292f081d083875d67097dfc7edb47d260ee9f3ba030d5dc9d1b9",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/audits/frozen_classifier_20261121/platform_rows.json",
+      "gz_path": "experiments/ablation_v9/audits/frozen_classifier_20261121/platform_rows.json.gz",
+      "bytes_before": 524902,
+      "bytes_after": 26862,
+      "sha256_uncompressed": "92515258ae40d8b6b20f36c380a3beee2b8d725c7087d9335754173a907a947b",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/audits/residual_readout_20261121/real_rows.json",
+      "gz_path": "experiments/ablation_v9/audits/residual_readout_20261121/real_rows.json.gz",
+      "bytes_before": 773637,
+      "bytes_after": 174290,
+      "sha256_uncompressed": "a012c87d07956afa500bfc69418a993c389823e8a6fc748f322cffbeef66999a",
+      "status": "compressed_verified"
+    },
+    {
+      "path": "experiments/ablation_v9/audits/residual_readout_20261121/synthetic_rows.json",
+      "gz_path": "experiments/ablation_v9/audits/residual_readout_20261121/synthetic_rows.json.gz",
+      "bytes_before": 71765,
+      "bytes_after": 15560,
+      "sha256_uncompressed": "7a36a9b2bb60145ead14f459fe6bb03df2c78a5f3419277011dfccf1a2673e57",
+      "status": "compressed_verified"
+    }
+  ],
+  "deleted_snapshots": [
+    {
+      "path": "experiments/ablation_v9/runs/p2_official_stable_20261121_2320/checkpoints/epoch_0039.pth",
+      "bytes": 460610258
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/diagnostics/rolling_0.pth",
+      "bytes": 863106106
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/diagnostics/rolling_0.json",
+      "bytes": 69
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/diagnostics/rolling_1.pth",
+      "bytes": 709635322
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401/diagnostics/rolling_1.json",
+      "bytes": 69
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/rolling_0.pth",
+      "bytes": 733890874
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/rolling_0.json",
+      "bytes": 69
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/rolling_1.pth",
+      "bytes": 776245370
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/rolling_1.json",
+      "bytes": 69
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/first_event.pth",
+      "bytes": 692761454
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/first_event_post.pth",
+      "bytes": 460599714
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/first_event_previous.pth",
+      "bytes": 714339002
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_001.pth",
+      "bytes": 701531834
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_001_post.pth",
+      "bytes": 460598770
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_001_previous.pth",
+      "bytes": 713487098
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_002.pth",
+      "bytes": 918485562
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_002_post.pth",
+      "bytes": 460598770
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_002_previous.pth",
+      "bytes": 830497466
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_003.pth",
+      "bytes": 722013114
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_003_post.pth",
+      "bytes": 460598770
+    },
+    {
+      "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/diagnostics/event_003_previous.pth",
+      "bytes": 722018490
+    }
+  ],
+  "retired_runs": [
+    {
+      "run": "p1_mask_normal_official_dp_20261115_015137",
+      "bytes_freed": 1843373994
+    },
+    {
+      "run": "p1_epoch24_continue_20261116_211434",
+      "bytes_freed": 16724407630
+    }
+  ],
+  "archives_created": [
+    {
+      "archive": "experiments/_archive/retired_p1_fixedlr_meta_20261124.tar.gz",
+      "files_archived": 33,
+      "raw_bytes": 1394552,
+      "archive_bytes": 252130,
+      "sha256": "76286cbf04a9cafba0a88b3c76d48df494d5ea1fda5133cf21ce792a02d58011"
+    },
+    {
+      "archive": "experiments/_archive/20261110_cleanup.tar.gz",
+      "files_archived": 47,
+      "raw_bytes": 360273,
+      "archive_bytes": 123808,
+      "sha256": "946153947aa59f8a82487b6695b7a574994c8d1cbfd7eadaaca008d44d76b63a"
+    },
+    {
+      "archive": "experiments/_archive/audits_history_20261110_20261121.tar.gz",
+      "files_archived": 177,
+      "raw_bytes": 9017665,
+      "archive_bytes": 5025833,
+      "sha256": "8cd68c4389e84edf85bbf7638ed6465d4e4a604302f177f1a75428423126f49d"
+    }
+  ],
+  "consolidated_removed": [
+    {
+      "path": "experiments/_archive/20261110_cleanup",
+      "bytes": 360273
+    },
+    {
+      "path": "experiments/ablation_v9/audits/CLEANUP_20261116.md",
+      "bytes": 2486
+    },
+    {
+      "path": "experiments/ablation_v9/audits/CLEANUP_20261121.md",
+      "bytes": 1689
+    },
+    {
+      "path": "experiments/ablation_v9/audits/RUN_CLEANUP_PROPOSAL.md",
+      "bytes": 2199
+    },
+    {
+      "path": "experiments/ablation_v9/audits/cleanup_20261116.json",
+      "bytes": 9015
+    },
+    {
+      "path": "experiments/ablation_v9/audits/cleanup_20261121.json",
+      "bytes": 2162
+    },
+    {
+      "path": "experiments/ablation_v9/audits/cleanup_20261121.py",
+      "bytes": 4892
+    },
+    {
+      "path": "experiments/ablation_v9/audits/run_cleanup_execution_20261116.json",
+      "bytes": 494137
+    },
+    {
+      "path": "experiments/ablation_v9/audits/run_cleanup_proposal_20261116.json",
+      "bytes": 23601
+    },
+    {
+      "path": "experiments/ablation_v9/audits/run_cleanup_proposal_checkpoint_checks_20261116.json",
+      "bytes": 2112
+    },
+    {
+      "path": "experiments/ablation_v9/audits/bench_20261111",
+      "bytes": 2160
+    },
+    {
+      "path": "experiments/ablation_v9/audits/bucket_review_20261111",
+      "bytes": 5239
+    },
+    {
+      "path": "experiments/ablation_v9/audits/docs_review_20261111",
+      "bytes": 349177
+    },
+    {
+      "path": "experiments/ablation_v9/audits/padding_20261110",
+      "bytes": 74491
+    },
+    {
+      "path": "experiments/ablation_v9/audits/parallel_20261110",
+      "bytes": 49121
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261114",
+      "bytes": 2448178
+    },
+    {
+      "path": "experiments/ablation_v9/audits/spike_20261114",
+      "bytes": 98404
+    },
+    {
+      "path": "experiments/ablation_v9/audits/p1_20261115",
+      "bytes": 464081
+    },
+    {
+      "path": "experiments/ablation_v9/audits/p1_failure_20261116",
+      "bytes": 2786476
+    },
+    {
+      "path": "experiments/ablation_v9/audits/patch_20261110/REPORT.md",
+      "bytes": 7679
+    },
+    {
+      "path": "experiments/ablation_v9/audits/patch_20261110/pytest_local.xml",
+      "bytes": 3416
+    },
+    {
+      "path": "experiments/ablation_v9/audits/patch_20261110/source_manifest.json",
+      "bytes": 1904
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261112/CODE_REVIEW.md",
+      "bytes": 9307
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261112/REPORT.md",
+      "bytes": 5171
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261112/cleanup_cpu_tests.txt",
+      "bytes": 191
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261112/cleanup_execution.json",
+      "bytes": 10776
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261112/cleanup_proposal.diff",
+      "bytes": 731
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261112/cleanup_proposal.json",
+      "bytes": 3045
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261112/final_review_checks.json",
+      "bytes": 7282
+    },
+    {
+      "path": "experiments/ablation_v9/audits/eval_20261112/verification.json",
+      "bytes": 3254
+    },
+    {
+      "path": "experiments/ablation_v9/audits/spike_20261111/CHECKPOINT_RETENTION_20261114.md",
+      "bytes": 4755
+    },
+    {
+      "path": "experiments/ablation_v9/audits/spike_20261111/REPORT.md",
+      "bytes": 4986
+    },
+    {
+      "path": "experiments/ablation_v9/audits/spike_20261111/checkpoint_cleanup_20261114.json",
+      "bytes": 13528
+    },
+    {
+      "path": "experiments/ablation_v9/audits/spike_20261111/checkpoint_retention_20261114.json",
+      "bytes": 29748
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/compare_eval_20261120.py",
+      "bytes": 6849
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/config_recheck.log",
+      "bytes": 181
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/consolidated_tests.log",
+      "bytes": 2013
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/consolidated_tests_result.json",
+      "bytes": 17
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/eval_pair_20261120.py",
+      "bytes": 1239
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/fullsize_smoke.json",
+      "bytes": 1260
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/launch.json",
+      "bytes": 4345
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/launch_sources.zip",
+      "bytes": 59255
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/log_display_checks.json",
+      "bytes": 259
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/p0_official_stable_20261117_130401_eval_20261120_s200_r700.log",
+      "bytes": 308773
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/p0_official_stable_20261117_130401_eval_real700_20261121.log.gz",
+      "bytes": 811158
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/p1_official_stable_20261117_130401_eval_real700_20261121.log.gz",
+      "bytes": 852307
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/probe_31454.log",
+      "bytes": 23108
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/probe_31454.py",
+      "bytes": 1834
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/queue_status.txt",
+      "bytes": 10
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/real700_health.jsonl",
+      "bytes": 3668
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/real700_pair.py",
+      "bytes": 4565
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/restart_cleanup.json",
+      "bytes": 821
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/source.sha256",
+      "bytes": 2714
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/source_check_p0.log",
+      "bytes": 1438
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/source_check_p1.log",
+      "bytes": 1438
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/startup_verification.json",
+      "bytes": 1343
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/structure_mapping.json",
+      "bytes": 2369
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/structure_recheck.log",
+      "bytes": 115
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/tests.log",
+      "bytes": 1176
+    },
+    {
+      "path": "experiments/ablation_v9/audits/stability_20261117/tests_result.json",
+      "bytes": 17
+    }
+  ],
+  "bytes_after": 52481919198,
+  "bytes_freed": 38789665128,
+  "elapsed_seconds": 237.55,
+  "phase2_20261124": {
+    "timestamp_utc": "2026-11-24T15:10:10Z",
+    "caches_removed": [
+      {
+        "path": ".pytest_cache",
+        "bytes": 15302
+      },
+      {
+        "path": "time_rcd/__pycache__",
+        "bytes": 7295
+      },
+      {
+        "path": "time_rcd/_core/__pycache__",
+        "bytes": 12138
+      },
+      {
+        "path": "experiments/ablation_v9/__pycache__",
+        "bytes": 13181
+      },
+      {
+        "path": "experiments/ablation_v9/audits/eval_20261112/sources/__pycache__",
+        "bytes": 50459
+      },
+      {
+        "path": "experiments/ablation_v9/audits/patch_20261110/sources/__pycache__",
+        "bytes": 2920
+      },
+      {
+        "path": "experiments/ablation_v9/audits/spike_20261111/sources_cleanup_20261114/experiments/ablation_v9/src/__pycache__",
+        "bytes": 12315
+      },
+      {
+        "path": "experiments/ablation_v9/tests/__pycache__",
+        "bytes": 180041
+      },
+      {
+        "path": "experiments/ablation_v9/src/__pycache__",
+        "bytes": 109829
+      },
+      {
+        "path": "utils/__pycache__",
+        "bytes": 11279
+      },
+      {
+        "path": "evaluation/__pycache__",
+        "bytes": 58562
+      },
+      {
+        "path": "evaluation/affiliation/__pycache__",
+        "bytes": 31209
+      }
+    ],
+    "intermediate_checkpoints_removed": [
+      {
+        "path": "experiments/ablation_v9/runs/p0_official_dp_20261111_003608/checkpoints/epoch_0000.pth",
+        "bytes": 444822519,
+        "kept": [
+          "best.pth",
+          "epoch_0038.pth"
+        ],
+        "best_epoch": 31
+      },
+      {
+        "path": "experiments/ablation_v9/runs/p0_official_dp_20261111_003608/checkpoints/epoch_0016.pth",
+        "bytes": 444822519,
+        "kept": [
+          "best.pth",
+          "epoch_0038.pth"
+        ],
+        "best_epoch": 31
+      },
+      {
+        "path": "experiments/ablation_v9/runs/p0_ignore_dp_20261112_170107/checkpoints/epoch_0001.pth",
+        "bytes": 444822519,
+        "kept": [
+          "best.pth",
+          "epoch_0033.pth"
+        ],
+        "best_epoch": 26
+      },
+      {
+        "path": "experiments/ablation_v9/runs/p0_ignore_dp_20261112_170107/checkpoints/epoch_0030.pth",
+        "bytes": 444822519,
+        "kept": [
+          "best.pth",
+          "epoch_0033.pth"
+        ],
+        "best_epoch": 26
+      },
+      {
+        "path": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401/checkpoints/epoch_0000.pth",
+        "bytes": 460610578,
+        "kept": [
+          "best.pth",
+          "epoch_0030.pth"
+        ],
+        "best_epoch": 23
+      }
+    ],
+    "bytes_before": 54721795061,
+    "bytes_after": 52481919198,
+    "bytes_freed": 2239875863,
+    "elapsed_seconds": 0.3
+  },
+  "bytes_freed_total": 41049321751,
+  "phase1_bytes_after": 54721795061,
+  "phase3_20261124": {
+    "timestamp_utc": "2026-11-24T15:33:30Z",
+    "caches_removed_count": 12,
+    "caches_removed_bytes": 504396,
+    "tmp_removed": [
+      {
+        "path": "/tmp/pytest-of-omnisky",
+        "bytes": 8174709721
+      }
+    ],
+    "local_temp_removed": [
+      "%LOCALAPPDATA%\\Temp\\timercd_docs (38 files, 221302 B)"
+    ],
+    "bytes_after": 52462138438
+  }
+}
