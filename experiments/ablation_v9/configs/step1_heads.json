@@ -1,0 +1,9 @@
+{
+  "reference_probe": "experiments/ablation_v9/audits/frozen_classifier_20261121",
+  "p1_baseline": "experiments/ablation_v9/runs/p1_official_stable_20261117_130401_eval_real700_20261121",
+  "p0_baseline": "experiments/ablation_v9/runs/p0_official_stable_20261117_130401_eval_real700_20261121",
+  "epochs": 2, "learning_rate": 0.00005, "weight_decay": 0.00001,
+  "batch_windows": 32, "microbatch": 4,
+  "selection": "minimum valid-point CE on original synthetic validation split; first epoch wins ties",
+  "p2_real_evaluation": "unconditional diagnostic; all three seeds; sequence-paired bootstrap; UCR preselected"
+}

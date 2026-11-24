@@ -97,3 +97,7 @@ CUDA_VISIBLE_DEVICES=0,1 python -u experiments/ablation_v9/run_experiment.py \
 `--epochs` 是总上限，稳定版恢复原调度位置。当前 run 只保留 best 与末轮检查点，示例用末轮 `epoch_0030.pth`。训练输出、开关细节和 `bench` 等模式见[运行说明](RUNTIME_NOTES.md)。
 
 历史审计正文集中在 `experiments/_archive/audits_history_20261110_20261121.tar.gz`，按包内同名路径引用；当前保留的证据见[审计索引](audits/README.md)。
+
+### 冻结编码器实验（2026-11-25）
+
+`probe-p2` 沿用已有探针头的三个种子、2048 条训练样本与 512 条合成留出，固定评测真实 700 条，报告 P2 相对 P0/P1 的配对 AP 及 UCR 分项。`finetune-head` 仅更新 P1 原分类头，用原 95/5 合成划分、完整输入训练两轮，按验证交叉熵选轮，再独立执行一次正式 `eval --eval-real-only`。设置见 [step1_heads.json](configs/step1_heads.json)。从仓库根目录在空闲设备上运行 `bash experiments/ablation_v9/audits/p2_frozen_classifier_20261125/queue.sh`；三个 run 使用固定名称，不覆盖已有结果。进度见各 run 的 `status.json`，阶段日志与队列脚本同目录。

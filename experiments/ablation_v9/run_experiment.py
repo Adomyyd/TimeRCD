@@ -31,7 +31,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run TimeRCD v9 ablation experiments")
     parser.add_argument("--config", required=True, help="Path to a JSON experiment config")
     parser.add_argument("--run-id", required=True, help="Unique output directory name")
-    parser.add_argument("--mode", choices=["audit", "smoke", "bench", "train", "eval", "report", "all"], required=True)
+    parser.add_argument("--mode", choices=["audit", "smoke", "bench", "train", "eval", "report", "all", "probe-p2", "finetune-head"], required=True)
+    parser.add_argument("--head-plan", help="Frozen-encoder experiment settings (JSON)")
     parser.add_argument("--max-batches", type=int, default=300,
                         help="Batch limit for --mode bench (default 300)")
     parser.add_argument("--batch-size", type=int, default=None,
@@ -73,6 +74,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gpu-ids", type=int, nargs="+", default=None,
                         help="Visible CUDA device ids for data_parallel; first id gathers outputs")
     args = parser.parse_args()
+    if args.mode in {"probe-p2", "finetune-head"} and not (args.checkpoint and args.head_plan):
+        parser.error("Frozen-encoder modes require --checkpoint and --head-plan")
     if args.eval_real_only and (args.mode != "eval" or args.eval_max_synthetic is not None):
         parser.error("--eval-real-only requires eval mode and no synthetic limit")
     if args.resume_from and args.mode != "train":
@@ -240,6 +243,30 @@ def run_one(args: argparse.Namespace) -> None:
         audit = run_audit(config)
         write_json(run_dir / "data_manifest.json", audit["data_manifest"])
         write_json(run_dir / "audit.json", audit)
+
+        if args.mode in {"probe-p2", "finetune-head"}:
+            from src.benchmark_eval import verify_checkpoint_config
+            from src.data import sha256
+            plan = json.loads(Path(args.head_plan).read_text())
+            checkpoint = Path(args.checkpoint)
+            expected = "p2_mask_x_normal_anomaly_patch" if args.mode == "probe-p2" else "p1_mask_x_normal"
+            if config.experiment_id != expected or not checkpoint.is_file():
+                raise ValueError("Wrong source model for frozen-encoder experiment")
+            payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
+            verify_checkpoint_config(payload, config.raw)
+            model = build_model(config.raw)
+            model.load_state_dict(payload["model_state_dict"], strict=True)
+            write_json(run_dir / "head_plan.json", dict(settings=plan, source=str(checkpoint),
+                       source_epoch=int(payload["epoch"]), source_sha256=sha256(checkpoint)))
+            del payload
+            set_seed(config.seed)
+            torch.set_num_threads(2)
+            model.requires_grad_(False).eval().cuda()
+            if args.mode == "probe-p2":
+                from audits.p2_frozen_classifier_20261125.probe import run
+            else:
+                from src.finetune_anomaly_head import run
+            run(model, config.raw, run_dir, plan)
 
         if args.mode == "audit":
             status["status"] = "completed"
